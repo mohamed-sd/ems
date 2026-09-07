@@ -153,16 +153,17 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </div></div>
   </form>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>العرض</th><th>النسخة</th><th>الواقعة</th><th>الطرف</th><th>النص</th>
       <th>قبل</th><th>بعد</th><th>السريان</th><th>سجلها</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
-    </tr></thead>
+    <th>رقم الواقعة</th><th>نوع السجل</th><th>رقم العرض</th><th>مرجع العقد</th><th>دورة الالتزام الجديدة</th><th>دورة الالتزام السابقة</th><th>نطاق المقارنة</th><th>التاريخ</th><th>نوع التغيير</th><th>الأثر التجاري</th><th>الوثيقة المرجعية</th><th>السبب/الدليل</th><th>الطرف الطالب</th><th>الحالة</th><th>ملاحظات</th><th>مفتاح دورة الالتزام المصدر</th><th>مستوى الحجية</th><th>أساس القيمة الرجعية</th></tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا واقعة تفاوض مسجلة بعد</td></tr>
+      <tr><td colspan="29" class="text-center text-muted">لا واقعة تفاوض مسجلة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>
@@ -175,44 +176,10 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         <td><?= $r['amount_after'] !== null ? number_format((float) $r['amount_after'], 2) : '—' ?></td>
         <td><?= htmlspecialchars((string) $r['valid_until'], ENT_QUOTES, 'UTF-8') ?: '—' ?></td>
         <td><?= (int) $r['decided_by'] ?></td>
-      </tr>
+      <?= ems_sf_cells($r, array('event_no', 'record_type', 'offer_no', 'contract_ref', 'new_commitment_cycle', 'previous_commitment_cycle', 'comparison_scope', 'date_value', 'change_type', 'commercial_impact', 'reference_document', 'reason_or_evidence', 'requesting_party', 'state', 'notes', 'source_commitment_cycle_key', 'evidence_level', 'residual_value_basis')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotation_negotiation
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الواقعة' => 'g141',
-            'نوع السجل' => 'g142',
-            'رقم العرض' => 'g143',
-            'مرجع العقد' => 'g144',
-            'دورة الالتزام الجديدة' => 'g145',
-            'دورة الالتزام السابقة' => 'g146',
-            'نطاق المقارنة' => 'g147',
-            'التاريخ' => 'g148',
-            'نوع التغيير' => 'g149',
-            'قبل' => 'g150',
-            'بعد' => 'g151',
-            'الأثر التجاري' => 'g152',
-            'الوثيقة المرجعية' => 'g153',
-            'السبب/الدليل' => 'g154',
-            'الطرف الطالب' => 'g155',
-            'الحالة' => 'g156',
-            'ملاحظات' => 'g157',
-            'مفتاح دورة الالتزام المصدر' => 'g158',
-            'مستوى الحجية' => 'g159',
-            'أساس القيمة الرجعية' => 'g160',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_quotation_negotiation');
-        echo ems_w14_grid('emsList_sal_quotation_negotiation', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التفاوض ومراجعات العرض'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <script>
 /* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».

@@ -259,6 +259,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-header"><h5><i class="fa fa-book"></i> ③ القيود المتولدة (<?php echo count($journals); ?>)</h5></div>
             <div class="card-body">
                 <?php if ($journals): ?>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>رقم القيد</th><th>الحالة</th><th>إجمالي مدين</th><th>البيان</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -279,7 +280,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               <th class="ems-gov-th" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
-              </tr></thead>
+              <th>معرف السطر</th><th>الواقعة الأصلية</th><th>الحدث الناشر</th><th>قاعدة الأثر بمصفوفة التكامل</th><th>القيد المتولد</th><th>تاريخ القيد</th><th>قيمة الأثر</th><th>زمن التأخر بين الواقعة والقيد</th><th>حالة الاتساق</th><th>مرجع المعالجة</th></tr></thead>
                     <tbody>
                     <?php foreach ($journals as $j): ?>
                         <tr>
@@ -287,7 +288,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td><?php echo htmlspecialchars($j['state']); ?></td>
                             <td><?php echo number_format(floatval($j['total_debit']), 2); ?></td>
                             <td><?php echo htmlspecialchars($j['memo'] ?? ''); ?></td>
-                        </tr>
+                        <?= ems_sf_cells($j, array('line_uid', 'original_event', 'publishing_event', 'integration_matrix_effect_rule', 'generated_entry', 'entry_date', 'effect_value', 'event_to_entry_lag', 'consistency_state', 'processing_ref')) ?></tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -334,31 +335,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g64',
-            'الواقعة الأصلية' => 'g65',
-            'الإدارة المصدر' => 'g66',
-            'الحدث الناشر' => 'g67',
-            'قاعدة الأثر بمصفوفة التكامل' => 'g68',
-            'القيد المتولد' => 'g69',
-            'تاريخ القيد' => 'g70',
-            'قيمة الأثر' => 'g71',
-            'زمن التأخر بين الواقعة والقيد' => 'g72',
-            'حالة الاتساق' => 'g73',
-            'مرجع المعالجة' => 'g74',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_effect_map');
-        echo ems_w14_grid('emsList_fina_effect_map', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تتبع الأثر من الواقعة إلى القيد'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

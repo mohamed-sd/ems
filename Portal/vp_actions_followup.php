@@ -73,8 +73,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="ems-data-table">
-            <thead><tr><th>القرار</th><th>الرافعة</th><th>النوع</th><th>البيان</th><th>الخيار المتخذ</th><th>المكلفة</th><th>مهلة التنفيذ</th><th>موعد المتابعة</th><th>الحالة</th></tr></thead>
+            <thead><tr><th>القرار</th><th>الرافعة</th><th>النوع</th><th>البيان</th><th>الخيار المتخذ</th><th>المكلفة</th><th>مهلة التنفيذ</th><th>موعد المتابعة</th><th>الحالة</th><th>Action_ID</th><th>Deputy_Role</th><th>مصدر القرار</th><th>الموضوع</th><th>الإدارة</th><th>المسؤول</th><th>Due_Date</th><th>Priority</th><th>Status</th><th>أيام التأخير</th><th>Evidence</th><th>Closure</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x0): ?>
                 <tr>
@@ -87,9 +88,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['due']) ?></td>
                     <td><?= htmlspecialchars($x0['fup']) ?></td>
                     <td><?= htmlspecialchars($x0['state']) ?></td>
-                </tr>
+                <?= ems_sf_cells($x0, array('action_uid', 'deputy_role', 'decision_source', 'subject', 'department', 'responsible', 'due_date', 'priority', 'status', 'delay_days', 'evidence', 'closure')) ?></tr>
             <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="9">لا قرارات في سجل الادارة العليا بعد</td></tr><?php endif; ?>
+            <?php if (!$rows): ?><tr><td colspan="21">لا قرارات في سجل الادارة العليا بعد</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -98,37 +99,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         سجل متابعة موحد يقرأ قرارات الادارة العليا بمصدرها الرافع ومكلفها وخيارها ومهلتي تنفيذها ومتابعتها،
         والمتجاوز يعلم بيوم القاعدة. التحديث والاقفال عند فاعلهما في شاشة القرارات الاستراتيجية ولا كتابة هنا.
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_exec_action_followup')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'Action_ID' => 'g355',
-            'Deputy_Role' => 'g7',
-            'مصدر القرار' => 'g356',
-            'الموضوع' => 'g358',
-            'الإدارة' => 'g359',
-            'المسؤول' => 'g360',
-            'Due_Date' => 'g361',
-            'Priority' => 'g362',
-            'Status' => 'g363',
-            'أيام التأخير' => 'g364',
-            'Evidence' => 'g365',
-            'Closure' => 'g366',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('exec_action_followup');
-        echo ems_w14_grid('emsList_exec_action_followup', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في متابعة قرارات النائب'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

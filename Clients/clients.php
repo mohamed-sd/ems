@@ -894,6 +894,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             <?php endif; ?>
             <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
                 <table id="clientsTable" class="display clients-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
@@ -928,7 +929,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_at'); ?>>تاريخ التسجيل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="base_currency" data-slice="3" title="عملة دفاتر الكيان">العملة الأساسية</th>
-                            </tr>
+                            <th>رقم العميل</th><th>الاسم القانوني</th><th>الاسم المختصر</th><th>أساس التصنيف</th><th>حالة العميل</th><th>القطاع</th><th>الدولة</th><th>المدينة/المنطقة</th><th>رقم التسجيل</th><th>مالك الحساب</th><th>مصدر التعرف</th><th>درجة الأولوية</th><th>التصنيف الائتماني</th><th>حد الائتمان ($)</th><th>حد الائتمان (ج.س)</th><th>شروط الدفع الافتراضية</th><th>تاريخ أول تعامل</th><th>عدد العقود</th><th>العقود الجارية</th><th>آخر نشاط تنفيذي</th><th>نماذج التعامل</th><th>ملاحظات</th><th>أنواع الخدمات</th><th>العملات المتعامل بها</th><th>دورية الفوترة بالمصدر</th><th>مستوى حجية بيانات العميل</th></tr>
                     </thead>
                     <tbody>
                         <?php
@@ -1031,7 +1032,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             // ويبقى عمودُ الحوكمةِ الأخير (`base_currency`) يحشوه JS كما كان.
                             echo ems_xf_tds($XF_SCREEN, $row, array('conn' => $conn));
 
-                            echo "</tr>";
+                            echo "" . ems_sf_cells($row, array('client_no', 'legal_name', 'short_name', 'classification_basis', 'client_state', 'sector', 'country', 'city_or_region', 'registration_no', 'account_owner', 'recognition_source', 'priority_degree', 'credit_rating', 'credit_limit_usd', 'credit_limit_sdg', 'default_payment_terms', 'first_deal_date', 'contracts_count', 'active_contracts', 'last_exec_activity', 'dealing_models', 'notes', 'service_types', 'dealt_currencies', 'source_billing_frequency', 'client_data_evidence_level')) . "</tr>";
                         }
                         ?>
                     </tbody>
@@ -1039,49 +1040,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_clients
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم العميل' => 'g88',
-            'الاسم القانوني' => 'g89',
-            'الاسم المختصر' => 'g90',
-            'تصنيف العميل' => 'g91',
-            'أساس التصنيف' => 'g92',
-            'حالة العميل' => 'g93',
-            'القطاع' => 'g94',
-            'الدولة' => 'g95',
-            'المدينة/المنطقة' => 'g96',
-            'رقم التسجيل' => 'g97',
-            'الرقم الضريبي' => 'g98',
-            'مالك الحساب' => 'g99',
-            'مصدر التعرف' => 'g100',
-            'درجة الأولوية' => 'g101',
-            'التصنيف الائتماني' => 'g102',
-            'حد الائتمان ($)' => 'g103',
-            'حد الائتمان (ج.س)' => 'g104',
-            'شروط الدفع الافتراضية' => 'g105',
-            'تاريخ أول تعامل' => 'g106',
-            'عدد العقود' => 'g107',
-            'العقود الجارية' => 'g108',
-            'آخر نشاط تنفيذي' => 'g109',
-            'نماذج التعامل' => 'g110',
-            'ملاحظات' => 'g111',
-            'أنواع الخدمات' => 'g112',
-            'العملات المتعامل بها' => 'g113',
-            'دورية الفوترة بالمصدر' => 'g114',
-            'عدد المشاريع' => 'g115',
-            'مستوى حجية بيانات العميل' => 'g116',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_clients');
-        echo ems_w14_grid('emsList_sal_clients', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل العملاء'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <!-- نافذة عرض العميل تُولَّد ديناميكياً عبر النظام الموحّد EmsDetailsModal (assets/js/ems-details-modal.js) -->

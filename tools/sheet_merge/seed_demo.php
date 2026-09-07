@@ -194,9 +194,16 @@ function live_ids(mysqli $c, $t, $company) {
 }
 
 /* ─────────────────────────────── التنفيذ ───────────────────────────────── */
+/* ⛔ **العمودُ المُعادُ استعمالُه لا يُكتَب فيه**: هو عمودُ عملٍ قائمٌ سبقت الجولةَ
+ *   (‏`contract_code` · `legal_name` · `claim_no` …) — والبذّارُ يملأ ما أنشأته
+ *   الهجرةُ وحدَه. الكتابةُ فيه تدهس بياناتِ الشاشاتِ الأخرى التي تقرؤه. */
 $byOwner = array();
 foreach ($plan as $p) {
-    foreach ($p['cols'] as $c) { $byOwner[$p['owner']][$c['col']] = $c['label']; }
+    foreach ($p['cols'] as $c) {
+        if (!empty($c['reuse'])) { continue; }
+        $byOwner[$p['owner']][$c['col']] = $c['label'];
+    }
+    if (!isset($byOwner[$p['owner']])) { $byOwner[$p['owner']] = array(); }
 }
 
 /* ◆ **آباءٌ مُمكِّنون**: جدولان خارجَ الخطةِ لكنّ صفَّين من صفوفِ الخطةِ لا يقومان
@@ -297,11 +304,19 @@ foreach ($byOwner as $tbl => $newCols) {
         continue;
     }
 
-    /* ② جدولٌ فيه صفوفٌ — تُملأ أعمدتُه الجديدةُ وحدَها */
-    $ids = live_ids($conn, $tbl, $COMPANY);
-    $r = $conn->query("SELECT id FROM `$tbl` WHERE company_id = " . (int) $COMPANY . " ORDER BY id");
+    /* ② جدولٌ فيه صفوفٌ — تُملأ أعمدتُه الجديدةُ وحدَها.
+     * ⛔ **والمفتاحُ من المخطَّطِ لا يُفترَض `id`**: `rec_applications` مفتاحُها
+     *   `app_id` و`org_units` مفتاحُها `unit_id` — واستعلامٌ بـ`id` يفشل صامتًا
+     *   فتبقى أعمدةُ الجدولِ فارغةً بلا بلاغِ خطأ. */
+    $pk = 'id';
+    $kq = $conn->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS
+                        WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='" . $conn->real_escape_string($tbl) . "'
+                          AND COLUMN_KEY='PRI' LIMIT 1");
+    if ($kq && ($kx = $kq->fetch_assoc())) { $pk = $kx['COLUMN_NAME']; }
+    $r = $conn->query("SELECT `$pk` k FROM `$tbl` WHERE company_id = " . (int) $COMPANY . " ORDER BY `$pk`");
     $ids = array();
-    if ($r) { while ($x = $r->fetch_assoc()) { $ids[] = (int) $x['id']; } }
+    if ($r) { while ($x = $r->fetch_assoc()) { $ids[] = (int) $x['k']; } }
+    else { $skipped[$tbl] = 'تعذر قراءة المفتاح: ' . $conn->error; continue; }
     foreach ($ids as $i => $id) {
         $set = array();
         foreach ($newCols as $col => $lab) {
@@ -312,7 +327,7 @@ foreach ($byOwner as $tbl => $newCols) {
         }
         if (!$set) { continue; }
         if (!$APPLY) { $filled++; continue; }
-        if ($conn->query("UPDATE `$tbl` SET " . implode(',', $set) . " WHERE id = " . (int) $id)) { $filled++; }
+        if ($conn->query("UPDATE `$tbl` SET " . implode(',', $set) . " WHERE `$pk` = " . (int) $id)) { $filled++; }
         else { $blockedRows[$tbl] = (isset($blockedRows[$tbl]) ? $blockedRows[$tbl] : 0) + 1;
                $skipped[$tbl] = 'صفوفٌ ردّها حارسُ عملٍ: ' . $conn->error; }
     }

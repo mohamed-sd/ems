@@ -175,6 +175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="ems-data-table">
             <thead>
                 <tr>
@@ -192,7 +193,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>الاقفال الشهري</th>
                     <th>الالتزام والسياسات</th>
                     <th>النزول للتفصيل</th>
-                </tr>
+                <th>وضع العرض</th><th>Deputy_Role</th><th>خارج النطاق قراءة فقط</th><th>KPI</th><th>Pending_Requests</th><th>Overdue_Actions</th><th>Critical_Risks</th><th>Budget_Status</th><th>Daily_Report_Status</th><th>Monthly_Close_Status</th><th>Compliance_Status</th><th>رابط النزول</th></tr>
             </thead>
             <tbody>
             <?php foreach ($rows as $x0): ?>
@@ -211,10 +212,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['close']) ?></td>
                     <td><?= htmlspecialchars($x0['comp']) ?></td>
                     <td><a href="<?= htmlspecialchars($x0['link']) ?>">لوحة الادارات</a></td>
-                </tr>
+                <?= ems_sf_cells($x0, array('offer_status', 'deputy_role', 'out_of_scope_read_only', 'kpi', 'pending_requests', 'overdue_actions', 'critical_risks', 'budget_status', 'daily_report_status', 'monthly_close_status', 'compliance_status', 'download_link')) ?></tr>
             <?php endforeach; ?>
             <?php if (!$rows): ?>
-                <tr><td colspan="14"><?= $mode === 'my' ? 'لا ادارة ضمن نطاق نيابتك المسجل في سجل التكليفات. بدل وضع العرض الى كل الادارات قراءة' : 'لا ادارات نشطة مسجلة' ?></td></tr>
+                <tr><td colspan="26"><?= $mode === 'my' ? 'لا ادارة ضمن نطاق نيابتك المسجل في سجل التكليفات. بدل وضع العرض الى كل الادارات قراءة' : 'لا ادارات نشطة مسجلة' ?></td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -228,36 +229,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         والالتزام من سياسات الادارة السارية. وما لا مصدر له منسوبا بعد يصرح بذلك ولا يختلق له رقم.
         قراءة صرف ولا ادخال من هذه الشاشة.
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف البطاقة' => 'g17',
-            'وضع العرض' => 'g8',
-            'Deputy_Role' => 'g9',
-            'الإدارة' => 'g10',
-            'التبعية التنظيمية' => 'g21',
-            'ضمن نطاقي؟' => 'g11',
-            'خارج النطاق قراءة فقط' => 'g12',
-            'KPI' => 'g24',
-            'Pending_Requests' => 'g13',
-            'Overdue_Actions' => 'g28',
-            'Critical_Risks' => 'g14',
-            'Budget_Status' => 'g29',
-            'Daily_Report_Status' => 'g31',
-            'Monthly_Close_Status' => 'g33',
-            'Compliance_Status' => 'g30',
-            'رابط النزول' => 'g34',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('exec_org_project');
-        echo ems_w14_grid('emsList_exec_org_project', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإدارات نطاقي والشركة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

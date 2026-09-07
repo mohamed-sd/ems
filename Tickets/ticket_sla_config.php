@@ -172,7 +172,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<td>" . htmlspecialchars((string)$row['response_hours']) . "</td>";
                 echo "<td>" . htmlspecialchars((string)$row['resolution_hours']) . "</td>";
                 echo "<td>" . htmlspecialchars($row['remind_before_hours'] !== null ? (string)$row['remind_before_hours'] : '—') . "</td>";
-                echo "<td>" . tkt_active_badge($row['active']) . "</td>" . "<td>" . ems_sf($row, 'line_uid') . "</td>" . "<td>" . ems_sf($row, 'report_type') . "</td>" . "<td>" . ems_sf($row, 'responsible_department') . "</td>" . "<td>" . ems_sf($row, 'response_sla') . "</td>" . "<td>" . ems_sf($row, 'resolution_sla') . "</td>" . "<td>" . ems_sf($row, 'escalation_ladder') . "</td>" . "<td>" . ems_sf($row, 'matrix_effective_from') . "</td>" . "<td>" . ems_sf($row, 'line_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+                echo "<td>" . tkt_active_badge($row['active']) . "</td>" . ems_sf_cells($row, array('line_uid', 'report_type', 'responsible_department', 'response_sla', 'resolution_sla', 'escalation_ladder', 'matrix_effective_from', 'line_state', 'creator_name', 'data_state', 'source_ref')) . "</tr>";
             }
             ?>
             </tbody>

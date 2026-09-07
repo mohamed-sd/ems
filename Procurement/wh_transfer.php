@@ -137,7 +137,7 @@ echo ems_states_bundle('لا تحويلات بين المخازن بعد',
           <td><?= htmlspecialchars($m2['wh'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars($m2['move_type'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= floatval($m2['qty']) ?></td>
-          <td><?= htmlspecialchars($m2['note'], ENT_QUOTES, 'UTF-8') ?></td><td><?= ems_sf($m2, 'order_date') ?></td><td><?= ems_sf($m2, 'items_count_ref_kh09_2') ?></td><td><?= ems_sf($m2, 'transfer_justification') ?></td><td><?= ems_sf($m2, 'transport_mode') ?></td><td><?= ems_sf($m2, 'gate_pass') ?></td><td><?= ems_sf($m2, 'receipt_note') ?></td><td><?= ems_sf($m2, 'receipt_match') ?></td><td><?= ems_sf($m2, 'order_state') ?></td><td><?= ems_sf($m2, 'creator_name') ?></td><td><?= ems_sf($m2, 'data_state') ?></td><td><?= ems_sf($m2, 'source_ref') ?></td></tr>
+          <td><?= htmlspecialchars($m2['note'], ENT_QUOTES, 'UTF-8') ?></td><?= ems_sf_cells($m2, array('order_date', 'items_count_ref_kh09_2', 'transfer_justification', 'transport_mode', 'gate_pass', 'receipt_note', 'receipt_match', 'order_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?></tbody>
   </table>
 

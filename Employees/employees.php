@@ -1010,7 +1010,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
                         echo "<td>" . $classificationBadge . "</td>";
                         echo "<td>" . $statusBadge . "</td>";
-                        echo "" . "<td>" . ems_sf($row, 'employee_no') . "</td>" . "<td>" . ems_sf($row, 'national_id') . "</td>" . "<td>" . ems_sf($row, 'type') . "</td>" . "<td>" . ems_sf($row, 'marital_status') . "</td>" . "<td>" . ems_sf($row, 'commencement_date') . "</td>" . "<td>" . ems_sf($row, 'is_operational_operator') . "</td>" . "<td>" . ems_sf($row, 'workforce_operator_code') . "</td>" . "<td>" . ems_sf($row, 'contact_details') . "</td>" . "<td>" . ems_sf($row, 'emergency_contact') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+                        echo "" . ems_sf_cells($row, array('employee_no', 'national_id', 'type', 'marital_status', 'commencement_date', 'is_operational_operator', 'workforce_operator_code', 'contact_details', 'emergency_contact', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
                     } }
                     ?>
                 </tbody>

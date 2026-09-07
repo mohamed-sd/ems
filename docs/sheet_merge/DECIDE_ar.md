@@ -9,127 +9,15 @@
 
 | المجموعة | العدد |
 |---|---:|
-| أ · ترجيحي حاضرٌ — يكفي «نعم» أو تصحيحُ الاسم | **13** |
-| ب · اختر من المرشَّحين | **21** |
+| أ · ترجيحي حاضرٌ — يكفي «نعم» أو تصحيحُ الاسم | **2** |
+| ب · اختر من المرشَّحين | **7** |
 | ج · لا مرشَّحَ من الشيفرة — تحتاج معرفتَك بالنظام | **16** |
 
 ---
 
 ## أ · ترجيحي حاضرٌ — يكفي «نعم» أو تصحيحُ الاسم
 
-### 1. `Clients/clients.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Clients/client_contacts.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **29** |
-| القوقعةُ الحاليّة | `sal_clients` |
-| ترجيحي | **`clients`** |
-| الجداولُ التي تقرأ منها الصفحة | `clients` (91) · `project` (125) · `operations` (478) · `equipment_drivers` (34) · `users` (80) |
-
-**قرارك:** `________________________`
-
----
-
-### 2. `Clients/quotation_negotiation.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Clients/quotations.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **20** |
-| القوقعةُ الحاليّة | `sal_quotation_negotiation` |
-| ترجيحي | **`quotations`** |
-| الجداولُ التي تقرأ منها الصفحة | `sal_quotation_revisions` (0) · `quotations` (141) |
-
-**قرارك:** `________________________`
-
----
-
-### 3. `Clients/quotations.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Clients/quotation_negotiation.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **26** |
-| القوقعةُ الحاليّة | `sal_quotations` |
-| ترجيحي | **`quotations`** |
-| الجداولُ التي تقرأ منها الصفحة | `quotations` (141) · `clients` (91) · `opportunities` (23) · `users` (80) |
-
-**قرارك:** `________________________`
-
----
-
-### 4. `Contracts/claims.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ وبلا منازع |
-| حقولٌ ستُضاف | **25** |
-| القوقعةُ الحاليّة | `sal_claims` |
-| ترجيحي | **`claims`** |
-| الجداولُ التي تقرأ منها الصفحة | `clients` (91) · `project` (125) · `claims` (300) · `contracts` (121) · `fin_tax_codes` (20) |
-
-**قرارك:** `________________________`
-
----
-
-### 5. `Finance/bank_reconciliation_fin.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ وبلا منازع |
-| حقولٌ ستُضاف | **16** |
-| القوقعةُ الحاليّة | `tre_bank_reconciliation_fin` |
-| ترجيحي | **`fin_bank_accounts`** |
-| الجداولُ التي تقرأ منها الصفحة | `fin_bank_statement_lines` (2) · `fin_payments` (1118) · `fin_bank_accounts` (20) · `tre_recon_difference` (0) |
-
-**قرارك:** `________________________`
-
----
-
-### 6. `Maintenance/preventive_plans.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ وبلا منازع |
-| حقولٌ ستُضاف | **18** |
-| القوقعةُ الحاليّة | `mnt_preventive_plans` |
-| ترجيحي | **`mnt_plan`** |
-| الجداولُ التي تقرأ منها الصفحة | `equipments` (219) · `equipments_types` (30) · `mnt_plan_task` (20) · `mnt_lookup` (20) · `mnt_plan` (20) · `mnt_order` (22) |
-
-**قرارك:** `________________________`
-
----
-
-### 7. `Procurement/proc_packages.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ وبلا منازع |
-| حقولٌ ستُضاف | **23** |
-| القوقعةُ الحاليّة | `prc_proc_packages · prc_package_lines` |
-| ترجيحي | **`proc_package`** |
-| الجداولُ التي تقرأ منها الصفحة | `proc_package` (0) · `proc_package_member` (0) · `proc_request` (26) |
-
-**قرارك:** `________________________`
-
----
-
-### 8. `Procurement/proc_po_amendments.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ وبلا منازع |
-| حقولٌ ستُضاف | **17** |
-| القوقعةُ الحاليّة | `prc_proc_po_amendments` |
-| ترجيحي | **`proc_po_amendment`** |
-| الجداولُ التي تقرأ منها الصفحة | `proc_po_amendment` (0) · `proc_order` (22) · `proc_award` (0) |
-
-**قرارك:** `________________________`
-
----
-
-### 9. `Procurement/proc_rfq.php`
+### 1. `Procurement/proc_rfq.php`
 
 | | |
 |---|---|
@@ -143,49 +31,7 @@
 
 ---
 
-### 10. `Tickets/ticket_form.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Tickets/tickets_list.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **27** |
-| القوقعةُ الحاليّة | `tkt_ticket_form` |
-| ترجيحي | **`tickets`** |
-| الجداولُ التي تقرأ منها الصفحة | `ticket_events` (309) · `ticket_attachments` (20) · `tickets` (66) · `ticket_transfers` (23) · `ticket_categories` (21) |
-
-**قرارك:** `________________________`
-
----
-
-### 11. `Tickets/tickets_list.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Tickets/ticket_form.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **14** |
-| القوقعةُ الحاليّة | `tkt_tickets_list` |
-| ترجيحي | **`tickets`** |
-| الجداولُ التي تقرأ منها الصفحة | `tickets` (66) · `ticket_workstreams` (131) · `ticket_types` (20) · `equipments` (219) · `project` (125) · `ticket_categories` (21) |
-
-**قرارك:** `________________________`
-
----
-
-### 12. `Transport/transfer_order_form.php`
-
-| | |
-|---|---|
-| ملاحظة | ترجيحي واضحٌ لكن `Transport/transfer_dashboard.php` تطالب بالجدولِ نفسِه |
-| حقولٌ ستُضاف | **25** |
-| القوقعةُ الحاليّة | `trp_transfer_order_form` |
-| ترجيحي | **`transfer_orders`** |
-| الجداولُ التي تقرأ منها الصفحة | `trs_locations` (20) · `equipments` (219) · `employees` (373) · `transfer_cost_lines` (39) · `transfer_orders` (20) · `transfer_types` (20) |
-
-**قرارك:** `________________________`
-
----
-
-### 13. `Workforce/worker_worklog.php`
+### 2. `Workforce/worker_worklog.php`
 
 | | |
 |---|---|
@@ -201,35 +47,7 @@
 
 ## ب · اختر من المرشَّحين
 
-### 14. `Contracts/collections.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **10** |
-| القوقعةُ الحاليّة | `fina_collections` |
-| ترجيحي | **`clients`** |
-| الجداولُ التي تقرأ منها الصفحة | `clients` (91) · `fin_payments` (1118) |
-
-**قرارك:** `________________________`
-
----
-
-### 15. `FinRequests/effect_map.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **11** |
-| القوقعةُ الحاليّة | `fina_effect_map` |
-| ترجيحي | **`fin_event_links`** |
-| الجداولُ التي تقرأ منها الصفحة | `fin_event_links` (10519) · `fin_journal_entries` (6713) · `fin_payments` (1118) · `fin_dues` (23) |
-
-**قرارك:** `________________________`
-
----
-
-### 16. `Finance/cfo_daily_board_fin.php`
+### 3. `Finance/cfo_daily_board_fin.php`
 
 | | |
 |---|---|
@@ -243,7 +61,7 @@
 
 ---
 
-### 17. `Finance/financial_statements_fin.php`
+### 4. `Finance/financial_statements_fin.php`
 
 | | |
 |---|---|
@@ -257,49 +75,7 @@
 
 ---
 
-### 18. `Finance/journal_form_fin.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **21** |
-| القوقعةُ الحاليّة | `fina_journal_form_fin` |
-| ترجيحي | **`fin_journal_lines`** |
-| الجداولُ التي تقرأ منها الصفحة | `fin_journal_lines` (13426) · `fin_financial_events` (5256) · `fin_journal_entries` (6713) |
-
-**قرارك:** `________________________`
-
----
-
-### 19. `Finance/tax_fin.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **14** |
-| القوقعةُ الحاليّة | `fina_tax_fin` |
-| ترجيحي | **`fin_tax_transactions`** |
-| الجداولُ التي تقرأ منها الصفحة | `fin_tax_transactions` (20) · `fin_tax_codes` (20) |
-
-**قرارك:** `________________________`
-
----
-
-### 20. `Finance/tre_beneficiary.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **14** |
-| القوقعةُ الحاليّة | `tre_beneficiary` |
-| ترجيحي | **`tre_beneficiaries`** |
-| الجداولُ التي تقرأ منها الصفحة | `tre_beneficiaries` (0) |
-
-**قرارك:** `________________________`
-
----
-
-### 21. `Finance/tre_liquidity_board.php`
+### 5. `Finance/tre_liquidity_board.php`
 
 | | |
 |---|---|
@@ -313,21 +89,7 @@
 
 ---
 
-### 22. `Fleet/asset_full_history.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **14** |
-| القوقعةُ الحاليّة | `flt_asset_full_history` |
-| ترجيحي | **`equipments`** |
-| الجداولُ التي تقرأ منها الصفحة | `equipments` (219) · `project` (125) · `fleet_equipment_history` (37) · `asset_hour_reconciliations` (363) |
-
-**قرارك:** `________________________`
-
----
-
-### 23. `Portal/my_portal.php`
+### 6. `Portal/my_portal.php`
 
 | | |
 |---|---|
@@ -341,7 +103,7 @@
 
 ---
 
-### 24. `Portal/my_tasks.php`
+### 7. `Portal/my_tasks.php`
 
 | | |
 |---|---|
@@ -355,35 +117,7 @@
 
 ---
 
-### 25. `Portal/vp_actions_followup.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **12** |
-| القوقعةُ الحاليّة | `exec_action_followup` |
-| ترجيحي | **`exec_decisions`** |
-| الجداولُ التي تقرأ منها الصفحة | `exec_decisions` (30) |
-
-**قرارك:** `________________________`
-
----
-
-### 26. `Portal/vp_departments.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **16** |
-| القوقعةُ الحاليّة | `exec_org_project` |
-| ترجيحي | **`org_assignment_types`** |
-| الجداولُ التي تقرأ منها الصفحة | `org_assignment_types` (14) · `org_assignments` (87) · `org_units` (24) · `fin_requests` (23) · `risk_register` (20) · `exec_dept_caps` (20) |
-
-**قرارك:** `________________________`
-
----
-
-### 27. `Portal/vp_pending_actions.php`
+### 8. `Portal/vp_pending_actions.php`
 
 | | |
 |---|---|
@@ -397,7 +131,7 @@
 
 ---
 
-### 28. `Procurement/dashboard_proc.php`
+### 9. `Procurement/dashboard_proc.php`
 
 | | |
 |---|---|
@@ -411,93 +145,9 @@
 
 ---
 
-### 29. `Procurement/stock_proc.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **9** |
-| القوقعةُ الحاليّة | `wh_stock_proc` |
-| ترجيحي | **`proc_stock_move`** |
-| الجداولُ التي تقرأ منها الصفحة | `proc_warehouse` (20) · `proc_stock_move` (25) · `proc_item` (21) · `proc_stock_state` (0) · `admin_companies` (2) |
-
-**قرارك:** `________________________`
-
----
-
-### 30. `Procurement/wh_count.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **16** |
-| القوقعةُ الحاليّة | `wh_count` |
-| ترجيحي | **`proc_warehouse`** |
-| الجداولُ التي تقرأ منها الصفحة | `proc_count_session` (0) · `proc_count_line` (0) · `proc_warehouse` (20) · `proc_item` (21) · `proc_stock_move` (25) |
-
-**قرارك:** `________________________`
-
----
-
-### 31. `Risk/risk_reports.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **9** |
-| القوقعةُ الحاليّة | `rsk_risk_reports` |
-| ترجيحي | **`risk_register`** |
-| الجداولُ التي تقرأ منها الصفحة | `risk_register` (20) · `risk_controls` (20) · `risk_export_log` (20) · `risk_units` (12) · `users` (80) |
-
-**قرارك:** `________________________`
-
----
-
-### 32. `Transport/transfer_in_transit.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **14** |
-| القوقعةُ الحاليّة | `trp_transfer_in_transit` |
-| ترجيحي | **`transfer_orders`** |
-| الجداولُ التي تقرأ منها الصفحة | `transfer_orders` (20) · `trs_locations` (20) · `transfer_events` (20) · `trp_trip_leg` (0) · `equipments` (219) · `employees` (373) |
-
-**قرارك:** `________________________`
-
----
-
-### 33. `Transport/transfer_orders_report.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **10** |
-| القوقعةُ الحاليّة | `trp_transfer_orders_report` |
-| ترجيحي | **`trp_kpi_period`** |
-| الجداولُ التي تقرأ منها الصفحة | `trp_kpi_period` (11) |
-
-**قرارك:** `________________________`
-
----
-
-### 34. `Workforce/recruitment_pipeline.php`
-
-| | |
-|---|---|
-| ملاحظة | اختر من المرشَّحين |
-| حقولٌ ستُضاف | **21** |
-| القوقعةُ الحاليّة | `hr_recruitment_pipeline` |
-| ترجيحي | **`rec_applications`** |
-| الجداولُ التي تقرأ منها الصفحة | `rec_applications` (32) · `rec_vacancies` (20) |
-
-**قرارك:** `________________________`
-
----
-
 ## ج · لا مرشَّحَ من الشيفرة — تحتاج معرفتَك بالنظام
 
-### 35. `Clients/client_contacts.php`
+### 10. `Clients/client_contacts.php`
 
 | | |
 |---|---|
@@ -511,7 +161,7 @@
 
 ---
 
-### 36. `Contracts/commercial_board.php`
+### 11. `Contracts/commercial_board.php`
 
 | | |
 |---|---|
@@ -525,7 +175,7 @@
 
 ---
 
-### 37. `Fleet/fleet_schema_matrix.php`
+### 12. `Fleet/fleet_schema_matrix.php`
 
 | | |
 |---|---|
@@ -539,7 +189,7 @@
 
 ---
 
-### 38. `Maintenance/dashboard_mnt.php`
+### 13. `Maintenance/dashboard_mnt.php`
 
 | | |
 |---|---|
@@ -553,7 +203,7 @@
 
 ---
 
-### 39. `Maintenance/workshop.php`
+### 14. `Maintenance/workshop.php`
 
 | | |
 |---|---|
@@ -567,7 +217,7 @@
 
 ---
 
-### 40. `Operations/attendance.php`
+### 15. `Operations/attendance.php`
 
 | | |
 |---|---|
@@ -581,7 +231,7 @@
 
 ---
 
-### 41. `Operations/monthly_close.php`
+### 16. `Operations/monthly_close.php`
 
 | | |
 |---|---|
@@ -595,7 +245,7 @@
 
 ---
 
-### 42. `Operations/site_gate_equip.php`
+### 17. `Operations/site_gate_equip.php`
 
 | | |
 |---|---|
@@ -609,7 +259,7 @@
 
 ---
 
-### 43. `Portal/my_achievement.php`
+### 18. `Portal/my_achievement.php`
 
 | | |
 |---|---|
@@ -623,7 +273,7 @@
 
 ---
 
-### 44. `Portal/vp_dashboard.php`
+### 19. `Portal/vp_dashboard.php`
 
 | | |
 |---|---|
@@ -637,7 +287,7 @@
 
 ---
 
-### 45. `Tickets/gov_dept_crp.php`
+### 20. `Tickets/gov_dept_crp.php`
 
 | | |
 |---|---|
@@ -651,7 +301,7 @@
 
 ---
 
-### 46. `Tickets/ticket_contextual_open.php`
+### 21. `Tickets/ticket_contextual_open.php`
 
 | | |
 |---|---|
@@ -665,7 +315,7 @@
 
 ---
 
-### 47. `Transport/transfer_dashboard.php`
+### 22. `Transport/transfer_dashboard.php`
 
 | | |
 |---|---|
@@ -679,7 +329,7 @@
 
 ---
 
-### 48. `Transport/transfer_fleet.php`
+### 23. `Transport/transfer_fleet.php`
 
 | | |
 |---|---|
@@ -693,7 +343,7 @@
 
 ---
 
-### 49. `Workforce/project_contracts.php`
+### 24. `Workforce/project_contracts.php`
 
 | | |
 |---|---|
@@ -707,7 +357,7 @@
 
 ---
 
-### 50. `user_capacities.php`
+### 25. `user_capacities.php`
 
 | | |
 |---|---|

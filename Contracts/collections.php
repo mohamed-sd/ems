@@ -205,6 +205,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
         </form>
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display nowrap col-table">
             <thead><tr><th>مرجع التفويض</th><th>المبلغ</th><th>المحصل</th><th>المتبقي</th>
                 <th>العمر (يوم)</th><th>الحالة</th>
@@ -233,7 +234,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                </tr></thead>
+                <th>معرف السطر</th><th>رقم العميل</th><th>رقم المشروع</th><th>إجمالي الذمة</th><th>قيمة الشريحة</th><th>آخر تحصيل</th><th>إجراء المطالبة</th></tr></thead>
             <tbody>
             <?php foreach ($ageing as $r):
                 $age = intval($r['age_days']);
@@ -249,7 +250,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><strong><?php echo htmlspecialchars((string)$r['outstanding']); ?></strong></td>
                     <td><span class="badge <?php echo $cls; ?>"><?php echo $age; ?></span></td>
                     <td><?php echo htmlspecialchars((string)$r['state']); ?></td>
-                </tr>
+                <?= ems_sf_cells($r, array('line_uid', 'client_no', 'project_no', 'total_receivable', 'bracket_value', 'last_collection', 'claim_action')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -445,30 +446,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endif; ?>
         <?php endif; ?>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g143',
-            'رقم العميل' => 'g144',
-            'رقم المشروع' => 'g145',
-            'إجمالي الذمة' => 'g146',
-            'شريحة العمر' => 'g147',
-            'قيمة الشريحة' => 'g148',
-            'حالة التحصيل' => 'g149',
-            'إتاحة النقد للاستخدام' => 'g150',
-            'آخر تحصيل' => 'g151',
-            'إجراء المطالبة' => 'g152',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_collections');
-        echo ems_w14_grid('emsList_fina_collections', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ذمم العملاء وأعمارها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

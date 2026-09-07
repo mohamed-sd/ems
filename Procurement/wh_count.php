@@ -128,6 +128,7 @@ echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار'
   <?php /* INJ-0564: كان الجدولُ لا يُصيَّر إلا بعد اختيارِ مخزنٍ — فالشاشةُ تُفتح
            بلا جدولٍ ولا تفسير. صار يُصيَّر دائمًا: الحالةُ الفارغةُ المشتركةُ
            تشرح ما ينقص (اختيارُ مخزن). */ ?>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم الصنف</th><th>الدفتري (محسوب من الحركات)</th><th>الفعلي المجرود</th><th>سبب الفرق</th><th>قرار التسوية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -161,7 +162,7 @@ echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار'
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              </tr></thead>
+              <th>معرف الجلسة</th><th>لجنة الجرد</th><th>عدد الأصناف المجرودة</th><th>بنود الفروق تفصيلها خ10-2</th><th>مرجع التحقيق</th><th>حالة الجلسة</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody>
     <?php foreach ($rows as $it): ?>
       <tr>
@@ -175,7 +176,7 @@ echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار'
           <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سبب الفرق" aria-label="سبب الفرق"></td>
           <td><button class="action-btn" type="submit">سو</button></td>
         </form>
-      </tr>
+      <?= ems_sf_cells($it, array('session_uid', 'count_committee', 'counted_items_count', 'variance_items_ref_kh10_2', 'investigation_ref', 'session_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
@@ -225,34 +226,4 @@ echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار'
     <?php endif; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_count
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الجلسة' => 'g79',
-            'المخزن' => 'g80',
-            'أسلوب الجرد' => 'g81',
-            'تاريخ الجرد' => 'g82',
-            'لجنة الجرد' => 'g83',
-            'عدد الأصناف المجرودة' => 'g84',
-            'بنود الفروق تفصيلها خ10-2' => 'g85',
-            'مرجع التحقيق' => 'g86',
-            'حالة الجلسة' => 'g87',
-            'المنشئ' => 'g88',
-            'تاريخ الإنشاء' => 'g89',
-            'المراجع' => 'g90',
-            'المعتمد' => 'g91',
-            'تاريخ الاعتماد' => 'g92',
-            'حالة البيانات' => 'g93',
-            'مرجع المصدر' => 'g94',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_count');
-        echo ems_w14_grid('emsList_wh_count', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الجرد ومعالجة الفروقات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

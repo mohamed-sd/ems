@@ -518,6 +518,7 @@ function mnt_opt($value, $label, $selected) {
 
     <div class="card"><div class="card-body">
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="mntTable" class="display nowrap alltables no-datatable mnt-pl-w100" data-order='[[1, "desc"]]' data-state-save="false" data-scroll-x="1">
                 <thead><tr><th>الإجراءات</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الفاصل</th><th>الاستحقاق القادم</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -541,7 +542,7 @@ function mnt_opt($value, $label, $selected) {
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              </tr></thead>
+              <th>معرف السطر</th><th>كود المعدة</th><th>نوع المعدة</th><th>مصدر الفاصل</th><th>دورة الوقائية</th><th>فاصل الأصل المخصص</th><th>ساعات الدورة</th><th>قراءة آخر وقائية</th><th>قراءة العداد الحالية</th><th>المتبقي للاستحقاق</th><th>تاريخ الاستحقاق المتوقع</th><th>بنود الدورة القياسية</th><th>حالة الاستحقاق</th><th>رقم الأمر المتولد</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                     <?php foreach ($rows as $row):
                         $st = (string) $row['state'];
@@ -573,51 +574,13 @@ function mnt_opt($value, $label, $selected) {
                         $due = $row['trigger_basis'] === 'ساعات' ? (string) ($row['next_due_meter'] ?? '-') : (string) ($row['next_due_date'] ?? '-');
                         echo "<td>" . htmlspecialchars($due) . "</td>";
                         echo "<td><span class='action-btn'>" . htmlspecialchars((string) $row['state']) . "</span></td>";
-                        echo "</tr>";
+                        echo "" . ems_sf_cells($row, array('line_uid', 'equipment_code', 'equipment_type', 'cutoff_source', 'preventive_cycle', 'allocated_asset_cutoff', 'cycle_hours', 'last_preventive_meter', 'current_meter_reading', 'remaining_to_due', 'expected_due_date', 'standard_cycle_items', 'due_state', 'generated_order_no', 'creator_name', 'data_state', 'source_ref')) . "</tr>";
                     endforeach; ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_preventive_plans"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_preventive_plans
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g76',
-            'كود المعدة' => 'g77',
-            'نوع المعدة' => 'g78',
-            'مصدر الفاصل' => 'g79',
-            'دورة الوقائية' => 'g80',
-            'فاصل الأصل المخصص' => 'g81',
-            'ساعات الدورة' => 'g82',
-            'قراءة آخر وقائية' => 'g83',
-            'قراءة العداد الحالية' => 'g84',
-            'المتبقي للاستحقاق' => 'g85',
-            'تاريخ الاستحقاق المتوقع' => 'g86',
-            'بنود الدورة القياسية' => 'g87',
-            'حالة الاستحقاق' => 'g88',
-            'رقم الأمر المتولد' => 'g89',
-            'المنشئ' => 'g90',
-            'تاريخ الإنشاء' => 'g91',
-            'حالة البيانات' => 'g92',
-            'مرجع المصدر' => 'g93',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_preventive_plans');
-        echo ems_w14_grid('emsList_mnt_preventive_plans', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الخطة الوقائية بالساعات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 <?php endif; ?>
 </div>
 

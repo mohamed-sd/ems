@@ -201,7 +201,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if ($V('created_at')): ?>
                     <td><?php echo htmlspecialchars((string) $x['created_at']); ?></td><?php endif; ?>
                     <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['id']; ?>">ملف الخطر</a></td>
-                <td><?= ems_sf($x, 'risk_uid') ?></td><td><?= ems_sf($x, 'risk_title') ?></td><td><?= ems_sf($x, 'classification_node') ?></td><td><?= ems_sf($x, 'family') ?></td><td><?= ems_sf($x, 'identification_source') ?></td><td><?= ems_sf($x, 'source_event_key') ?></td><td><?= ems_sf($x, 'affected_entity') ?></td><td><?= ems_sf($x, 'entity_ref') ?></td><td><?= ems_sf($x, 'affected_operating_unit') ?></td><td><?= ems_sf($x, 'risk_description') ?></td><td><?= ems_sf($x, 'risk_owner') ?></td><td><?= ems_sf($x, 'identification_date') ?></td><td><?= ems_sf($x, 'last_assessment') ?></td><td><?= ems_sf($x, 'current_residual_level') ?></td><td><?= ems_sf($x, 'risk_state') ?></td><td><?= ems_sf($x, 'creator_name') ?></td><td><?= ems_sf($x, 'reviewer') ?></td><td><?= ems_sf($x, 'approver') ?></td><td><?= ems_sf($x, 'approval_date') ?></td><td><?= ems_sf($x, 'data_state') ?></td><td><?= ems_sf($x, 'source_ref') ?></td></tr>
+                <?= ems_sf_cells($x, array('risk_uid', 'risk_title', 'classification_node', 'family', 'identification_source', 'source_event_key', 'affected_entity', 'entity_ref', 'affected_operating_unit', 'risk_description', 'risk_owner', 'identification_date', 'last_assessment', 'current_residual_level', 'risk_state', 'creator_name', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>

@@ -86,7 +86,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['events_count']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'stage_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'stage_sequence') ?></td><td><?= ems_sf($r, 'assigned_carrier') ?></td><td><?= ems_sf($r, 'driver') ?></td><td><?= ems_sf($r, 'estimated_distance') ?></td><td><?= ems_sf($r, 'stage_handover_to_next') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('stage_uid', 'order_no', 'stage_sequence', 'assigned_carrier', 'driver', 'estimated_distance', 'stage_handover_to_next', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="23">لا مراحل رحلة مسجلة.</td></tr>
         <?php endif; ?>

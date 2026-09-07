@@ -9,54 +9,80 @@
 ⛔ **ولا يُحذف جدولٌ منها قبلَ فحصَين**: أن لا يذكرَه المصدرُ (‏`grep`)،
 وأن يكون خاليًا من صفٍّ لم تكتبه أداةُ التوليد.
 
-## ① المرشَّحةُ للحذف — 44 جدولًا
+## ① المرشَّحةُ للحذف — 70 جدولًا
 
 | # | الشاشة | جدولُ القوقعةِ (يُحذف) | الجدولُ الحقيقيُّ الذي حلَّ محلَّه | أعمدةٌ نُقلت |
 |---:|---|---|---|---:|
 | 1 | `Approvals/hours_approval.php` | **`ops_hours_approval`** | `timesheet_approvals` | 19 |
-| 2 | `Contracts/contracts.php` | **`sal_contracts`** | `contracts` | 43 |
-| 3 | `Employees/employee_contracts.php` | **`hr_employee_contracts`** | `employee_contracts` | 14 |
-| 4 | `Employees/employees.php` | **`hr_employees`** | `employees` | 14 |
-| 5 | `FinRequests/request_form.php` | **`my_requests`** | `fin_requests` | 10 |
-| 6 | `Finance/currencies_fin.php` | **`fina_currencies`** | `fin_currencies` | 9 |
-| 7 | `Finance/dues_fin.php` | **`fina_dues`** | `fin_dues` | 12 |
-| 8 | `Finance/periods_fin.php` | **`fina_periods_fin`** | `fin_financial_periods` | 16 |
-| 9 | `Finance/tre_pay_batch.php` | **`tre_pay_batch`** | `tre_pay_batches` | 21 |
-| 10 | `Maintenance/breakdown_intake.php` | **`mnt_breakdown_intake`** | `mnt_breakdown` | 42 |
-| 11 | `Maintenance/external_repairs.php` | **`mnt_external_repairs`** | `mnt_external_repair` | 8 |
-| 12 | `Maintenance/mnt_kpis.php` | **`mnt_kpis`** | `mnt_kpi_period` | 4 |
-| 13 | `Maintenance/part_requests.php` | **`mnt_part_requests`** | `mnt_part_request` | 8 |
-| 14 | `Maintenance/repeat_repairs.php` | **`mnt_repeat_repairs`** | `mnt_repeat_repair` | 13 |
-| 15 | `Operations/monthly_plan.php` | **`ops_monthly_plan`** | `scr_op_monthly` | 25 |
-| 16 | `Opportunities/client_need_rfq.php` | **`sal_client_need_rfq`** | `sal_client_needs` | 27 |
-| 17 | `Portal/vp_approval_inbox.php` | **`exec_request_queue`** | `exec_approvals` | 19 |
-| 18 | `Procurement/orders_proc.php` | **`prc_orders_proc`** | `proc_order` | 14 |
-| 19 | `Procurement/proc_award_minutes.php` | **`prc_proc_award_minutes`** | `proc_award` | 16 |
-| 20 | `Procurement/proc_delivery_track.php` | **`prc_proc_delivery_track`** | `proc_delivery_event` | 12 |
-| 21 | `Procurement/proc_offers.php` | **`prc_proc_offers`** | `proc_offer` | 25 |
-| 22 | `Procurement/proc_offers.php` | **`prc_offer_compare`** | `proc_offer` | 25 |
-| 23 | `Procurement/proc_supplier_eval.php` | **`prc_proc_supplier_eval`** | `proc_supplier_eval` | 9 |
-| 24 | `Procurement/requests_proc.php` | **`prc_requests`** | `proc_request` | 11 |
-| 25 | `Procurement/warehouses.php` | **`wh_warehouses`** | `proc_warehouse` | 16 |
-| 26 | `Procurement/wh_hazmat.php` | **`wh_hazmat`** | `proc_hazmat_control` | 16 |
-| 27 | `Procurement/wh_issue_requests.php` | **`wh_issue_request_lines`** | `proc_issue_request` | 20 |
-| 28 | `Procurement/wh_issue_requests.php` | **`wh_issue_requests`** | `proc_issue_request` | 20 |
-| 29 | `Procurement/wh_month_close.php` | **`wh_month_close`** | `proc_wh_close` | 17 |
-| 30 | `Procurement/wh_transfer.php` | **`wh_transfer`** | `proc_transfer` | 11 |
-| 31 | `Projects/projects.php` | **`sal_projects`** | `project` | 21 |
-| 32 | `Risk/risk_register.php` | **`rsk_risk_register`** | `risk_register` | 21 |
-| 33 | `Risk/risk_treatments.php` | **`rsk_risk_treatments`** | `risk_treatments` | 15 |
-| 34 | `Tickets/ticket_sla_config.php` | **`tkt_ticket_sla_config`** | `ticket_sla_policies` | 11 |
-| 35 | `Timesheet/timesheet.php` | **`ops_timesheet`** | `timesheet` | 34 |
-| 36 | `Transport/transfer_closure.php` | **`trp_transfer_closure`** | `trp_closure` | 11 |
-| 37 | `Transport/transfer_damage_claims.php` | **`trp_transfer_damage_claims`** | `trp_damage_claim` | 12 |
-| 38 | `Transport/transfer_origin_handover.php` | **`trp_transfer_origin_handover`** | `trp_origin_handover` | 9 |
-| 39 | `Transport/transfer_permits.php` | **`trp_transfer_permits`** | `transfer_permits` | 8 |
-| 40 | `Transport/transfer_requests.php` | **`trp_transfer_requests`** | `transfer_requests` | 12 |
-| 41 | `Transport/transfer_trip_legs.php` | **`trp_transfer_trip_legs`** | `trp_trip_leg` | 11 |
-| 42 | `Workforce/housing_units.php` | **`wf_housing_units`** | `housing_unit` | 8 |
-| 43 | `Workforce/payroll_runs.php` | **`hr_payroll_runs`** | `payroll_runs` | 16 |
-| 44 | `Workforce/worker_leave_absence.php` | **`hr_worker_leave_absence`** | `worker_leave_absence` | 9 |
+| 2 | `Clients/clients.php` | **`sal_clients`** | `clients` | 26 |
+| 3 | `Clients/quotation_negotiation.php` | **`sal_quotation_negotiation`** | `quotations` | 18 |
+| 4 | `Clients/quotations.php` | **`sal_quotations`** | `quotations` | 22 |
+| 5 | `Contracts/claims.php` | **`sal_claims`** | `claims` | 25 |
+| 6 | `Contracts/collections.php` | **`fina_collections`** | `fin_payments` | 7 |
+| 7 | `Contracts/contracts.php` | **`sal_contracts`** | `contracts` | 43 |
+| 8 | `Employees/employee_contracts.php` | **`hr_employee_contracts`** | `employee_contracts` | 14 |
+| 9 | `Employees/employees.php` | **`hr_employees`** | `employees` | 14 |
+| 10 | `FinRequests/effect_map.php` | **`fina_effect_map`** | `fin_event_links` | 10 |
+| 11 | `FinRequests/request_form.php` | **`my_requests`** | `fin_requests` | 10 |
+| 12 | `Finance/bank_reconciliation_fin.php` | **`tre_bank_reconciliation_fin`** | `fin_bank_statement_lines` | 14 |
+| 13 | `Finance/currencies_fin.php` | **`fina_currencies`** | `fin_currencies` | 9 |
+| 14 | `Finance/dues_fin.php` | **`fina_dues`** | `fin_dues` | 12 |
+| 15 | `Finance/journal_form_fin.php` | **`fina_journal_form_fin`** | `fin_journal_entries` | 11 |
+| 16 | `Finance/periods_fin.php` | **`fina_periods_fin`** | `fin_financial_periods` | 16 |
+| 17 | `Finance/tax_fin.php` | **`fina_tax_fin`** | `fin_tax_transactions` | 12 |
+| 18 | `Finance/tre_beneficiary.php` | **`tre_beneficiary`** | `tre_beneficiaries` | 12 |
+| 19 | `Finance/tre_pay_batch.php` | **`tre_pay_batch`** | `tre_pay_batches` | 21 |
+| 20 | `Fleet/asset_full_history.php` | **`flt_asset_full_history`** | `fleet_equipment_history` | 5 |
+| 21 | `Maintenance/breakdown_intake.php` | **`mnt_breakdown_intake`** | `mnt_breakdown` | 42 |
+| 22 | `Maintenance/external_repairs.php` | **`mnt_external_repairs`** | `mnt_external_repair` | 8 |
+| 23 | `Maintenance/mnt_kpis.php` | **`mnt_kpis`** | `mnt_kpi_period` | 4 |
+| 24 | `Maintenance/part_requests.php` | **`mnt_part_requests`** | `mnt_part_request` | 8 |
+| 25 | `Maintenance/preventive_plans.php` | **`mnt_preventive_plans`** | `mnt_plan` | 17 |
+| 26 | `Maintenance/repeat_repairs.php` | **`mnt_repeat_repairs`** | `mnt_repeat_repair` | 13 |
+| 27 | `Operations/monthly_plan.php` | **`ops_monthly_plan`** | `scr_op_monthly` | 25 |
+| 28 | `Opportunities/client_need_rfq.php` | **`sal_client_need_rfq`** | `sal_client_needs` | 27 |
+| 29 | `Portal/vp_actions_followup.php` | **`exec_action_followup`** | `exec_decisions` | 12 |
+| 30 | `Portal/vp_approval_inbox.php` | **`exec_request_queue`** | `exec_approvals` | 19 |
+| 31 | `Portal/vp_departments.php` | **`exec_org_project`** | `org_units` | 12 |
+| 32 | `Procurement/orders_proc.php` | **`prc_orders_proc`** | `proc_order` | 14 |
+| 33 | `Procurement/proc_award_minutes.php` | **`prc_proc_award_minutes`** | `proc_award` | 16 |
+| 34 | `Procurement/proc_delivery_track.php` | **`prc_proc_delivery_track`** | `proc_delivery_event` | 12 |
+| 35 | `Procurement/proc_offers.php` | **`prc_proc_offers`** | `proc_offer` | 25 |
+| 36 | `Procurement/proc_offers.php` | **`prc_offer_compare`** | `proc_offer` | 25 |
+| 37 | `Procurement/proc_packages.php` | **`prc_proc_packages`** | `proc_package` | 18 |
+| 38 | `Procurement/proc_packages.php` | **`prc_package_lines`** | `proc_package` | 18 |
+| 39 | `Procurement/proc_po_amendments.php` | **`prc_proc_po_amendments`** | `proc_po_amendment` | 17 |
+| 40 | `Procurement/proc_supplier_eval.php` | **`prc_proc_supplier_eval`** | `proc_supplier_eval` | 9 |
+| 41 | `Procurement/requests_proc.php` | **`prc_requests`** | `proc_request` | 11 |
+| 42 | `Procurement/stock_proc.php` | **`wh_stock_proc`** | `proc_stock_state` | 6 |
+| 43 | `Procurement/warehouses.php` | **`wh_warehouses`** | `proc_warehouse` | 16 |
+| 44 | `Procurement/wh_count.php` | **`wh_count`** | `proc_count_session` | 11 |
+| 45 | `Procurement/wh_hazmat.php` | **`wh_hazmat`** | `proc_hazmat_control` | 16 |
+| 46 | `Procurement/wh_issue_requests.php` | **`wh_issue_request_lines`** | `proc_issue_request` | 20 |
+| 47 | `Procurement/wh_issue_requests.php` | **`wh_issue_requests`** | `proc_issue_request` | 20 |
+| 48 | `Procurement/wh_month_close.php` | **`wh_month_close`** | `proc_wh_close` | 17 |
+| 49 | `Procurement/wh_transfer.php` | **`wh_transfer`** | `proc_transfer` | 11 |
+| 50 | `Projects/projects.php` | **`sal_projects`** | `project` | 21 |
+| 51 | `Risk/risk_register.php` | **`rsk_risk_register`** | `risk_register` | 21 |
+| 52 | `Risk/risk_reports.php` | **`rsk_risk_reports`** | `risk_export_log` | 9 |
+| 53 | `Risk/risk_treatments.php` | **`rsk_risk_treatments`** | `risk_treatments` | 15 |
+| 54 | `Tickets/ticket_form.php` | **`tkt_ticket_form`** | `tickets` | 26 |
+| 55 | `Tickets/ticket_sla_config.php` | **`tkt_ticket_sla_config`** | `ticket_sla_policies` | 11 |
+| 56 | `Tickets/tickets_list.php` | **`tkt_tickets_list`** | `tickets` | 10 |
+| 57 | `Timesheet/timesheet.php` | **`ops_timesheet`** | `timesheet` | 34 |
+| 58 | `Transport/transfer_closure.php` | **`trp_transfer_closure`** | `trp_closure` | 11 |
+| 59 | `Transport/transfer_damage_claims.php` | **`trp_transfer_damage_claims`** | `trp_damage_claim` | 12 |
+| 60 | `Transport/transfer_in_transit.php` | **`trp_transfer_in_transit`** | `transfer_orders` | 12 |
+| 61 | `Transport/transfer_order_form.php` | **`trp_transfer_order_form`** | `transfer_orders` | 23 |
+| 62 | `Transport/transfer_orders_report.php` | **`trp_transfer_orders_report`** | `trp_kpi_period` | 1 |
+| 63 | `Transport/transfer_origin_handover.php` | **`trp_transfer_origin_handover`** | `trp_origin_handover` | 9 |
+| 64 | `Transport/transfer_permits.php` | **`trp_transfer_permits`** | `transfer_permits` | 8 |
+| 65 | `Transport/transfer_requests.php` | **`trp_transfer_requests`** | `transfer_requests` | 12 |
+| 66 | `Transport/transfer_trip_legs.php` | **`trp_transfer_trip_legs`** | `trp_trip_leg` | 11 |
+| 67 | `Workforce/housing_units.php` | **`wf_housing_units`** | `housing_unit` | 8 |
+| 68 | `Workforce/payroll_runs.php` | **`hr_payroll_runs`** | `payroll_runs` | 16 |
+| 69 | `Workforce/recruitment_pipeline.php` | **`hr_recruitment_pipeline`** | `rec_applications` | 16 |
+| 70 | `Workforce/worker_leave_absence.php` | **`hr_worker_leave_absence`** | `worker_leave_absence` | 9 |
 
 ## ② ثلاثةٌ **لا تُحذف** — جداولُ عملٍ حقيقيّةٌ حُقنت فيها أعمدةُ الورقة
 
@@ -74,30 +100,49 @@
 ```sql
 -- بعدَ التحقّقِ من انقطاعِ القارئِ لكلِّ اسم:
 DROP TABLE IF EXISTS `ops_hours_approval`;
+DROP TABLE IF EXISTS `sal_clients`;
+DROP TABLE IF EXISTS `sal_quotation_negotiation`;
+DROP TABLE IF EXISTS `sal_quotations`;
+DROP TABLE IF EXISTS `sal_claims`;
+DROP TABLE IF EXISTS `fina_collections`;
 DROP TABLE IF EXISTS `sal_contracts`;
 DROP TABLE IF EXISTS `hr_employee_contracts`;
 DROP TABLE IF EXISTS `hr_employees`;
+DROP TABLE IF EXISTS `fina_effect_map`;
 DROP TABLE IF EXISTS `my_requests`;
+DROP TABLE IF EXISTS `tre_bank_reconciliation_fin`;
 DROP TABLE IF EXISTS `fina_currencies`;
 DROP TABLE IF EXISTS `fina_dues`;
+DROP TABLE IF EXISTS `fina_journal_form_fin`;
 DROP TABLE IF EXISTS `fina_periods_fin`;
+DROP TABLE IF EXISTS `fina_tax_fin`;
+DROP TABLE IF EXISTS `tre_beneficiary`;
 DROP TABLE IF EXISTS `tre_pay_batch`;
+DROP TABLE IF EXISTS `flt_asset_full_history`;
 DROP TABLE IF EXISTS `mnt_breakdown_intake`;
 DROP TABLE IF EXISTS `mnt_external_repairs`;
 DROP TABLE IF EXISTS `mnt_kpis`;
 DROP TABLE IF EXISTS `mnt_part_requests`;
+DROP TABLE IF EXISTS `mnt_preventive_plans`;
 DROP TABLE IF EXISTS `mnt_repeat_repairs`;
 DROP TABLE IF EXISTS `ops_monthly_plan`;
 DROP TABLE IF EXISTS `sal_client_need_rfq`;
+DROP TABLE IF EXISTS `exec_action_followup`;
 DROP TABLE IF EXISTS `exec_request_queue`;
+DROP TABLE IF EXISTS `exec_org_project`;
 DROP TABLE IF EXISTS `prc_orders_proc`;
 DROP TABLE IF EXISTS `prc_proc_award_minutes`;
 DROP TABLE IF EXISTS `prc_proc_delivery_track`;
 DROP TABLE IF EXISTS `prc_proc_offers`;
 DROP TABLE IF EXISTS `prc_offer_compare`;
+DROP TABLE IF EXISTS `prc_proc_packages`;
+DROP TABLE IF EXISTS `prc_package_lines`;
+DROP TABLE IF EXISTS `prc_proc_po_amendments`;
 DROP TABLE IF EXISTS `prc_proc_supplier_eval`;
 DROP TABLE IF EXISTS `prc_requests`;
+DROP TABLE IF EXISTS `wh_stock_proc`;
 DROP TABLE IF EXISTS `wh_warehouses`;
+DROP TABLE IF EXISTS `wh_count`;
 DROP TABLE IF EXISTS `wh_hazmat`;
 DROP TABLE IF EXISTS `wh_issue_request_lines`;
 DROP TABLE IF EXISTS `wh_issue_requests`;
@@ -105,17 +150,24 @@ DROP TABLE IF EXISTS `wh_month_close`;
 DROP TABLE IF EXISTS `wh_transfer`;
 DROP TABLE IF EXISTS `sal_projects`;
 DROP TABLE IF EXISTS `rsk_risk_register`;
+DROP TABLE IF EXISTS `rsk_risk_reports`;
 DROP TABLE IF EXISTS `rsk_risk_treatments`;
+DROP TABLE IF EXISTS `tkt_ticket_form`;
 DROP TABLE IF EXISTS `tkt_ticket_sla_config`;
+DROP TABLE IF EXISTS `tkt_tickets_list`;
 DROP TABLE IF EXISTS `ops_timesheet`;
 DROP TABLE IF EXISTS `trp_transfer_closure`;
 DROP TABLE IF EXISTS `trp_transfer_damage_claims`;
+DROP TABLE IF EXISTS `trp_transfer_in_transit`;
+DROP TABLE IF EXISTS `trp_transfer_order_form`;
+DROP TABLE IF EXISTS `trp_transfer_orders_report`;
 DROP TABLE IF EXISTS `trp_transfer_origin_handover`;
 DROP TABLE IF EXISTS `trp_transfer_permits`;
 DROP TABLE IF EXISTS `trp_transfer_requests`;
 DROP TABLE IF EXISTS `trp_transfer_trip_legs`;
 DROP TABLE IF EXISTS `wf_housing_units`;
 DROP TABLE IF EXISTS `hr_payroll_runs`;
+DROP TABLE IF EXISTS `hr_recruitment_pipeline`;
 DROP TABLE IF EXISTS `hr_worker_leave_absence`;
 ```
 

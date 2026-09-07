@@ -812,6 +812,7 @@ endif; ?>
                 : "<span class='tkt-chip is-ok'><i class='fa fa-circle-check' aria-hidden='true'></i> كلها مغلقة</span>"; ?>
       </div>
       <div class="tkt-panel__body tkt-scroll">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables no-datatable tkt-frm-subtable">
             <thead><tr><th>فتح</th><th>رقم الفرع</th><th>المرحلة</th><th>الإدارة المالكة</th><th>الوصف</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -823,7 +824,7 @@ endif; ?>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              </tr></thead>
+              <th>رقم البلاغ</th><th>وقت التسجيل</th><th>قناة التسجيل</th><th>Reporter_ID</th><th>Reporter_Name</th><th>Reporter_Department</th><th>Reporter_Entity</th><th>Reporter_Contact</th><th>Subject_Type</th><th>Subject_ID</th><th>Subject_Name</th><th>Subject_Owning_Department</th><th>الفئة</th><th>الطبيعة</th><th>الأولوية</th><th>مستوى السرية</th><th>وصف البلاغ</th><th>المرفقات</th><th>Ticket_Owner</th><th>Assigned_Department</th><th>Resolution_Owner</th><th>مهلة المعالجة</th><th>حالة البلاغ</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($children as $ch): ?>
                 <tr>
@@ -832,7 +833,7 @@ endif; ?>
                     <td><?php echo tkt_stage_badge($ch['stage']); ?></td>
                     <td><?php echo htmlspecialchars(tkt_label($roles_map, intval($ch['owner_role_id']))); ?></td>
                     <td><?php echo htmlspecialchars(mb_substr((string)$ch['complaint'], 0, 70)); ?></td>
-                </tr>
+                <?= ems_sf_cells($ch, array('report_no', 'registration_time', 'registration_channel', 'reporter_uid', 'reporter_name', 'reporter_department', 'reporter_entity', 'reporter_contact', 'subject_type', 'subject_uid', 'subject_name', 'subject_owning_department', 'category', 'nature', 'priority_level', 'confidentiality_level', 'report_description', 'attachments', 'ticket_owner', 'assigned_department', 'resolution_owner', 'processing_deadline', 'report_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -984,47 +985,6 @@ endif; ?>
     </aside>
     </div><!-- /tkt-layout -->
 <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم البلاغ' => 'g22',
-            'وقت التسجيل' => 'g23',
-            'قناة التسجيل' => 'g24',
-            'Reporter_ID' => 'g25',
-            'Reporter_Name' => 'g26',
-            'Reporter_Department' => 'g27',
-            'Reporter_Entity' => 'g28',
-            'Reporter_Contact' => 'g29',
-            'Subject_Type' => 'g30',
-            'Subject_ID' => 'g31',
-            'Subject_Name' => 'g32',
-            'Subject_Owning_Department' => 'g33',
-            'الفئة' => 'g34',
-            'الطبيعة' => 'g35',
-            'الأولوية' => 'g36',
-            'مستوى السرية' => 'g37',
-            'وصف البلاغ' => 'g38',
-            'المرفقات' => 'g39',
-            'Ticket_Owner' => 'g40',
-            'Assigned_Department' => 'g41',
-            'Resolution_Owner' => 'g42',
-            'مهلة المعالجة' => 'g43',
-            'حالة البلاغ' => 'g44',
-            'المنشئ' => 'g45',
-            'تاريخ الإنشاء' => 'g46',
-            'حالة البيانات' => 'g47',
-            'مرجع المصدر' => 'g48',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tkt_ticket_form');
-        echo ems_w14_grid('emsList_tkt_ticket_form', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تسجيل البلاغ'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

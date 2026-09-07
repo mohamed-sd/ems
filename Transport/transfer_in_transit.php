@@ -88,6 +88,7 @@ include __DIR__ . '/../includes/page_header.php'; ?>
 echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد المغادرة من أمر الترحيل لتظهر الرحلة في هذه الشاشة');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم الأمر</th><th>من → إلى</th><th>المركبة</th><th>السائق</th><th>تاريخ المغادرة</th><th>منذ</th><th>إجراء</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -115,9 +116,9 @@ echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد ال�
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
               <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              </tr></thead>
+              <th>معرف الحدث</th><th>نوع الحدث</th><th>وقت الحدث</th><th>الموقع الجغرافي</th><th>قراءة عداد الناقل</th><th>ملاحظة الحدث</th><th>مرفق/صورة</th><th>مسجل دون اتصال؟</th><th>حالة السطر</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا معدة في الطريق — وصفر عالق</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="42" class="text-center text-muted">لا معدة في الطريق — وصفر عالق</td></tr><?php endif; ?>
     <?php foreach ($rows as $o):
         $dep = $o['departure_datetime'] ? strtotime($o['departure_datetime']) : null;
         $hrs = $dep ? round((time() - $dep) / 3600, 1) : null; ?>
@@ -131,38 +132,10 @@ echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد ال�
         <td><form method="post" class="trs-it-inline">
         <?= csrf_field() ?><input type="hidden" name="arrive_id" value="<?= intval($o['id']) ?>">
             <button class="action-btn" type="submit"><i class="fa fa-flag-checkered"></i> وصلت</button></form></td>
-      </tr>
+      <?= ems_sf_cells($o, array('business_event_uid', 'event_type', 'event_time', 'geo_location', 'carrier_meter_reading', 'event_note', 'attachment_or_photo', 'recorded_offline', 'line_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_in_transit
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الحدث' => 'g43',
-            'رقم الأمر' => 'g44',
-            'نوع الحدث' => 'g45',
-            'وقت الحدث' => 'g46',
-            'الموقع الجغرافي' => 'g47',
-            'قراءة عداد الناقل' => 'g48',
-            'ملاحظة الحدث' => 'g49',
-            'مرفق/صورة' => 'g50',
-            'مسجل دون اتصال؟' => 'g51',
-            'حالة السطر' => 'g52',
-            'المنشئ' => 'g53',
-            'تاريخ الإنشاء' => 'g54',
-            'حالة البيانات' => 'g55',
-            'مرجع المصدر' => 'g56',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_in_transit');
-        echo ems_w14_grid('emsList_trp_transfer_in_transit', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تتبع الرحلة وأحداثها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
   <h3 class="ems-section-title">أحداث الرحلات الجارية</h3>

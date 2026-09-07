@@ -88,7 +88,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['cost_per_hour']) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derived_from']) ?></small></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'equipment_or_type') ?></td><td><?= ems_sf($r, 'executed_preventive_orders') ?></td><td><?= ems_sf($r, 'maintenance_cost_per_hour') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'equipment_or_type', 'executed_preventive_orders', 'maintenance_cost_per_hour')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="17">لا أسطر مؤشرات مشتقة بعد.</td></tr>
         <?php endif; ?>

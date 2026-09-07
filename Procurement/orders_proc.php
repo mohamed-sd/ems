@@ -661,7 +661,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . ($e18 ? implode(' ', $e18) : "<span class='text-muted'>—</span>") . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['fin_approval_ref'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";
-                        echo "" . "<td>" . ems_sf($row, 'order_date') . "</td>" . "<td>" . ems_sf($row, 'minutes_no') . "</td>" . "<td>" . ems_sf($row, 'supplier_no') . "</td>" . "<td>" . ems_sf($row, 'framework_contract_ref') . "</td>" . "<td>" . ems_sf($row, 'items_count_ref_sh07_2') . "</td>" . "<td>" . ems_sf($row, 'total_value') . "</td>" . "<td>" . ems_sf($row, 'delivery_place') . "</td>" . "<td>" . ems_sf($row, 'delay_penalty') . "</td>" . "<td>" . ems_sf($row, 'order_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+                        echo "" . ems_sf_cells($row, array('order_date', 'minutes_no', 'supplier_no', 'framework_contract_ref', 'items_count_ref_sh07_2', 'total_value', 'delivery_place', 'delay_penalty', 'order_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
                     } }
                     ?>
                 </tbody>

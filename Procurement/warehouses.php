@@ -100,7 +100,7 @@ echo ems_states_bundle('لا مستودعات مسجلة بعد',
           <td><?php echo htmlspecialchars((string) $x['status'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['notes'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
-        <td><?= ems_sf($x, 'warehouse_code') ?></td><td><?= ems_sf($x, 'warehouse_name') ?></td><td><?= ems_sf($x, 'warehouse_type') ?></td><td><?= ems_sf($x, 'custodian_on_duty') ?></td><td><?= ems_sf($x, 'custody_method') ?></td><td><?= ems_sf($x, 'special_licence') ?></td><td><?= ems_sf($x, 'storage_capacity') ?></td><td><?= ems_sf($x, 'safety_controls') ?></td><td><?= ems_sf($x, 'warehouse_state') ?></td><td><?= ems_sf($x, 'creator_name') ?></td><td><?= ems_sf($x, 'created_date') ?></td><td><?= ems_sf($x, 'reviewer') ?></td><td><?= ems_sf($x, 'approver') ?></td><td><?= ems_sf($x, 'approval_date') ?></td><td><?= ems_sf($x, 'data_state') ?></td><td><?= ems_sf($x, 'source_ref') ?></td></tr>
+        <?= ems_sf_cells($x, array('warehouse_code', 'warehouse_name', 'warehouse_type', 'custodian_on_duty', 'custody_method', 'special_licence', 'storage_capacity', 'safety_controls', 'warehouse_state', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
       <?php endforeach; endif; ?>
       </tbody>
     </table>

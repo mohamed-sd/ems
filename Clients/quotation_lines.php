@@ -181,7 +181,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         <td><strong><?= number_format((float) $r['line_total'], 2) ?></strong></td>
         <td><?= htmlspecialchars((string) $r['currency'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= (int) $r['created_by'] ?></td>
-      <td><?= ems_sf($r, 'item_no') ?></td><td><?= ems_sf($r, 'offer_no') ?></td><td><?= ems_sf($r, 'contract_ref') ?></td><td><?= ems_sf($r, 'item_type') ?></td><td><?= ems_sf($r, 'service_type') ?></td><td><?= ems_sf($r, 'equipment_or_item_type') ?></td><td><?= ems_sf($r, 'work_model') ?></td><td><?= ems_sf($r, 'equipment_count') ?></td><td><?= ems_sf($r, 'monthly_unit_basis') ?></td><td><?= ems_sf($r, 'duration_months') ?></td><td><?= ems_sf($r, 'quantity_or_target') ?></td><td><?= ems_sf($r, 'measure_unit') ?></td><td><?= ems_sf($r, 'value') ?></td><td><?= ems_sf($r, 'price_version_effective_from') ?></td><td><?= ems_sf($r, 'price_basis') ?></td><td><?= ems_sf($r, 'tax_as_stated') ?></td><td><?= ems_sf($r, 'price_text_as_stated') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'commercial_notes') ?></td><td><?= ems_sf($r, 'source_commitment_cycle_key') ?></td><td><?= ems_sf($r, 'evidence_level') ?></td><td><?= ems_sf($r, 'residual_value_basis') ?></td></tr>
+      <?= ems_sf_cells($r, array('item_no', 'offer_no', 'contract_ref', 'item_type', 'service_type', 'equipment_or_item_type', 'work_model', 'equipment_count', 'monthly_unit_basis', 'duration_months', 'quantity_or_target', 'measure_unit', 'value', 'price_version_effective_from', 'price_basis', 'tax_as_stated', 'price_text_as_stated', 'data_state', 'commercial_notes', 'source_commitment_cycle_key', 'evidence_level', 'residual_value_basis')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>

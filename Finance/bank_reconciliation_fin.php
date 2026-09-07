@@ -356,6 +356,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display nowrap no-datatable fin-bank-tbl" data-no-dt="hard">
             <thead><tr><th>#</th><th>تاريخ الإقفال</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
                 <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
@@ -377,7 +378,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                </tr></thead>
+                <th>معرف المطابقة</th><th>الحساب البنكي</th><th>رصيد الكشف البنكي</th><th>رصيد الدفتر</th><th>بنود الفروق</th><th>سبب الفرق</th><th>معالجة الفرق</th><th>الفرق المتبقي</th><th>مرفق الكشف</th><th>حالة المطابقة</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($h13_lines as $l):
                 $ms = (string)$l['match_state'];
@@ -435,9 +436,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <?php endif; ?>
-                </tr>
+                <?= ems_sf_cells($l, array('match_uid', 'bank_account', 'bank_statement_balance', 'book_balance', 'variance_items', 'variance_reason', 'variance_treatment', 'remaining_variance', 'statement_attachment', 'match_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
-            <?php if (!$h13_lines): ?><tr><td colspan="11"><em>لا أسطر</em></td></tr><?php endif; ?>
+            <?php if (!$h13_lines): ?><tr><td colspan="40"><em>لا أسطر</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -556,36 +557,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endforeach; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المطابقة' => 'g186',
-            'الحساب البنكي' => 'g187',
-            'الشهر' => 'g188',
-            'رصيد الكشف البنكي' => 'g189',
-            'رصيد الدفتر' => 'g190',
-            'الفرق' => 'g191',
-            'بنود الفروق' => 'g192',
-            'سبب الفرق' => 'g193',
-            'معالجة الفرق' => 'g194',
-            'الفرق المتبقي' => 'g195',
-            'مرفق الكشف' => 'g196',
-            'حالة المطابقة' => 'g197',
-            'المنشئ' => 'g198',
-            'تاريخ الإنشاء' => 'g199',
-            'حالة البيانات' => 'g200',
-            'مرجع المصدر' => 'g201',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tre_bank_reconciliation_fin');
-        echo ems_w14_grid('emsList_tre_bank_reconciliation_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المطابقة البنكية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

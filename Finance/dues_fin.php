@@ -375,7 +375,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                     echo "<td>" . htmlspecialchars((string)($row['due_date'] ?? '—')) . $e06 . "</td>";
                     echo "<td><span class='badge badge-" . $st_tone . "'>" . ($st_lbl[$st] ?? $st) . "</span></td>";
-                    echo "" . "<td>" . ems_sf($row, 'due_uid') . "</td>" . "<td>" . ems_sf($row, 'supplier_invoice_no') . "</td>" . "<td>" . ems_sf($row, 'supplier_no') . "</td>" . "<td>" . ems_sf($row, 'due_source') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "<td>" . ems_sf($row, 'gate_check') . "</td>" . "<td>" . ems_sf($row, 'tax') . "</td>" . "<td>" . ems_sf($row, 'due_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "</tr>";
+                    echo "" . ems_sf_cells($row, array('due_uid', 'supplier_invoice_no', 'supplier_no', 'due_source', 'source_ref', 'gate_check', 'tax', 'due_state', 'creator_name', 'reviewer', 'approver', 'data_state')) . "</tr>";
                 } }
                 ?>
                 </tbody>

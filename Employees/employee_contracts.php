@@ -1069,7 +1069,7 @@ include('../insidebar.php'); ?>
 
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
-              echo "" . "<td>" . ems_sf($row, 'contract_uid') . "</td>" . "<td>" . ems_sf($row, 'employee_no') . "</td>" . "<td>" . ems_sf($row, 'wage_model') . "</td>" . "<td>" . ems_sf($row, 'basic_wage') . "</td>" . "<td>" . ems_sf($row, 'allowances') . "</td>" . "<td>" . ems_sf($row, 'date_from') . "</td>" . "<td>" . ems_sf($row, 'date_to') . "</td>" . "<td>" . ems_sf($row, 'project_ref') . "</td>" . "<td>" . ems_sf($row, 'signed_contract_attachment') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+              echo "" . ems_sf_cells($row, array('contract_uid', 'employee_no', 'wage_model', 'basic_wage', 'allowances', 'date_from', 'date_to', 'project_ref', 'signed_contract_attachment', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
             } }
             ?>
           </tbody>

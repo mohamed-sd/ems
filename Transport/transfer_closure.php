@@ -87,7 +87,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'closing_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'receipt_minutes_check') ?></td><td><?= ems_sf($r, 'closing_note') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('closing_uid', 'order_no', 'receipt_minutes_check', 'closing_note', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="22">لا أوامر ترحيل مقفلة.</td></tr>
         <?php endif; ?>

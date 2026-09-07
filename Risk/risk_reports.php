@@ -142,9 +142,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php if (empty($exports)): ?>
         <p class="rsk-empty-note">لا تصدير بعد — والسجل يكتب بأول تصدير.</p>
         <?php else: ?>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>المصدر</th><th>بصفته</th><th>الشاشة</th><th>المنظر</th>
-                <th>الأعمدة</th><th>الفلاتر</th><th>المستبعد بالصلاحية</th><th>الصفوف</th><th>الوقت</th></tr></thead>
+                <th>الأعمدة</th><th>الفلاتر</th><th>المستبعد بالصلاحية</th><th>الصفوف</th><th>الوقت</th><th>معرف السطر</th><th>الدورية</th><th>الفترة</th><th>العائلة</th><th>البند</th><th>القيمة</th><th>الاتجاه</th><th>يستلزم قرارا؟</th><th>مرجع الخطر</th></tr></thead>
             <tbody>
             <?php foreach ($exports as $x): ?>
                 <tr>
@@ -157,7 +158,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td class="rsk-blocked-cell"><?php echo htmlspecialchars((string) $x['blocked_text'] ?: 'لا شيء'); ?></td>
                     <td><?php echo (int) $x['row_count']; ?></td>
                     <td><?php echo htmlspecialchars((string) $x['exported_at']); ?></td>
-                </tr>
+                <?= ems_sf_cells($x, array('line_uid', 'frequency', 'period', 'family', 'item', 'value', 'direction', 'needs_decision', 'risk_ref')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -187,29 +188,6 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         });
     });
     </script>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_reports
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g84',
-            'الدورية' => 'g85',
-            'الفترة' => 'g86',
-            'العائلة' => 'g87',
-            'البند' => 'g88',
-            'القيمة' => 'g89',
-            'الاتجاه' => 'g90',
-            'يستلزم قرارا؟' => 'g91',
-            'مرجع الخطر' => 'g92',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('rsk_risk_reports');
-        echo ems_w14_grid('emsList_rsk_risk_reports', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقارير المخاطر الدورية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

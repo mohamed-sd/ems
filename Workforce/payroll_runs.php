@@ -447,7 +447,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <td><?php echo htmlspecialchars($__money($rr['absence'])); ?></td>
                     <td><?php echo htmlspecialchars($__money($rr['deductions'])); ?></td>
                     <td><strong><?php echo htmlspecialchars($__money($rr['net'])); ?></strong></td>
-                <td><?= ems_sf($rr, 'payroll_uid') ?></td><td><?= ems_sf($rr, 'payroll_scope') ?></td><td><?= ems_sf($rr, 'employees_count') ?></td><td><?= ems_sf($rr, 'basic_total') ?></td><td><?= ems_sf($rr, 'allowances_total') ?></td><td><?= ems_sf($rr, 'production_incentives') ?></td><td><?= ems_sf($rr, 'operator_workforce_basis') ?></td><td><?= ems_sf($rr, 'payroll_net') ?></td><td><?= ems_sf($rr, 'finance_referral') ?></td><td><?= ems_sf($rr, 'treasury_referral') ?></td><td><?= ems_sf($rr, 'payroll_state') ?></td><td><?= ems_sf($rr, 'creator_name') ?></td><td><?= ems_sf($rr, 'reviewer') ?></td><td><?= ems_sf($rr, 'approver') ?></td><td><?= ems_sf($rr, 'data_state') ?></td><td><?= ems_sf($rr, 'source_ref') ?></td></tr>
+                <?= ems_sf_cells($rr, array('payroll_uid', 'payroll_scope', 'employees_count', 'basic_total', 'allowances_total', 'production_incentives', 'operator_workforce_basis', 'payroll_net', 'finance_referral', 'treasury_referral', 'payroll_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
             </tbody>
             <tfoot><tr>

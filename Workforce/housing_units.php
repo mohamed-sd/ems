@@ -143,7 +143,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php if($can_delete): ?><a href="housing_units.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
             <td><strong><?= htmlspecialchars($r['name']) ?></strong></td><td><?= htmlspecialchars($r['pname'] ?: '-') ?></td>
-            <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td><td><?= ems_sf($r, 'occupied_count') ?></td><td><?= ems_sf($r, 'vacant_count') ?></td><td><?= ems_sf($r, 'supervisor') ?></td><td><?= ems_sf($r, 'maintenance_state') ?></td><td><?= ems_sf($r, 'unit_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td><?= ems_sf_cells($r, array('occupied_count', 'vacant_count', 'supervisor', 'maintenance_state', 'unit_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="34" class="hu-empty-cell">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>

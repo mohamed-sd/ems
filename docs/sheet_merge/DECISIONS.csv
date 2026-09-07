@@ -1,0 +1,26 @@
+batch,screen,owner_table,decided_by,decided_at,note
+1,Clients/clients.php,clients,owner,2026-09-07,
+1,Clients/quotations.php,quotations,owner,2026-09-07,
+1,Clients/quotation_negotiation.php,quotations,owner,2026-09-07,يشارك quotations مع quotations.php — لا تكرار للحقول المضافة سلفا
+1,Contracts/claims.php,claims,owner,2026-09-07,
+1,Tickets/ticket_form.php,tickets,owner,2026-09-07,
+1,Tickets/tickets_list.php,tickets,owner,2026-09-07,يشارك tickets مع ticket_form.php — لا تكرار للحقول المضافة سلفا
+1,Maintenance/preventive_plans.php,mnt_plan,owner,2026-09-07,
+1,Transport/transfer_order_form.php,transfer_orders,owner,2026-09-07,
+1,Procurement/proc_po_amendments.php,proc_po_amendment,owner,2026-09-07,الجدول فارغ — يبذر بعشرين صفا
+1,Finance/tax_fin.php,fin_tax_transactions,owner,2026-09-07,
+2,Procurement/proc_packages.php,proc_package,owner,2026-09-07,
+2,Finance/journal_form_fin.php,fin_journal_entries,owner,2026-09-07,رأس القيد لا أسطره
+2,Workforce/recruitment_pipeline.php,rec_applications,owner,2026-09-07,
+2,Finance/bank_reconciliation_fin.php,fin_bank_statement_lines,owner,2026-09-07,
+2,Portal/vp_departments.php,org_units,owner,2026-09-07,
+2,Procurement/wh_count.php,proc_count_session,owner,2026-09-07,الجدول فارغ — يبذر
+2,Finance/tre_beneficiary.php,tre_beneficiaries,owner,2026-09-07,الجدول فارغ — يبذر
+2,Fleet/asset_full_history.php,fleet_equipment_history,owner,2026-09-07,
+2,Transport/transfer_in_transit.php,transfer_orders,owner,2026-09-07,يشارك transfer_orders مع transfer_order_form.php — لا تكرار
+2,Portal/vp_actions_followup.php,exec_decisions,owner,2026-09-07,
+2,FinRequests/effect_map.php,fin_event_links,owner,2026-09-07,
+2,Contracts/collections.php,fin_payments,owner,2026-09-07,
+2,Transport/transfer_orders_report.php,trp_kpi_period,owner,2026-09-07,
+2,Procurement/stock_proc.php,proc_stock_state,owner,2026-09-07,الجدول فارغ — يبذر
+2,Risk/risk_reports.php,risk_export_log,owner,2026-09-07,قرار المالك خلافا لترجيحي

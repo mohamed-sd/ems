@@ -93,7 +93,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= (int) $r['delay_days'] ?></td>
                 <td><?= htmlspecialchars((string) $r['delay_why']) ?></td>
                 <td><?= ((int) $r['receipt_id'] > 0 ? (int) $r['receipt_id'] : '') ?></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'covered_quantity') ?></td><td><?= ems_sf($r, 'grn_no') ?></td><td><?= ems_sf($r, 'inspection_result') ?></td><td><?= ems_sf($r, 'delay_days') ?></td><td><?= ems_sf($r, 'supplier_notification') ?></td><td><?= ems_sf($r, 'line_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'order_no', 'covered_quantity', 'grn_no', 'inspection_result', 'delay_days', 'supplier_notification', 'line_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

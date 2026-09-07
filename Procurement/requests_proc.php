@@ -630,7 +630,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . htmlspecialchars((string)$row['fin_approval_state']) . "</td>";
                         echo "<td>" . intval($row['line_count']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";
-                        echo "" . "<td>" . ems_sf($row, 'requesting_party') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "<td>" . ems_sf($row, 'charged_project') . "</td>" . "<td>" . ems_sf($row, 'items_count_ref_sh02_2') . "</td>" . "<td>" . ems_sf($row, 'required_date') . "</td>" . "<td>" . ems_sf($row, 'initial_estimate') . "</td>" . "<td>" . ems_sf($row, 'request_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "</tr>";
+                        echo "" . ems_sf_cells($row, array('requesting_party', 'source_ref', 'charged_project', 'items_count_ref_sh02_2', 'required_date', 'initial_estimate', 'request_state', 'creator_name', 'reviewer', 'approver', 'data_state')) . "</tr>";
                     } }
                     ?>
                 </tbody>

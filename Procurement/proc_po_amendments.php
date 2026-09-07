@@ -101,8 +101,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </table></div>
 
     <h3 class="ems-section-title">سجل التعديلات</h3>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>الأمر</th><th>التسلسل</th><th>نوع التعديل</th><th>قبل</th><th>بعد</th><th>فرق المبلغ</th><th>السبب</th><th>المسار الحوكمي</th><th>الحالة</th></tr></thead>
+        <thead><tr><th>الأمر</th><th>التسلسل</th><th>نوع التعديل</th><th>قبل</th><th>بعد</th><th>فرق المبلغ</th><th>السبب</th><th>المسار الحوكمي</th><th>الحالة</th><th>معرف السطر</th><th>النوع</th><th>رقم الأمر/الطلب</th><th>المبرر</th><th>قاعدة AAM المفعلة</th><th>مسار الموافقة</th><th>قرار الاعتماد</th><th>الأثر المالي</th><th>بنود متأثرة</th><th>حالة السطر</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): $o = isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : null; ?>
             <tr>
@@ -115,42 +116,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['reason']) ?></td>
                 <td><?= htmlspecialchars((string) $r['gov_path']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-            </tr>
+            <?= ems_sf_cells($r, array('line_uid', 'type', 'order_or_request_no', 'justification', 'active_aam_rule', 'approval_path', 'approval_decision', 'financial_impact', 'affected_items', 'line_state', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا تعديلات مسجلة</td></tr>
+            <tr><td colspan="26">لا تعديلات مسجلة</td></tr>
         <?php endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_po_amendments
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g1',
-            'النوع' => 'g2',
-            'رقم الأمر/الطلب' => 'g3',
-            'المبرر' => 'g4',
-            'قاعدة AAM المفعلة' => 'g5',
-            'مسار الموافقة' => 'g6',
-            'قرار الاعتماد' => 'g7',
-            'الأثر المالي' => 'g8',
-            'بنود متأثرة' => 'g9',
-            'حالة السطر' => 'g10',
-            'المنشئ' => 'g11',
-            'تاريخ الإنشاء' => 'g12',
-            'المراجع' => 'g13',
-            'المعتمد' => 'g14',
-            'تاريخ الاعتماد' => 'g15',
-            'حالة البيانات' => 'g16',
-            'مرجع المصدر' => 'g17',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_po_amendments');
-        echo ems_w14_grid('emsList_prc_proc_po_amendments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في استثناءات الشراء وتعديلات الأوامر'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

@@ -105,7 +105,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['mine']) ?></td>
                     <td><?= htmlspecialchars($x0['at']) ?></td>
                     <td><a href="<?= htmlspecialchars($x0['link']) ?>"><?= htmlspecialchars($x0['label']) ?></a></td>
-                <td><?= ems_sf($x0, 'request_uid') ?></td><td><?= ems_sf($x0, 'source_department') ?></td><td><?= ems_sf($x0, 'request_type') ?></td><td><?= ems_sf($x0, 'deputy_role') ?></td><td><?= ems_sf($x0, 'approval_scope') ?></td><td><?= ems_sf($x0, 'amount') ?></td><td><?= ems_sf($x0, 'currency') ?></td><td><?= ems_sf($x0, 'previous_approval') ?></td><td><?= ems_sf($x0, 'recommendation') ?></td><td><?= ems_sf($x0, 'documents') ?></td><td><?= ems_sf($x0, 'risk') ?></td><td><?= ems_sf($x0, 'status') ?></td><td><?= ems_sf($x0, 'deputy_decision') ?></td><td><?= ems_sf($x0, 'conditions') ?></td><td><?= ems_sf($x0, 'decision_date') ?></td><td><?= ems_sf($x0, 'creator_name') ?></td><td><?= ems_sf($x0, 'created_date') ?></td><td><?= ems_sf($x0, 'data_state') ?></td><td><?= ems_sf($x0, 'source_ref') ?></td></tr>
+                <?= ems_sf_cells($x0, array('request_uid', 'source_department', 'request_type', 'deputy_role', 'approval_scope', 'amount', 'currency', 'previous_approval', 'recommendation', 'documents', 'risk', 'status', 'deputy_decision', 'conditions', 'decision_date', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
             <?php if (!$rows): ?><tr><td colspan="26">لا وارد منتظرا في الرافدين</td></tr><?php endif; ?>
             </tbody>

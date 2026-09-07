@@ -191,7 +191,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <td><?= (int) $r['prepared_by'] ?></td>
         <td><?= (int) $r['executed_by'] ?: '—' ?></td>
         <td><?= htmlspecialchars((string) $r['bank_ref'], ENT_QUOTES, 'UTF-8') ?: '—' ?></td>
-      <td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'request_no') ?></td><td><?= ems_sf($r, 'approval_completeness_check') ?></td><td><?= ems_sf($r, 'beneficiary') ?></td><td><?= ems_sf($r, 'value') ?></td><td><?= ems_sf($r, 'disbursing_vessel') ?></td><td><?= ems_sf($r, 'vessel_balance_check') ?></td><td><?= ems_sf($r, 'first_location') ?></td><td><?= ems_sf($r, 'second_location') ?></td><td><?= ems_sf($r, 'delegation_validity_check') ?></td><td><?= ems_sf($r, 'bank_execution_ref') ?></td><td><?= ems_sf($r, 'execution_date') ?></td><td><?= ems_sf($r, 'receivables_effect') ?></td><td><?= ems_sf($r, 'order_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+      <?= ems_sf_cells($r, array('order_no', 'request_no', 'approval_completeness_check', 'beneficiary', 'value', 'disbursing_vessel', 'vessel_balance_check', 'first_location', 'second_location', 'delegation_validity_check', 'bank_execution_ref', 'execution_date', 'receivables_effect', 'order_state', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>

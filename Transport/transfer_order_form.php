@@ -618,6 +618,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </form>
         <?php endif; ?>
         <div class="card"><div class="card-body"><div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>الإجراءات</th><th>النوع</th><th>المعدة</th><th>المرفق</th><th>الصنف</th><th>الموظف</th><th>الكمية</th><th>ملاحظة</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -629,7 +630,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-                </tr></thead><tbody>
+                <th>رقم الأمر</th><th>تاريخ الأمر</th><th>رقم الطلب</th><th>نوع الحمولة</th><th>كود المعدة</th><th>من موقع</th><th>إلى موقع</th><th>المسافة التقديرية</th><th>وسيلة النقل</th><th>الناقل</th><th>عقد الناقل</th><th>السائق</th><th>رخصة السائق سارية؟</th><th>المسار المقرر</th><th>تاريخ المغادرة المخطط</th><th>تاريخ الوصول المخطط</th><th>التصاريح المطلوبة</th><th>حالة الأمر</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead><tbody>
             <?php
             // scopedQuery: العزل بالرمز (company_id اليدوي يسقط — مسؤولية البوابة)
             $line_rows = trs_gate($is_super_admin)->scopedQuery(
@@ -653,7 +654,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<td>" . htmlspecialchars((string)($x['pname'] ?? '—')) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['emname'] ?? '—')) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['quantity'] ?? '—')) . "</td>";
-                echo "<td>" . htmlspecialchars((string)($x['note'] ?? '')) . "</td></tr>";
+                echo "<td>" . htmlspecialchars((string)($x['note'] ?? '')) . "</td>" . ems_sf_cells($x, array('order_no', 'order_date', 'request_no', 'cargo_type', 'equipment_code', 'from_location', 'to_location', 'planned_distance', 'transport_mode', 'carrier', 'carrier_contract', 'driver', 'driver_licence_valid', 'planned_route', 'planned_departure_date', 'planned_arrival_date', 'required_permits', 'order_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
             }
             ?>
             </tbody></table>
@@ -774,45 +775,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div></div></div>
     </div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_order_form
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الأمر' => 'g1',
-            'تاريخ الأمر' => 'g2',
-            'رقم الطلب' => 'g3',
-            'نوع الحمولة' => 'g4',
-            'كود المعدة' => 'g5',
-            'من موقع' => 'g6',
-            'إلى موقع' => 'g7',
-            'المسافة التقديرية' => 'g8',
-            'وسيلة النقل' => 'g9',
-            'الناقل' => 'g10',
-            'عقد الناقل' => 'g11',
-            'السائق' => 'g12',
-            'رخصة السائق سارية؟' => 'g13',
-            'المسار المقرر' => 'g14',
-            'تاريخ المغادرة المخطط' => 'g15',
-            'تاريخ الوصول المخطط' => 'g16',
-            'التصاريح المطلوبة' => 'g17',
-            'حالة الأمر' => 'g18',
-            'المنشئ' => 'g19',
-            'تاريخ الإنشاء' => 'g20',
-            'المراجع' => 'g21',
-            'المعتمد' => 'g22',
-            'تاريخ الاعتماد' => 'g23',
-            'حالة البيانات' => 'g24',
-            'مرجع المصدر' => 'g25',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_order_form');
-        echo ems_w14_grid('emsList_trp_transfer_order_form', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أمر الترحيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

@@ -87,7 +87,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['settlement_amount']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'likely_cause_party') ?></td><td><?= ems_sf($r, 'estimated_claim_value') ?></td><td><?= ems_sf($r, 'evidence_documents') ?></td><td><?= ems_sf($r, 'settlement_decision') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('order_no', 'likely_cause_party', 'estimated_claim_value', 'evidence_documents', 'settlement_decision', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="24">لا مطالبات تلف ولا حوادث.</td></tr>
         <?php endif; ?>

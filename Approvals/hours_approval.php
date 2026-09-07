@@ -912,7 +912,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
               </div>
             </td>
-          <td><?= ems_sf($ad, 'batch_uid') ?></td><td><?= ems_sf($ad, 'approval_day') ?></td><td><?= ems_sf($ad, 'batch_scope') ?></td><td><?= ems_sf($ad, 'records_count') ?></td><td><?= ems_sf($ad, 'records_over_capacity') ?></td><td><?= ems_sf($ad, 'records_missing_reason') ?></td><td><?= ems_sf($ad, 'approval_stage') ?></td><td><?= ems_sf($ad, 'site_approver') ?></td><td><?= ems_sf($ad, 'parties_approver') ?></td><td><?= ems_sf($ad, 'contracts_approver') ?></td><td><?= ems_sf($ad, 'match_result') ?></td><td><?= ems_sf($ad, 'excluded_records') ?></td><td><?= ems_sf($ad, 'exception_reason') ?></td><td><?= ems_sf($ad, 'batch_decision') ?></td><td><?= ems_sf($ad, 'creator_name') ?></td><td><?= ems_sf($ad, 'reviewer') ?></td><td><?= ems_sf($ad, 'approver') ?></td><td><?= ems_sf($ad, 'data_state') ?></td><td><?= ems_sf($ad, 'source_ref') ?></td></tr>
+          <?= ems_sf_cells($ad, array('batch_uid', 'approval_day', 'batch_scope', 'records_count', 'records_over_capacity', 'records_missing_reason', 'approval_stage', 'site_approver', 'parties_approver', 'contracts_approver', 'match_result', 'excluded_records', 'exception_reason', 'batch_decision', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; ?>
         </tbody>
       </table>

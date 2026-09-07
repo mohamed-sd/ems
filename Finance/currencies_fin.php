@@ -360,7 +360,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <span class="fin-cur-ok">—</span>
                         <?php endif; ?>
                     </td>
-                <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'currency') ?></td><td><?= ems_sf($r, 'counterparty') ?></td><td><?= ems_sf($r, 'effective_date') ?></td><td><?= ems_sf($r, 'source_documentation') ?></td><td><?= ems_sf($r, 'line_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+                <?= ems_sf_cells($r, array('line_uid', 'currency', 'counterparty', 'effective_date', 'source_documentation', 'line_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>

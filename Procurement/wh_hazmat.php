@@ -89,7 +89,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['permit_ref']) ?></td>
                 <td><?= htmlspecialchars((string) $r['issue_gate']) ?></td>
                 <td><?= htmlspecialchars((string) $r['separation_rule']) ?></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'item_code') ?></td><td><?= ems_sf($r, 'severity_category') ?></td><td><?= ems_sf($r, 'statutory_permit') ?></td><td><?= ems_sf($r, 'isolation_location') ?></td><td><?= ems_sf($r, 'authorized_custodian') ?></td><td><?= ems_sf($r, 'batch_tracking_required') ?></td><td><?= ems_sf($r, 'disbursement_authority') ?></td><td><?= ems_sf($r, 'dual_control') ?></td><td><?= ems_sf($r, 'validity_constraint') ?></td><td><?= ems_sf($r, 'disposal_route') ?></td><td><?= ems_sf($r, 'controls_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'item_code', 'severity_category', 'statutory_permit', 'isolation_location', 'authorized_custodian', 'batch_tracking_required', 'disbursement_authority', 'dual_control', 'validity_constraint', 'disposal_route', 'controls_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

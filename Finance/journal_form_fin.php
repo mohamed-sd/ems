@@ -374,6 +374,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="finTable" class="display nowrap alltables fin-jrn-table">
                 <thead><tr>
                     <th>الإجراءات</th><th>رقم القيد</th><th>تاريخ القيد</th><th>مدين</th><th>دائن</th>
@@ -406,7 +407,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد (الاسم والصفة)</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
                     <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
@@ -415,7 +416,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
-                    </tr></thead>
+                    <th>مرجع الحدث</th><th>عدد أسطر القيد تفصيلها م06-2</th><th>إجمالي المدين</th><th>إجمالي الدائن</th><th>قيد عكسي ل</th><th>حالة القيد</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                     <?php
                     $entries = fin_gate($is_super_admin)->select('fin_journal_entries', array('orderBy' => 'id DESC'));
@@ -445,48 +446,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . ($balanced ? "<span class='badge badge-success'>متوازن</span>" : "<span class='badge badge-danger'>غير متوازن</span>") . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['memo'] ?? '')) . "</td>";
                         echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($st_label) . "</span></td>";
-                        echo "</tr>";
+                        echo "" . ems_sf_cells($row, array('event_ref', 'entry_lines_count_ref_m06_2', 'total_debit', 'total_credit', 'reversal_of', 'entry_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
                     }
                     ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم القيد' => 'g179',
-            'تاريخ القيد' => 'g180',
-            'المصدر' => 'g181',
-            'مرجع الحدث' => 'g182',
-            'الوصف' => 'g183',
-            'عدد أسطر القيد تفصيلها م06-2' => 'g184',
-            'إجمالي المدين' => 'g185',
-            'إجمالي الدائن' => 'g186',
-            'التوازن' => 'g187',
-            'العملة' => 'g188',
-            'سعر الصرف' => 'g189',
-            'الفترة' => 'g190',
-            'قيد عكسي ل' => 'g191',
-            'حالة القيد' => 'g192',
-            'المنشئ' => 'g193',
-            'تاريخ الإنشاء' => 'g194',
-            'المراجع' => 'g195',
-            'المعتمد' => 'g196',
-            'تاريخ الاعتماد' => 'g197',
-            'حالة البيانات' => 'g198',
-            'مرجع المصدر' => 'g199',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_journal_form_fin');
-        echo ems_w14_grid('emsList_fina_journal_form_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القيود اليومية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <template id="j_line_tpl">

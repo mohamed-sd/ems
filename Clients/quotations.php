@@ -592,6 +592,7 @@ function quo_state_tone($state)
                 </div>
             <?php endif; ?>
             <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
                 <table id="quoTable" class="display quo-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
@@ -632,7 +633,7 @@ function quo_state_tone($state)
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                            </tr>
+                            <th>رقم العرض الداخلي</th><th>رقم الفرصة</th><th>رقم الطلب</th><th>رقم العميل</th><th>اسم العميل (بحث)</th><th>رقم المشروع</th><th>رقم العرض الرسمي</th><th>أساس التاريخ</th><th>نموذج العمل</th><th>مدة السريان</th><th>شروط الدفع/الفوترة</th><th>حالة العرض</th><th>رد العميل</th><th>حالة القرار</th><th>تاريخ القرار</th><th>قيمة العرض ($)</th><th>قيمة العرض (ج.س)</th><th>مرجع العقد الناتج</th><th>ملاحظات</th><th>مفتاح دورة الالتزام المصدر</th><th>مستوى الحجية</th><th>أساس القيمة الرجعية</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($rows as $row):
@@ -702,53 +703,13 @@ function quo_state_tone($state)
                                 <td class="quo-num"><?php echo quo_e($amount_disp); ?></td>
                                 <td class="quo-num"><?php echo $row['validity_date'] !== null ? quo_e($row['validity_date']) : '<span class="quo-muted">—</span>'; ?></td>
                                 <td><span class="quo-badge <?php echo quo_state_class($row['state']); ?>"><?php echo quo_e($row['state']); ?></span></td>
-                            </tr>
+                            <?= ems_sf_cells($row, array('internal_offer_no', 'opportunity_no', 'request_no', 'client_no', 'client_name_search', 'project_no', 'official_offer_no', 'date_basis', 'work_model', 'validity_period', 'payment_or_billing_terms', 'offer_state', 'client_response', 'decision_state', 'decision_date', 'offer_value_usd', 'offer_value_sdg', 'resulting_contract_ref', 'notes', 'source_commitment_cycle_key', 'evidence_level', 'residual_value_basis')) ?></tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotations
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم العرض الداخلي' => 'g186',
-            'رقم الفرصة' => 'g187',
-            'رقم الطلب' => 'g188',
-            'رقم العميل' => 'g189',
-            'اسم العميل (بحث)' => 'g190',
-            'رقم المشروع' => 'g191',
-            'رقم العرض الرسمي' => 'g192',
-            'تاريخ الإصدار' => 'g193',
-            'تاريخ الإرسال' => 'g194',
-            'أساس التاريخ' => 'g195',
-            'النسخة' => 'g196',
-            'نموذج العمل' => 'g197',
-            'العملة' => 'g198',
-            'مدة السريان' => 'g199',
-            'شروط الدفع/الفوترة' => 'g200',
-            'حالة العرض' => 'g201',
-            'رد العميل' => 'g202',
-            'حالة القرار' => 'g203',
-            'تاريخ القرار' => 'g204',
-            'قيمة العرض ($)' => 'g205',
-            'قيمة العرض (ج.س)' => 'g206',
-            'مرجع العقد الناتج' => 'g207',
-            'ملاحظات' => 'g208',
-            'مفتاح دورة الالتزام المصدر' => 'g209',
-            'مستوى الحجية' => 'g210',
-            'أساس القيمة الرجعية' => 'g211',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_quotations');
-        echo ems_w14_grid('emsList_sal_quotations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل العروض'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

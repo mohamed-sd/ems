@@ -664,7 +664,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td>
                                 <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
                             </td>
-                        <td><?= ems_sf($r, 'request_details') ?></td><td><?= ems_sf($r, 'attachment') ?></td><td><?= ems_sf($r, 'decision_owner_party') ?></td><td><?= ems_sf($r, 'approval_route') ?></td><td><?= ems_sf($r, 'request_state') ?></td><td><?= ems_sf($r, 'party_decision') ?></td><td><?= ems_sf($r, 'decision_date') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+                        <?= ems_sf_cells($r, array('request_details', 'attachment', 'decision_owner_party', 'approval_route', 'request_state', 'party_decision', 'decision_date', 'creator_name', 'data_state', 'source_ref')) ?></tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>

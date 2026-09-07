@@ -449,7 +449,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             ? ('ذمة #' . intval($due['id']) . ' (' . htmlspecialchars((string) $due['settlement_state']) . ')')
                             : '—'; ?></td>
                         <td><?php echo htmlspecialchars($entity_name); ?></td>
-                    <td><?= ems_sf($po, 'match_no') ?></td><td><?= ems_sf($po, 'supplier_no') ?></td><td><?= ems_sf($po, 'order_no') ?></td><td><?= ems_sf($po, 'grn_notes') ?></td><td><?= ems_sf($po, 'received_value') ?></td><td><?= ems_sf($po, 'variance_classification') ?></td><td><?= ems_sf($po, 'variance_value') ?></td><td><?= ems_sf($po, 'variance_explanation') ?></td><td><?= ems_sf($po, 'finance_referral') ?></td><td><?= ems_sf($po, 'match_state') ?></td><td><?= ems_sf($po, 'creator_name') ?></td><td><?= ems_sf($po, 'reviewer') ?></td><td><?= ems_sf($po, 'approver') ?></td><td><?= ems_sf($po, 'data_state') ?></td><td><?= ems_sf($po, 'source_ref') ?></td></tr>
+                    <?= ems_sf_cells($po, array('match_no', 'supplier_no', 'order_no', 'grn_notes', 'received_value', 'variance_classification', 'variance_value', 'variance_explanation', 'finance_referral', 'match_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>

@@ -85,7 +85,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['done_at']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'item_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'executor') ?></td><td><?= ems_sf($r, 'pre_transfer_photos') ?></td><td><?= ems_sf($r, 'route_risk_assessment') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('item_uid', 'order_no', 'executor', 'pre_transfer_photos', 'route_risk_assessment', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="19">لا بنود تجهيز مغادرة.</td></tr>
         <?php endif; ?>

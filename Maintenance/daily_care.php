@@ -83,7 +83,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ($r['breakdown_id'] === null || (int) $r['breakdown_id'] === 0) ? '—' : (int) $r['breakdown_id'] ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'equipment_code') ?></td><td><?= ems_sf($r, 'care_checklist_for_type') ?></td><td><?= ems_sf($r, 'executor') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'equipment_code', 'care_checklist_for_type', 'executor', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="18">لا أسطر عناية يومية.</td></tr>
         <?php endif; ?>

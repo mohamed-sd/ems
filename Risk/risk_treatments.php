@@ -101,7 +101,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <button class="btn btn-sm btn-primary treatVerify" data-id="<?php echo (int) $t['id']; ?>">قبول المتحقق</button>
                     <?php endif; ?>
                 </td>
-            <td><?= ems_sf($t, 'action_uid') ?></td><td><?= ems_sf($t, 'risk_uid') ?></td><td><?= ems_sf($t, 'processing_route') ?></td><td><?= ems_sf($t, 'action_description') ?></td><td><?= ems_sf($t, 'owner_name') ?></td><td><?= ems_sf($t, 'executing_department') ?></td><td><?= ems_sf($t, 'due_date') ?></td><td><?= ems_sf($t, 'target_level_after_action') ?></td><td><?= ems_sf($t, 'delay_days') ?></td><td><?= ems_sf($t, 'reassess_after') ?></td><td><?= ems_sf($t, 'action_state') ?></td><td><?= ems_sf($t, 'creator_name') ?></td><td><?= ems_sf($t, 'created_date') ?></td><td><?= ems_sf($t, 'data_state') ?></td><td><?= ems_sf($t, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($t, array('action_uid', 'risk_uid', 'processing_route', 'action_description', 'owner_name', 'executing_department', 'due_date', 'target_level_after_action', 'delay_days', 'reassess_after', 'action_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; if (empty($rows)): ?><tr><td colspan="23" class="text-muted">لا إجراءات</td></tr><?php endif; ?></tbody>
         </table>
     </div></div>

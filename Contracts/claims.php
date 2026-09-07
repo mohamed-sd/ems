@@ -395,6 +395,7 @@ include('../includes/page_header.php'); ?>
                 <strong>صف لكل عملة</strong>: العقد الواحد قد تكون أيامه بعملتين، ولا تجمعان في رقم
                 واحد ما لم يدخل سعر صرفهما.
             </p>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table class="display clm-w100">
                 <thead><tr><th>العقد</th><th>المشروع</th><th>العميل</th><th>العملة</th><th>الأيام</th>
                     <th>المدى</th><th>القيمة</th><th></th>
@@ -421,7 +422,7 @@ include('../includes/page_header.php'); ?>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    </tr></thead>
+                    <th>رقم المطالبة</th><th>مفتاح دورة الالتزام</th><th>كود العقد</th><th>رقم العميل</th><th>اسم العميل (بحث)</th><th>الفترة من</th><th>إلى</th><th>الكمية المنجزة المرجعية</th><th>الوحدة</th><th>الاستحقاق المحسوب ($)</th><th>الاستحقاق المحسوب (ج.س)</th><th>القيمة المطالب بها ($)</th><th>المطالب بها (ج.س)</th><th>مرجع القياس/المستخلص</th><th>حالة اعتماد العميل</th><th>تاريخ التسليم للمالية</th><th>مرجع الفاتورة</th><th>حالة المتابعة</th><th>ملاحظات</th><th>المفوتر للعميل ($)</th><th>مستحق غير مطالب به ($)</th><th>حالة التحصيل</th><th>أساس حالة التحصيل</th><th>دليل القياس/التسوية بالمصدر</th><th>مستوى الحجية</th></tr></thead>
                 <tbody>
                 <?php foreach ($unbilled_rows as $u): ?>
                     <tr>
@@ -442,7 +443,7 @@ include('../includes/page_header.php'); ?>
                                <i class="fas fa-wand-magic-sparkles"></i> ولد مداه</a>
                             <?php endif; ?>
                         </td>
-                    </tr>
+                    <?= ems_sf_cells($u, array('claim_no', 'commitment_cycle_key', 'contract_code', 'client_no', 'client_name_search', 'period_from', 'range_to', 'reference_done_quantity', 'unit', 'computed_due_usd', 'computed_due_sdg', 'claimed_value_usd', 'claimed_value_sdg', 'measure_or_claim_ref', 'client_approval_state', 'finance_handover_date', 'invoice_ref', 'followup_state', 'notes', 'invoiced_to_client_usd', 'unclaimed_due_usd', 'collection_state', 'collection_state_basis', 'measure_or_settlement_evidence', 'evidence_level')) ?></tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
@@ -820,45 +821,6 @@ include('../includes/page_header.php'); ?>
             <?php endif; ?>
         </div>
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_claims
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المطالبة' => 'g161',
-            'مفتاح دورة الالتزام' => 'g162',
-            'كود العقد' => 'g163',
-            'رقم العميل' => 'g164',
-            'اسم العميل (بحث)' => 'g165',
-            'الفترة من' => 'g166',
-            'إلى' => 'g167',
-            'الكمية المنجزة المرجعية' => 'g168',
-            'الوحدة' => 'g169',
-            'الاستحقاق المحسوب ($)' => 'g170',
-            'الاستحقاق المحسوب (ج.س)' => 'g171',
-            'القيمة المطالب بها ($)' => 'g172',
-            'المطالب بها (ج.س)' => 'g173',
-            'مرجع القياس/المستخلص' => 'g174',
-            'حالة اعتماد العميل' => 'g175',
-            'تاريخ التسليم للمالية' => 'g176',
-            'مرجع الفاتورة' => 'g177',
-            'حالة المتابعة' => 'g178',
-            'ملاحظات' => 'g179',
-            'المفوتر للعميل ($)' => 'g180',
-            'مستحق غير مطالب به ($)' => 'g181',
-            'حالة التحصيل' => 'g182',
-            'أساس حالة التحصيل' => 'g183',
-            'دليل القياس/التسوية بالمصدر' => 'g184',
-            'مستوى الحجية' => 'g185',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_claims');
-        echo ems_w14_grid('emsList_sal_claims', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المطالبات والتسليم للمالية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

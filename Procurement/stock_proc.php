@@ -106,6 +106,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="procTable" class="display nowrap alltables proc-stk-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
@@ -138,7 +139,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    </tr></thead>
+                    <th>معرف السطر</th><th>كود الصنف</th><th>حالة الرصيد</th><th>الكمية</th><th>القيمة</th><th>تحت الحد الأدنى؟</th></tr></thead>
                 <tbody>
                     <?php
                     $stock_rows = proc_gate($is_super_admin)->scopedQuery(
@@ -202,7 +203,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         $td($row['last_move'] !== null ? (string)$row['last_move'] : '—');
                         $td($stk_entity);                                             // الكيان
                         for ($gv = 0; $gv < 10; $gv++) { $td('—'); }                  // بقية الحوكمة حتى ربط مصادرها
-                        echo "</tr>";
+                        echo "" . ems_sf_cells($row, array('line_uid', 'item_code', 'balance_state', 'quantity', 'value', 'below_minimum')) . "</tr>";
                     } }
                     ?>
                 </tbody>
@@ -243,29 +244,6 @@ try {
     <?php endif; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_stock_proc
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g110',
-            'كود الصنف' => 'g111',
-            'المخزن' => 'g112',
-            'حالة الرصيد' => 'g113',
-            'الكمية' => 'g114',
-            'متوسط التكلفة' => 'g115',
-            'القيمة' => 'g116',
-            'آخر حركة' => 'g117',
-            'تحت الحد الأدنى؟' => 'g118',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_stock_proc');
-        echo ems_w14_grid('emsList_wh_stock_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أرصدة المخزون بحالاتها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

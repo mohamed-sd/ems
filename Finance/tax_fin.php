@@ -178,6 +178,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <h5 class="fin-tax-h5"><i class="fas fa-list"></i> الحركات الضريبية</h5>
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="finTable" class="display nowrap alltables fin-tax-table">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>الرمز</th><th>الوعاء</th><th>النسبة</th><th>الضريبة</th><th>المرجع</th><th>الفترة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -189,7 +190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              </tr></thead>
+              <th>معرف الإقرار</th><th>نوع الضريبة</th><th>ضريبة المخرجات</th><th>ضريبة المدخلات</th><th>الصافي المستحق</th><th>تاريخ الاستحقاق النظامي</th><th>مرجع التقديم بالحوكمة</th><th>مرجع السداد بالخزينة</th><th>حالة الإقرار</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                 <?php
                 $tx_rows = fin_gate($is_super_admin)->scopedQuery(
@@ -208,46 +209,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td><strong>" . number_format((float)$row['tax_amount'], 2) . "</strong></td>";
                     echo "<td>" . htmlspecialchars((string)($row['source_ref'] ?? '')) . "</td>";
                     echo "<td>" . htmlspecialchars((string)$row['period_ref']) . "</td>";
-                    echo "</tr>";
+                    echo "" . ems_sf_cells($row, array('declaration_uid', 'tax_type', 'output_tax', 'input_tax', 'net_due', 'statutory_due_date', 'governance_submission_ref', 'treasury_settlement_ref', 'declaration_state', 'creator_name', 'data_state', 'source_ref')) . "</tr>";
                 } }
                 ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_fina_tax_fin')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإقرار' => 'g89',
-            'الفترة' => 'g90',
-            'نوع الضريبة' => 'g91',
-            'ضريبة المخرجات' => 'g92',
-            'ضريبة المدخلات' => 'g93',
-            'الصافي المستحق' => 'g94',
-            'تاريخ الاستحقاق النظامي' => 'g95',
-            'مرجع التقديم بالحوكمة' => 'g96',
-            'مرجع السداد بالخزينة' => 'g97',
-            'حالة الإقرار' => 'g98',
-            'المنشئ' => 'g99',
-            'تاريخ الإنشاء' => 'g100',
-            'حالة البيانات' => 'g101',
-            'مرجع المصدر' => 'g102',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_tax_fin');
-        echo ems_w14_grid('emsList_fina_tax_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الضرائب والقيمة المضافة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

@@ -85,7 +85,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['receipt_ref']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'external_party_supplier') ?></td><td><?= ems_sf($r, 'contract_or_guarantee_ref') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'order_no', 'external_party_supplier', 'contract_or_guarantee_ref', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="19">لا إحالات خارجية ولا مطالبات ضمان.</td></tr>
         <?php endif; ?>

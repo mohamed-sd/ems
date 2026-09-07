@@ -65,8 +65,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا أسطر تقرير مشتقة بعد', 'الاشتقاق يجري من الأوامر ومحاضرها وتكاليفها. ولا يدخل من هنا'); ?>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>الفترة</th><th>عدد الأوامر</th><th>منها مقفلة</th><th>متوسط زمن الرحلة</th><th>الالتزام بالمواعيد</th><th>حوادث وتلفيات</th><th>إجمالي التكلفة</th><th>تكلفة الكيلومتر</th><th>التوزيع بالوسيلة</th><th>قاعدة الاشتقاق</th><th>المصادر</th></tr></thead>
+        <thead><tr><th>#</th><th>الفترة</th><th>عدد الأوامر</th><th>منها مقفلة</th><th>متوسط زمن الرحلة</th><th>الالتزام بالمواعيد</th><th>حوادث وتلفيات</th><th>إجمالي التكلفة</th><th>تكلفة الكيلومتر</th><th>التوزيع بالوسيلة</th><th>قاعدة الاشتقاق</th><th>المصادر</th><th>معرف السطر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -82,34 +83,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['by_carrier']) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derived_from']) ?></small></td>
-            </tr>
+            <?= ems_sf_cells($r, array('line_uid')) ?></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="12">لا أسطر تقرير مشتقة بعد.</td></tr>
+            <tr><td colspan="13">لا أسطر تقرير مشتقة بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_orders_report
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g161',
-            'الفترة' => 'g162',
-            'عدد الأوامر' => 'g163',
-            'منها مقفلة' => 'g164',
-            'متوسط زمن الرحلة' => 'g165',
-            'الالتزام بالمواعيد' => 'g166',
-            'حوادث وتلفيات' => 'g167',
-            'إجمالي التكلفة' => 'g168',
-            'تكلفة الكيلومتر' => 'g169',
-            'التوزيع بالوسيلة' => 'g170',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_orders_report');
-        echo ems_w14_grid('emsList_trp_transfer_orders_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقرير أوامر الترحيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

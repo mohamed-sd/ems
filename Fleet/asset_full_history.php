@@ -118,6 +118,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="ems-data-table">
             <thead>
                 <tr>
@@ -130,7 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>المشروع</th>
                     <th>الحالة بعد الواقعة</th>
                     <th>المسؤول</th>
-                </tr>
+                <th>تسلسل الواقعة</th><th>قراءة العداد</th><th>الموقع</th><th>الوحدة التعاقدية</th><th>المستند</th></tr>
             </thead>
             <tbody>
             <?php $seq = 0; foreach ($rows as $x0): $seq++; ?>
@@ -144,10 +145,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['proj']) ?></td>
                     <td><?= htmlspecialchars($x0['after']) ?></td>
                     <td><?= htmlspecialchars($x0['by']) ?></td>
-                </tr>
+                <?= ems_sf_cells($x0, array('event_sequence', 'meter_reading', 'location', 'contract_unit', 'document')) ?></tr>
             <?php endforeach; ?>
             <?php if (!$rows): ?>
-                <tr><td colspan="9">لا وقائع بعد. الروافد سجل تاريخ المعدة من خطافات الاحداث ومطابقات ساعات الاصول الشهرية</td></tr>
+                <tr><td colspan="14">لا وقائع بعد. الروافد سجل تاريخ المعدة من خطافات الاحداث ومطابقات ساعات الاصول الشهرية</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -160,34 +161,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وقراءة العداد في دفتر الحبة بلا عمود مصدر في الرافدين بعد فتعلن ولا يختلق لها رقم.
         قراءة صرف ولا ادخال من هذه الشاشة.
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_flt_asset_full_history
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود الأصل' => 'g33',
-            'تسلسل الواقعة' => 'g34',
-            'التاريخ' => 'g35',
-            'نوع الواقعة' => 'g36',
-            'الشيت المصدر' => 'g37',
-            'مرجع السجل' => 'g38',
-            'وصف الواقعة' => 'g39',
-            'قراءة العداد' => 'g40',
-            'الموقع' => 'g41',
-            'المشروع' => 'g42',
-            'الوحدة التعاقدية' => 'g43',
-            'الحالة بعد الواقعة' => 'g44',
-            'المسؤول' => 'g45',
-            'المستند' => 'g46',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('flt_asset_full_history');
-        echo ems_w14_grid('emsList_flt_asset_full_history', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تاريخ المعدة الكامل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

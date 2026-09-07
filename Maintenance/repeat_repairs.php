@@ -88,7 +88,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['rca_state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars(mb_substr((string) $r['root_cause'], 0, 120)) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'event_uid') ?></td><td><?= ems_sf($r, 'equipment_code') ?></td><td><?= ems_sf($r, 'original_order_no') ?></td><td><?= ems_sf($r, 'within_certificate_validity') ?></td><td><?= ems_sf($r, 'root_cause_analysis') ?></td><td><?= ems_sf($r, 'new_order_no') ?></td><td><?= ems_sf($r, 'rca_trigger') ?></td><td><?= ems_sf($r, 'decision') ?></td><td><?= ems_sf($r, 'event_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('event_uid', 'equipment_code', 'original_order_no', 'within_certificate_validity', 'root_cause_analysis', 'new_order_no', 'rca_trigger', 'decision', 'event_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="24">لا وقائع إعادة إصلاح.</td></tr>
         <?php endif; ?>

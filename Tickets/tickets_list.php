@@ -297,6 +297,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="tktTable" class="display nowrap alltables tkt-list-table" data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
@@ -321,7 +322,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-                    </tr></thead>
+                    <th>معرف السطر</th><th>نطاق العرض</th><th>تاريخ التسجيل</th><th>محل البلاغ</th><th>الكيان المنشأ في إدارتنا</th><th>مهلة SLA</th><th>المتبقي/التأخير</th><th>مستوى التصعيد</th><th>ينتظر تحققا؟</th><th>حالة البلاغ</th></tr></thead>
                 <tbody>
                 <?php
                 // scopedQuery: scope على tickets + إثراءات LEFT حصرًا (مراجع مرنة قد تغيب)
@@ -374,41 +375,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars((string)$row['call_date'] . ' ' . (string)($row['call_time'] ?? '')) . "</td>";
                     echo "<td>" . htmlspecialchars((string)($row['resolution_due_at'] ?? '—')) . "</td>";
                     echo "<td>" . tkt_overdue_badge($row) . "</td>";
-                    echo "</tr>";
+                    echo "" . ems_sf_cells($row, array('line_uid', 'offer_scope', 'registration_date', 'report_subject', 'entity_created_in_our_dept', 'sla_deadline', 'remaining_or_delay', 'escalation_level', 'awaiting_verification', 'report_state')) . "</tr>";
                 }
                 ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g75',
-            'نطاق العرض' => 'g76',
-            'رقم البلاغ' => 'g77',
-            'تاريخ التسجيل' => 'g78',
-            'الفئة' => 'g79',
-            'الأولوية' => 'g80',
-            'محل البلاغ' => 'g81',
-            'المكلف' => 'g82',
-            'الكيان المنشأ في إدارتنا' => 'g83',
-            'مهلة SLA' => 'g84',
-            'المتبقي/التأخير' => 'g85',
-            'مستوى التصعيد' => 'g86',
-            'ينتظر تحققا؟' => 'g87',
-            'حالة البلاغ' => 'g88',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tkt_tickets_list');
-        echo ems_w14_grid('emsList_tkt_tickets_list', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق بلاغات الإدارة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

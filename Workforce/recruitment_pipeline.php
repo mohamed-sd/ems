@@ -165,6 +165,7 @@ echo ems_states_bundle('لا متقدمين في دورة التوظيف الآ�
     </form>
   </div>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>#</th><th>المتقدم</th><th>سبب الشاغر</th><th>الخطوة</th><th>الاختبار</th><th>تقدم</th><th>رفض</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -196,9 +197,9 @@ echo ems_states_bundle('لا متقدمين في دورة التوظيف الآ�
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-              </tr></thead>
+              <th>رقم الشاغر</th><th>تاريخ الفتح</th><th>المسمى الوظيفي</th><th>عدد المطلوبين</th><th>اشتراطات الشاغر</th><th>المرحلة</th><th>المرشحون</th><th>المرشح المقبول</th><th>نتيجة الاختبار العملي</th><th>العرض المقدم</th><th>حالة الشاغر</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody>
-    <?php if (empty($apps)): ?><tr><td colspan="7" class="text-center text-muted">لا متقدمين في الدورة</td></tr><?php endif; ?>
+    <?php if (empty($apps)): ?><tr><td colspan="50" class="text-center text-muted">لا متقدمين في الدورة</td></tr><?php endif; ?>
     <?php foreach ($apps as $a2):
         $idx = array_search($a2['stage'], $ORDER, true);
         $nextLabel = ($idx !== false && $idx < count($ORDER) - 1) ? $STAGES[$ORDER[$idx + 1]] : null; ?>
@@ -232,43 +233,8 @@ echo ems_states_bundle('لا متقدمين في دورة التوظيف الآ�
             <button class="action-btn rec-reject-btn" type="submit">رفض</button>
           </form>
         </td>
-      </tr>
+      <?= ems_sf_cells($a2, array('vacancy_no', 'opening_date', 'job_title', 'required_headcount', 'vacancy_requirements', 'stage', 'candidates', 'accepted_candidate', 'practical_test_result', 'submitted_offer', 'vacancy_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الشاغر' => 'g24',
-            'تاريخ الفتح' => 'g25',
-            'الإدارة الطالبة' => 'g26',
-            'المسمى الوظيفي' => 'g27',
-            'سبب الشاغر' => 'g28',
-            'عدد المطلوبين' => 'g29',
-            'اشتراطات الشاغر' => 'g30',
-            'المرحلة' => 'g31',
-            'المرشحون' => 'g32',
-            'المرشح المقبول' => 'g33',
-            'نتيجة الاختبار العملي' => 'g34',
-            'العرض المقدم' => 'g35',
-            'تاريخ المباشرة' => 'g36',
-            'حالة الشاغر' => 'g37',
-            'المنشئ' => 'g38',
-            'تاريخ الإنشاء' => 'g39',
-            'المراجع' => 'g40',
-            'المعتمد' => 'g41',
-            'تاريخ الاعتماد' => 'g42',
-            'حالة البيانات' => 'g43',
-            'مرجع المصدر' => 'g44',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_recruitment_pipeline');
-        echo ems_w14_grid('emsList_hr_recruitment_pipeline', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التوظيف من الشاغر إلى المباشرة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

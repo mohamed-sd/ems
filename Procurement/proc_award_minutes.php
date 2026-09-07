@@ -98,7 +98,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ((int) $r['is_lowest'] === 1 ? 'نعم' : 'لا') ?></td>
                 <td><?= htmlspecialchars((string) $r['award_why']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-            <td><?= ems_sf($r, 'rfq_no') ?></td><td><?= ems_sf($r, 'compared_offers') ?></td><td><?= ems_sf($r, 'comparison_table') ?></td><td><?= ems_sf($r, 'awarded_offer') ?></td><td><?= ems_sf($r, 'award_value') ?></td><td><?= ems_sf($r, 'selection_justification') ?></td><td><?= ems_sf($r, 'justification_detail') ?></td><td><?= ems_sf($r, 'committee_members') ?></td><td><?= ems_sf($r, 'award_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('rfq_no', 'compared_offers', 'comparison_table', 'awarded_offer', 'award_value', 'selection_justification', 'justification_detail', 'committee_members', 'award_state', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

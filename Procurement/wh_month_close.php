@@ -93,7 +93,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ((int) $r['count_ref'] > 0 ? (int) $r['count_ref'] : '') ?></td>
                 <td><?= htmlspecialchars((string) $r['closed_at']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-            <td><?= ems_sf($r, 'closing_uid') ?></td><td><?= ems_sf($r, 'month') ?></td><td><?= ems_sf($r, 'month_grn_notes') ?></td><td><?= ems_sf($r, 'month_issue_notes') ?></td><td><?= ems_sf($r, 'month_transfers') ?></td><td><?= ems_sf($r, 'settled_count_variances') ?></td><td><?= ems_sf($r, 'open_custodies_carried') ?></td><td><?= ems_sf($r, 'closing_stock_value') ?></td><td><?= ems_sf($r, 'finance_match') ?></td><td><?= ems_sf($r, 'closing_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('closing_uid', 'month', 'month_grn_notes', 'month_issue_notes', 'month_transfers', 'settled_count_variances', 'open_custodies_carried', 'closing_stock_value', 'finance_match', 'closing_state', 'creator_name', 'created_date', 'reviewer', 'approver', 'approval_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

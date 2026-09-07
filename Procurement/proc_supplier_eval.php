@@ -90,7 +90,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(number_format((float) $r['score'], 2)) ?></td>
                 <td><?= htmlspecialchars((string) $r['grade']) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['score_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'supplier_no') ?></td><td><?= ems_sf($r, 'its_value') ?></td><td><?= ems_sf($r, 'schedule_adherence') ?></td><td><?= ems_sf($r, 'average_delay') ?></td><td><?= ems_sf($r, 'inspection_rejection_rate') ?></td><td><?= ems_sf($r, 'match_variances') ?></td><td><?= ems_sf($r, 'composite_index') ?></td><td><?= ems_sf($r, 'resulting_classification') ?></td></tr>
+            <?= ems_sf_cells($r, array('line_uid', 'supplier_no', 'its_value', 'schedule_adherence', 'average_delay', 'inspection_rejection_rate', 'match_variances', 'composite_index', 'resulting_classification')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

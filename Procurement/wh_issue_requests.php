@@ -98,7 +98,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
                 <td><a href="?req=<?= (int) $r['id'] ?>">عرض البنود</a></td>
-            <td><?= ems_sf($r, 'item_uid') ?></td><td><?= ems_sf($r, 'request_no') ?></td><td><?= ems_sf($r, 'item_code') ?></td><td><?= ems_sf($r, 'requested_quantity') ?></td><td><?= ems_sf($r, 'approved_quantity') ?></td><td><?= ems_sf($r, 'cumulative_spend') ?></td><td><?= ems_sf($r, 'remaining') ?></td><td><?= ems_sf($r, 'item_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td><td><?= ems_sf($r, 'arrival_date') ?></td><td><?= ems_sf($r, 'issue_type') ?></td><td><?= ems_sf($r, 'justifying_reference') ?></td><td><?= ems_sf($r, 'reference_check') ?></td><td><?= ems_sf($r, 'requested_items') ?></td><td><?= ems_sf($r, 'balance_check') ?></td><td><?= ems_sf($r, 'warehouse_decision') ?></td><td><?= ems_sf($r, 'request_state') ?></td></tr>
+            <?= ems_sf_cells($r, array('item_uid', 'request_no', 'item_code', 'requested_quantity', 'approved_quantity', 'cumulative_spend', 'remaining', 'item_state', 'creator_name', 'created_date', 'data_state', 'source_ref', 'arrival_date', 'issue_type', 'justifying_reference', 'reference_check', 'requested_items', 'balance_check', 'warehouse_decision', 'request_state')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>

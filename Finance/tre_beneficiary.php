@@ -162,6 +162,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       <button class="action-btn" type="submit" name="new_ben" value="1"><i class="fa fa-plus"></i> تسجيل مستفيد</button></div>
   </form>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>الطرف</th><th>المستفيد</th><th>البنك</th><th>الآيبان</th>
@@ -169,10 +170,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="creator" data-slice="1">المنشئ</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
-    </tr></thead>
+    <th>معرف المستفيد</th><th>اسم المستفيد</th><th>نوع المستفيد</th><th>رقم الحساب/IBAN</th><th>وثيقة التحقق</th><th>تاريخ التحقق</th><th>محقق مستقل</th><th>تغيير حساب معلق؟</th><th>حالة التحقق</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا مستفيد مسجل بعد</td></tr>
+      <tr><td colspan="24" class="text-center text-muted">لا مستفيد مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
@@ -189,52 +190,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <td><?= htmlspecialchars((string) $r['currency'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= (int) $r['created_by'] ?></td>
         <td><?= (int) $r['verified_by'] ?: '—' ?></td>
-      </tr>
+      <?= ems_sf_cells($r, array('beneficiary_uid', 'beneficiary_name', 'beneficiary_type', 'account_or_iban', 'verification_document', 'verification_date', 'independent_verifier', 'pending_account_change', 'verification_state', 'created_date', 'data_state', 'source_ref')) ?></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_tre_beneficiary')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المستفيد' => 'g202',
-            'اسم المستفيد' => 'g203',
-            'نوع المستفيد' => 'g204',
-            'رقم الحساب/IBAN' => 'g205',
-            'البنك' => 'g206',
-            'وثيقة التحقق' => 'g207',
-            'تاريخ التحقق' => 'g208',
-            'محقق مستقل' => 'g209',
-            'تغيير حساب معلق؟' => 'g210',
-            'حالة التحقق' => 'g211',
-            'المنشئ' => 'g212',
-            'تاريخ الإنشاء' => 'g213',
-            'حالة البيانات' => 'g214',
-            'مرجع المصدر' => 'g215',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tre_beneficiary');
-        echo ems_w14_grid('emsList_tre_beneficiary', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المستفيدين والتحقق'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('سجل المستفيدين والتحقق', 'سجل المستفيدين والتحقق'),
-        'table'    => 'tre_beneficiary',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'finance/tre_beneficiary.php',
-    )); ?>
-
-    </div></div></div>
 </div>

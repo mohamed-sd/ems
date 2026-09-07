@@ -263,7 +263,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars((string)$row['end_date']) . "</td>";
                     echo "<td>" . ($row['posting_allowed'] ? "<span class='badge badge-success'>نعم</span>" : "<span class='badge badge-secondary'>لا</span>") . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($period_states[$st] ?? $st) . "</span></td>";
-                    echo "" . "<td>" . ems_sf($row, 'period_uid') . "</td>" . "<td>" . ems_sf($row, 'month') . "</td>" . "<td>" . ems_sf($row, 'period_entries') . "</td>" . "<td>" . ems_sf($row, 'pending_entries') . "</td>" . "<td>" . ems_sf($row, 'warehouse_match') . "</td>" . "<td>" . ems_sf($row, 'treasury_match') . "</td>" . "<td>" . ems_sf($row, 'incoming_ops_closures') . "</td>" . "<td>" . ems_sf($row, 'processing_variances') . "</td>" . "<td>" . ems_sf($row, 'closing_decision') . "</td>" . "<td>" . ems_sf($row, 'reopen_decision') . "</td>" . "<td>" . ems_sf($row, 'period_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+                    echo "" . ems_sf_cells($row, array('period_uid', 'month', 'period_entries', 'pending_entries', 'warehouse_match', 'treasury_match', 'incoming_ops_closures', 'processing_variances', 'closing_decision', 'reopen_decision', 'period_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) . "</tr>";
                 }
                 ?>
                 </tbody>

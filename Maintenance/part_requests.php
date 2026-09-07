@@ -83,7 +83,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['receipt_match'], $conn)) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            <td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'requested_items') ?></td><td><?= ems_sf($r, 'custody_receiver') ?></td><td><?= ems_sf($r, 'issue_note_no') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+            <?= ems_sf_cells($r, array('order_no', 'requested_items', 'custody_receiver', 'issue_note_no', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; else: ?>
             <tr><td colspan="18">لا طلبات صرف قطع.</td></tr>
         <?php endif; ?>

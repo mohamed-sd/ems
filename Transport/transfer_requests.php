@@ -253,7 +253,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             echo "<td>" . htmlspecialchars((string)$row['reason']) . "</td>";
             echo "<td>" . htmlspecialchars($prio_ar) . "</td>";
             echo "<td><span class='action-btn trs-rq-chip' data-allow-style style='background:$sc'>" . htmlspecialchars($state_ar) . "</span></td>";
-            echo "" . "<td>" . ems_sf($row, 'requesting_party') . "</td>" . "<td>" . ems_sf($row, 'resource_move_order_ref') . "</td>" . "<td>" . ems_sf($row, 'cargo_type') . "</td>" . "<td>" . ems_sf($row, 'equipment_or_item_code') . "</td>" . "<td>" . ems_sf($row, 'weight_or_dimensions') . "</td>" . "<td>" . ems_sf($row, 'from_location') . "</td>" . "<td>" . ems_sf($row, 'to_location') . "</td>" . "<td>" . ems_sf($row, 'loading_notes') . "</td>" . "<td>" . ems_sf($row, 'request_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
+            echo "" . ems_sf_cells($row, array('requesting_party', 'resource_move_order_ref', 'cargo_type', 'equipment_or_item_code', 'weight_or_dimensions', 'from_location', 'to_location', 'loading_notes', 'request_state', 'creator_name', 'data_state', 'source_ref')) . "</tr>";
         }
         ?>
         </tbody></table>
