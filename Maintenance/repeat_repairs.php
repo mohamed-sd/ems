@@ -73,7 +73,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا وقائع إعادة إصلاح', 'الواقعة تفتح حين يتكرر العطل على العقدة نفسها. والصلاحية تقرأ من الشهادة'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>المعدة</th><th>الأمر الأصلي</th><th>عقدة الشجرة</th><th>تاريخ التكرار</th><th>المدة منذ الشهادة</th><th>ضمن الصلاحية</th><th>محفز التحليل</th><th>حالة التحليل</th><th>السبب الجذري</th><th>قاعدة الاشتقاق</th></tr></thead>
+        <thead><tr><th>#</th><th>المعدة</th><th>الأمر الأصلي</th><th>عقدة الشجرة</th><th>تاريخ التكرار</th><th>المدة منذ الشهادة</th><th>ضمن الصلاحية</th><th>محفز التحليل</th><th>حالة التحليل</th><th>السبب الجذري</th><th>قاعدة الاشتقاق</th><th>معرف الواقعة</th><th>كود المعدة</th><th>رقم الأمر الأصلي</th><th>ضمن صلاحية الشهادة؟</th><th>تحليل السبب الجذري RCA</th><th>رقم الأمر الجديد</th><th>محفز RCA</th><th>القرار</th><th>حالة الواقعة</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -88,47 +88,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['rca_state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars(mb_substr((string) $r['root_cause'], 0, 120)) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'event_uid') ?></td><td><?= ems_sf($r, 'equipment_code') ?></td><td><?= ems_sf($r, 'original_order_no') ?></td><td><?= ems_sf($r, 'within_certificate_validity') ?></td><td><?= ems_sf($r, 'root_cause_analysis') ?></td><td><?= ems_sf($r, 'new_order_no') ?></td><td><?= ems_sf($r, 'rca_trigger') ?></td><td><?= ems_sf($r, 'decision') ?></td><td><?= ems_sf($r, 'event_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="11">لا وقائع إعادة إصلاح.</td></tr>
+            <tr><td colspan="24">لا وقائع إعادة إصلاح.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_repeat_repairs"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_repeat_repairs
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الواقعة' => 'g101',
-            'كود المعدة' => 'g102',
-            'رقم الأمر الأصلي' => 'g103',
-            'عقدة الشجرة' => 'g104',
-            'تاريخ التكرار' => 'g105',
-            'المدة منذ الشهادة' => 'g106',
-            'ضمن صلاحية الشهادة؟' => 'g107',
-            'تحليل السبب الجذري RCA' => 'g108',
-            'رقم الأمر الجديد' => 'g109',
-            'محفز RCA' => 'g110',
-            'القرار' => 'g111',
-            'حالة الواقعة' => 'g112',
-            'المنشئ' => 'g113',
-            'تاريخ الإنشاء' => 'g114',
-            'حالة البيانات' => 'g115',
-            'مرجع المصدر' => 'g116',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_repeat_repairs');
-        echo ems_w14_grid('emsList_mnt_repeat_repairs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل إعادة الإصلاح'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

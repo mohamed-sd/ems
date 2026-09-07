@@ -70,7 +70,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا مراحل رحلة مسجلة', 'المرحلة تفتح على أمر ترحيل بتسلسلها. ولا تبدأ قبل تسليم سابقتها'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر الترحيل</th><th>التسلسل</th><th>من نقطة</th><th>إلى نقطة</th><th>المسافة</th><th>بدء المرحلة</th><th>انتهاء المرحلة</th><th>سلمت للتالية</th><th>أحداث المرحلة</th><th>حالة المرحلة</th><th>قاعدة الحالة</th></tr></thead>
+        <thead><tr><th>#</th><th>أمر الترحيل</th><th>التسلسل</th><th>من نقطة</th><th>إلى نقطة</th><th>المسافة</th><th>بدء المرحلة</th><th>انتهاء المرحلة</th><th>سلمت للتالية</th><th>أحداث المرحلة</th><th>حالة المرحلة</th><th>قاعدة الحالة</th><th>معرف المرحلة</th><th>رقم الأمر</th><th>تسلسل المرحلة</th><th>الناقلة المكلفة</th><th>السائق</th><th>المسافة المقدرة</th><th>تسليم المرحلة للتالية</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -86,41 +86,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['events_count']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'stage_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'stage_sequence') ?></td><td><?= ems_sf($r, 'assigned_carrier') ?></td><td><?= ems_sf($r, 'driver') ?></td><td><?= ems_sf($r, 'estimated_distance') ?></td><td><?= ems_sf($r, 'stage_handover_to_next') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="12">لا مراحل رحلة مسجلة.</td></tr>
+            <tr><td colspan="23">لا مراحل رحلة مسجلة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_trip_legs
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المرحلة' => 'g80',
-            'رقم الأمر' => 'g81',
-            'تسلسل المرحلة' => 'g82',
-            'من نقطة' => 'g83',
-            'إلى نقطة' => 'g84',
-            'الناقلة المكلفة' => 'g85',
-            'السائق' => 'g86',
-            'المسافة المقدرة' => 'g87',
-            'بدء المرحلة' => 'g88',
-            'انتهاء المرحلة' => 'g89',
-            'تسليم المرحلة للتالية' => 'g90',
-            'أحداث المرحلة' => 'g91',
-            'حالة المرحلة' => 'g92',
-            'المنشئ' => 'g93',
-            'تاريخ الإنشاء' => 'g94',
-            'حالة البيانات' => 'g95',
-            'مرجع المصدر' => 'g96',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_trip_legs');
-        echo ems_w14_grid('emsList_trp_transfer_trip_legs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مراحل الرحلة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

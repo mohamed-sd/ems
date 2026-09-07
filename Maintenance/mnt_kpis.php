@@ -71,7 +71,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أسطر مؤشرات مشتقة بعد', 'الاشتقاق يجري من الأوامر والشهادات والتوقفات. ولا يدخل من هنا'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>الفترة</th><th>النطاق</th><th>المعدة</th><th>عدد الأعطال</th><th>متوسط الزمن بين الأعطال</th><th>متوسط زمن الإصلاح</th><th>نسبة الجاهزية</th><th>وقائية منفذة</th><th>الالتزام بالوقائية</th><th>تكلفة الساعة</th><th>قاعدة الاشتقاق</th><th>المصادر</th></tr></thead>
+        <thead><tr><th>#</th><th>الفترة</th><th>النطاق</th><th>المعدة</th><th>عدد الأعطال</th><th>متوسط الزمن بين الأعطال</th><th>متوسط زمن الإصلاح</th><th>نسبة الجاهزية</th><th>وقائية منفذة</th><th>الالتزام بالوقائية</th><th>تكلفة الساعة</th><th>قاعدة الاشتقاق</th><th>المصادر</th><th>معرف السطر</th><th>المعدة/النوع</th><th>أوامر الوقائية المنفذة</th><th>تكلفة الصيانة للساعة</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -88,42 +88,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['cost_per_hour']) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derived_from']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'equipment_or_type') ?></td><td><?= ems_sf($r, 'executed_preventive_orders') ?></td><td><?= ems_sf($r, 'maintenance_cost_per_hour') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="13">لا أسطر مؤشرات مشتقة بعد.</td></tr>
+            <tr><td colspan="17">لا أسطر مؤشرات مشتقة بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_kpis"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_kpis
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g129',
-            'الفترة' => 'g130',
-            'النطاق' => 'g131',
-            'المعدة/النوع' => 'g132',
-            'عدد الأعطال' => 'g133',
-            'متوسط الزمن بين الأعطال' => 'g134',
-            'متوسط زمن الإصلاح' => 'g135',
-            'نسبة الجاهزية' => 'g136',
-            'أوامر الوقائية المنفذة' => 'g137',
-            'الالتزام بالوقائية' => 'g138',
-            'تكلفة الصيانة للساعة' => 'g139',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_kpis');
-        echo ems_w14_grid('emsList_mnt_kpis', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مؤشرات الصيانة الدورية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

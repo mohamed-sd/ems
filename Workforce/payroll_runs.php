@@ -430,7 +430,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                 <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                </tr></thead>
+                <th>معرف المسير</th><th>نطاق المسير</th><th>عدد الموظفين</th><th>إجمالي الأساسي</th><th>إجمالي البدلات</th><th>حوافز الإنتاج</th><th>أساس القوى للمشغلين</th><th>صافي المسير</th><th>الإحالة للمالية</th><th>الإحالة للخزينة</th><th>حالة المسير</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php $tNet = 0.0; foreach ($register as $rr): $tNet += (float) $rr['net']; ?>
                 <tr <?php echo intval($rr['red_rows']) > 0 ? 'class="pr-row-red"' : ''; ?>>
@@ -447,7 +447,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <td><?php echo htmlspecialchars($__money($rr['absence'])); ?></td>
                     <td><?php echo htmlspecialchars($__money($rr['deductions'])); ?></td>
                     <td><strong><?php echo htmlspecialchars($__money($rr['net'])); ?></strong></td>
-                </tr>
+                <td><?= ems_sf($rr, 'payroll_uid') ?></td><td><?= ems_sf($rr, 'payroll_scope') ?></td><td><?= ems_sf($rr, 'employees_count') ?></td><td><?= ems_sf($rr, 'basic_total') ?></td><td><?= ems_sf($rr, 'allowances_total') ?></td><td><?= ems_sf($rr, 'production_incentives') ?></td><td><?= ems_sf($rr, 'operator_workforce_basis') ?></td><td><?= ems_sf($rr, 'payroll_net') ?></td><td><?= ems_sf($rr, 'finance_referral') ?></td><td><?= ems_sf($rr, 'treasury_referral') ?></td><td><?= ems_sf($rr, 'payroll_state') ?></td><td><?= ems_sf($rr, 'creator_name') ?></td><td><?= ems_sf($rr, 'reviewer') ?></td><td><?= ems_sf($rr, 'approver') ?></td><td><?= ems_sf($rr, 'data_state') ?></td><td><?= ems_sf($rr, 'source_ref') ?></td></tr>
             <?php endforeach; ?>
             </tbody>
             <tfoot><tr>
@@ -579,41 +579,6 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php endforeach; ?>
             </tbody>
         </table>
-    </div></div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المسير' => 'g83',
-            'الشهر' => 'g84',
-            'نطاق المسير' => 'g85',
-            'عدد الموظفين' => 'g86',
-            'إجمالي الأساسي' => 'g87',
-            'إجمالي البدلات' => 'g88',
-            'حوافز الإنتاج' => 'g89',
-            'أساس القوى للمشغلين' => 'g90',
-            'إجمالي الخصومات' => 'g91',
-            'صافي المسير' => 'g92',
-            'العملة' => 'g93',
-            'الإحالة للمالية' => 'g94',
-            'الإحالة للخزينة' => 'g95',
-            'حالة المسير' => 'g96',
-            'المنشئ' => 'g97',
-            'تاريخ الإنشاء' => 'g98',
-            'المراجع' => 'g99',
-            'المعتمد' => 'g100',
-            'تاريخ الاعتماد' => 'g101',
-            'حالة البيانات' => 'g102',
-            'مرجع المصدر' => 'g103',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_payroll_runs');
-        echo ems_w14_grid('emsList_hr_payroll_runs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مسير الرواتب'); /* /GUIDE_COLS */ ?>
     </div></div></div>
 </div>
 

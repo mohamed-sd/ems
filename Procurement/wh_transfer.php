@@ -130,14 +130,14 @@ echo ems_states_bundle('لا تحويلات بين المخازن بعد',
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-              </tr></thead>
+              <th>تاريخ الأمر</th><th>عدد البنود تفصيلها خ09-2</th><th>مبرر التحويل</th><th>وسيلة النقل</th><th>سند الخروج</th><th>سند الاستلام</th><th>مطابقة الاستلام</th><th>حالة الأمر</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody><?php foreach ($recent as $m2): ?>
       <tr><td><?= htmlspecialchars($m2['moved_at'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars($m2['item'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars($m2['wh'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars($m2['move_type'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= floatval($m2['qty']) ?></td>
-          <td><?= htmlspecialchars($m2['note'], ENT_QUOTES, 'UTF-8') ?></td></tr>
+          <td><?= htmlspecialchars($m2['note'], ENT_QUOTES, 'UTF-8') ?></td><td><?= ems_sf($m2, 'order_date') ?></td><td><?= ems_sf($m2, 'items_count_ref_kh09_2') ?></td><td><?= ems_sf($m2, 'transfer_justification') ?></td><td><?= ems_sf($m2, 'transport_mode') ?></td><td><?= ems_sf($m2, 'gate_pass') ?></td><td><?= ems_sf($m2, 'receipt_note') ?></td><td><?= ems_sf($m2, 'receipt_match') ?></td><td><?= ems_sf($m2, 'order_state') ?></td><td><?= ems_sf($m2, 'creator_name') ?></td><td><?= ems_sf($m2, 'data_state') ?></td><td><?= ems_sf($m2, 'source_ref') ?></td></tr>
     <?php endforeach; ?></tbody>
   </table>
 
@@ -189,33 +189,4 @@ echo ems_states_bundle('لا تحويلات بين المخازن بعد',
     <?php endif; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_transfer
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الأمر' => 'g95',
-            'تاريخ الأمر' => 'g96',
-            'من مخزن' => 'g97',
-            'إلى مخزن' => 'g98',
-            'عدد البنود تفصيلها خ09-2' => 'g99',
-            'مبرر التحويل' => 'g100',
-            'وسيلة النقل' => 'g101',
-            'سند الخروج' => 'g102',
-            'سند الاستلام' => 'g103',
-            'مطابقة الاستلام' => 'g104',
-            'حالة الأمر' => 'g105',
-            'المنشئ' => 'g106',
-            'تاريخ الإنشاء' => 'g107',
-            'حالة البيانات' => 'g108',
-            'مرجع المصدر' => 'g109',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_transfer');
-        echo ems_w14_grid('emsList_wh_transfer', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التحويل بين المخازن'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

@@ -70,7 +70,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="table table-striped rtr-table">
-            <thead><tr><th>الخطر</th><th>النوع</th><th>الخطة</th><th>المسؤول</th><th>المهلة</th><th>الحالة</th><th>دليل الإنجاز</th><th>إجراء</th></tr></thead>
+            <thead><tr><th>الخطر</th><th>النوع</th><th>الخطة</th><th>المسؤول</th><th>المهلة</th><th>الحالة</th><th>دليل الإنجاز</th><th>إجراء</th><th>معرف الإجراء</th><th>Risk_ID</th><th>مسار المعالجة</th><th>وصف الإجراء</th><th>المالك</th><th>الإدارة المنفذة</th><th>Due_Date</th><th>المستوى المستهدف بعد الإجراء</th><th>أيام التأخير</th><th>إعادة التقييم بعده</th><th>حالة الإجراء</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody><?php foreach ($rows as $t): ?>
             <tr>
                 <td><a href="risk_card.php?id=<?php echo (int) $t['risk_id']; ?>"><?php echo $t['risk_code']; ?></a></td>
@@ -101,40 +101,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <button class="btn btn-sm btn-primary treatVerify" data-id="<?php echo (int) $t['id']; ?>">قبول المتحقق</button>
                     <?php endif; ?>
                 </td>
-            </tr>
-            <?php endforeach; if (empty($rows)): ?><tr><td colspan="8" class="text-muted">لا إجراءات</td></tr><?php endif; ?></tbody>
+            <td><?= ems_sf($t, 'action_uid') ?></td><td><?= ems_sf($t, 'risk_uid') ?></td><td><?= ems_sf($t, 'processing_route') ?></td><td><?= ems_sf($t, 'action_description') ?></td><td><?= ems_sf($t, 'owner_name') ?></td><td><?= ems_sf($t, 'executing_department') ?></td><td><?= ems_sf($t, 'due_date') ?></td><td><?= ems_sf($t, 'target_level_after_action') ?></td><td><?= ems_sf($t, 'delay_days') ?></td><td><?= ems_sf($t, 'reassess_after') ?></td><td><?= ems_sf($t, 'action_state') ?></td><td><?= ems_sf($t, 'creator_name') ?></td><td><?= ems_sf($t, 'created_date') ?></td><td><?= ems_sf($t, 'data_state') ?></td><td><?= ems_sf($t, 'source_ref') ?></td></tr>
+            <?php endforeach; if (empty($rows)): ?><tr><td colspan="23" class="text-muted">لا إجراءات</td></tr><?php endif; ?></tbody>
         </table>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_treatments
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإجراء' => 'g41',
-            'Risk_ID' => 'g42',
-            'مسار المعالجة' => 'g43',
-            'وصف الإجراء' => 'g44',
-            'المالك' => 'g45',
-            'الإدارة المنفذة' => 'g46',
-            'Due_Date' => 'g47',
-            'المستوى المستهدف بعد الإجراء' => 'g48',
-            'أيام التأخير' => 'g49',
-            'دليل الإنجاز' => 'g50',
-            'إعادة التقييم بعده' => 'g51',
-            'حالة الإجراء' => 'g52',
-            'المنشئ' => 'g53',
-            'تاريخ الإنشاء' => 'g54',
-            'حالة البيانات' => 'g55',
-            'مرجع المصدر' => 'g56',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('rsk_risk_treatments');
-        echo ems_w14_grid('emsList_rsk_risk_treatments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في خطط معالجة المخاطر'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <?php /* INJ-0576: موضعُ إدخالِ دليلِ الإنجاز — عنوانٌ وثلاثةُ حقولٍ وردٌّ في موضعِه */ ?>

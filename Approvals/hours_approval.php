@@ -741,7 +741,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr>
+            <th>معرف الدفعة</th><th>يوم الاعتماد</th><th>نطاق الدفعة</th><th>عدد السجلات</th><th>سجلات بتجاوز طاقة</th><th>سجلات ناقصة السبب</th><th>مرحلة الاعتماد</th><th>معتمد الموقع</th><th>معتمد الأطراف</th><th>معتمد العقود</th><th>نتيجة المطابقة</th><th>سجلات مستثناة</th><th>سبب الاستثناء</th><th>قرار الدفعة</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
         </thead>
         <tbody>
         <?php $idx = 1; foreach ($pending_rows as $row):
@@ -912,7 +912,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
               </div>
             </td>
-          </tr>
+          <td><?= ems_sf($ad, 'batch_uid') ?></td><td><?= ems_sf($ad, 'approval_day') ?></td><td><?= ems_sf($ad, 'batch_scope') ?></td><td><?= ems_sf($ad, 'records_count') ?></td><td><?= ems_sf($ad, 'records_over_capacity') ?></td><td><?= ems_sf($ad, 'records_missing_reason') ?></td><td><?= ems_sf($ad, 'approval_stage') ?></td><td><?= ems_sf($ad, 'site_approver') ?></td><td><?= ems_sf($ad, 'parties_approver') ?></td><td><?= ems_sf($ad, 'contracts_approver') ?></td><td><?= ems_sf($ad, 'match_result') ?></td><td><?= ems_sf($ad, 'excluded_records') ?></td><td><?= ems_sf($ad, 'exception_reason') ?></td><td><?= ems_sf($ad, 'batch_decision') ?></td><td><?= ems_sf($ad, 'creator_name') ?></td><td><?= ems_sf($ad, 'reviewer') ?></td><td><?= ems_sf($ad, 'approver') ?></td><td><?= ems_sf($ad, 'data_state') ?></td><td><?= ems_sf($ad, 'source_ref') ?></td></tr>
         <?php endforeach; ?>
         </tbody>
       </table>
@@ -1082,41 +1082,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   </div>
 
 </div><!-- end page-wrapper -->
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_hours_approval
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الدفعة' => 'g64',
-            'يوم الاعتماد' => 'g65',
-            'نطاق الدفعة' => 'g66',
-            'عدد السجلات' => 'g67',
-            'سجلات بتجاوز طاقة' => 'g68',
-            'سجلات ناقصة السبب' => 'g69',
-            'مرحلة الاعتماد' => 'g70',
-            'معتمد الموقع' => 'g71',
-            'معتمد الأطراف' => 'g72',
-            'معتمد العقود' => 'g73',
-            'نتيجة المطابقة' => 'g74',
-            'سجلات مستثناة' => 'g75',
-            'سبب الاستثناء' => 'g76',
-            'قرار الدفعة' => 'g77',
-            'المنشئ' => 'g78',
-            'تاريخ الإنشاء' => 'g79',
-            'المراجع' => 'g80',
-            'المعتمد' => 'g81',
-            'تاريخ الاعتماد' => 'g82',
-            'حالة البيانات' => 'g83',
-            'مرجع المصدر' => 'g84',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_hours_approval');
-        echo ems_w14_grid('emsList_ops_hours_approval', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في اعتماد الوحدات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <!-- ══ Modal: عرض الأعطال ══ -->

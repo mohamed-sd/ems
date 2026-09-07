@@ -213,7 +213,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-            </tr></thead><tbody>
+            <th>الجهة الطالبة</th><th>مرجع أمر نقل الموارد</th><th>نوع الحمولة</th><th>كود المعدة/الصنف</th><th>الوزن/الأبعاد</th><th>من موقع</th><th>إلى موقع</th><th>ملاحظات التحميل</th><th>حالة الطلب</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead><tbody>
         <?php
         // scopedQuery (عقد §10): النص الأصلي حرفيًا + الرمز؛ types/project إثراء LEFT
         $req_rows = trs_gate($is_super_admin)->scopedQuery(
@@ -253,41 +253,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             echo "<td>" . htmlspecialchars((string)$row['reason']) . "</td>";
             echo "<td>" . htmlspecialchars($prio_ar) . "</td>";
             echo "<td><span class='action-btn trs-rq-chip' data-allow-style style='background:$sc'>" . htmlspecialchars($state_ar) . "</span></td>";
-            echo "</tr>";
+            echo "" . "<td>" . ems_sf($row, 'requesting_party') . "</td>" . "<td>" . ems_sf($row, 'resource_move_order_ref') . "</td>" . "<td>" . ems_sf($row, 'cargo_type') . "</td>" . "<td>" . ems_sf($row, 'equipment_or_item_code') . "</td>" . "<td>" . ems_sf($row, 'weight_or_dimensions') . "</td>" . "<td>" . ems_sf($row, 'from_location') . "</td>" . "<td>" . ems_sf($row, 'to_location') . "</td>" . "<td>" . ems_sf($row, 'loading_notes') . "</td>" . "<td>" . ems_sf($row, 'request_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
         }
         ?>
         </tbody></table>
-    </div></div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g63',
-            'تاريخ الطلب' => 'g64',
-            'الجهة الطالبة' => 'g65',
-            'مرجع أمر نقل الموارد' => 'g66',
-            'نوع الحمولة' => 'g67',
-            'كود المعدة/الصنف' => 'g68',
-            'الوزن/الأبعاد' => 'g69',
-            'من موقع' => 'g70',
-            'إلى موقع' => 'g71',
-            'التاريخ المطلوب' => 'g72',
-            'الأولوية' => 'g73',
-            'ملاحظات التحميل' => 'g74',
-            'حالة الطلب' => 'g75',
-            'المنشئ' => 'g76',
-            'تاريخ الإنشاء' => 'g77',
-            'حالة البيانات' => 'g78',
-            'مرجع المصدر' => 'g79',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_requests');
-        echo ems_w14_grid('emsList_trp_transfer_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلب الترحيل'); /* /GUIDE_COLS */ ?>
     </div></div></div>
 </div>
 

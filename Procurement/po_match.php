@@ -402,7 +402,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    </tr></thead>
+                    <th>رقم المطابقة</th><th>رقم المورد</th><th>رقم الأمر</th><th>سندات الإدخال</th><th>قيمة المستلم</th><th>تصنيف الفرق</th><th>قيمة الفرق</th><th>تفسير الفرق</th><th>الإحالة للمالية</th><th>حالة المطابقة</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                 <?php foreach ($orders as $po):
                     $oid  = intval($po['id']);
@@ -449,7 +449,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             ? ('ذمة #' . intval($due['id']) . ' (' . htmlspecialchars((string) $due['settlement_state']) . ')')
                             : '—'; ?></td>
                         <td><?php echo htmlspecialchars($entity_name); ?></td>
-                    </tr>
+                    <td><?= ems_sf($po, 'match_no') ?></td><td><?= ems_sf($po, 'supplier_no') ?></td><td><?= ems_sf($po, 'order_no') ?></td><td><?= ems_sf($po, 'grn_notes') ?></td><td><?= ems_sf($po, 'received_value') ?></td><td><?= ems_sf($po, 'variance_classification') ?></td><td><?= ems_sf($po, 'variance_value') ?></td><td><?= ems_sf($po, 'variance_explanation') ?></td><td><?= ems_sf($po, 'finance_referral') ?></td><td><?= ems_sf($po, 'match_state') ?></td><td><?= ems_sf($po, 'creator_name') ?></td><td><?= ems_sf($po, 'reviewer') ?></td><td><?= ems_sf($po, 'approver') ?></td><td><?= ems_sf($po, 'data_state') ?></td><td><?= ems_sf($po, 'source_ref') ?></td></tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
@@ -499,41 +499,6 @@ try {
     <?php endif; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_proc_order
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المطابقة' => 'g173',
-            'رقم فاتورة المورد' => 'invoice_no',
-            'رقم المورد' => 'g174',
-            'رقم الأمر' => 'g175',
-            'سندات الإدخال' => 'g176',
-            'قيمة الفاتورة' => 'invoice_amount',
-            'قيمة الأمر' => 'g177',
-            'قيمة المستلم' => 'g178',
-            'تصنيف الفرق' => 'g179',
-            'قيمة الفرق' => 'g180',
-            'تفسير الفرق' => 'g181',
-            'نتيجة المطابقة' => 'g182',
-            'الإحالة للمالية' => 'g183',
-            'حالة المطابقة' => 'g184',
-            'المنشئ' => 'g185',
-            'تاريخ الإنشاء' => 'g186',
-            'المراجع' => 'g187',
-            'المعتمد' => 'g188',
-            'تاريخ الاعتماد' => 'g189',
-            'حالة البيانات' => 'g190',
-            'مرجع المصدر' => 'g191',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('proc_order');
-        echo ems_w14_grid('emsList_proc_order', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطابقة الفاتورة الثلاثية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 </body>

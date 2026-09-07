@@ -70,7 +70,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا إحالات خارجية ولا مطالبات ضمان', 'الإحالة تفتح من أمر عمل. ومطالبة الضمان بمرجع عقد المورد'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر العمل</th><th>النوع</th><th>مرجع العقد</th><th>نطاق العمل</th><th>التكلفة المقدرة</th><th>التكلفة الفعلية</th><th>نتيجة المطالبة</th><th>محضر الاستلام</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
+        <thead><tr><th>#</th><th>أمر العمل</th><th>النوع</th><th>مرجع العقد</th><th>نطاق العمل</th><th>التكلفة المقدرة</th><th>التكلفة الفعلية</th><th>نتيجة المطالبة</th><th>محضر الاستلام</th><th>حالة السطر</th><th>قاعدة الحالة</th><th>معرف السطر</th><th>رقم الأمر</th><th>الجهة الخارجية/المورد</th><th>مرجع العقد/الضمان</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -85,57 +85,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['receipt_ref']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'external_party_supplier') ?></td><td><?= ems_sf($r, 'contract_or_guarantee_ref') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="11">لا إحالات خارجية ولا مطالبات ضمان.</td></tr>
+            <tr><td colspan="19">لا إحالات خارجية ولا مطالبات ضمان.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_external_repairs"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_external_repairs
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g154',
-            'رقم الأمر' => 'g155',
-            'النوع' => 'g156',
-            'الجهة الخارجية/المورد' => 'g157',
-            'مرجع العقد/الضمان' => 'g158',
-            'نطاق العمل' => 'g159',
-            'التكلفة المقدرة' => 'g160',
-            'التكلفة الفعلية' => 'g161',
-            'نتيجة المطالبة' => 'g162',
-            'محضر الاستلام' => 'g163',
-            'حالة السطر' => 'g164',
-            'المنشئ' => 'g165',
-            'تاريخ الإنشاء' => 'g166',
-            'حالة البيانات' => 'g167',
-            'مرجع المصدر' => 'g168',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_external_repairs');
-        echo ems_w14_grid('emsList_mnt_external_repairs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإصلاح الخارجي ومطالبات الضمان'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('الاصلاح الخارجي ومطالبات الضمان', 'الإصلاح الخارجي ومطالبات الضمان'),
-        'table'    => 'mnt_external_repairs',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'Maintenance/external_repairs.php',
-    )); ?>
-
-    </div></div></div>
 </div>
 </body></html>

@@ -78,7 +78,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أسطر إقفال', 'الإقفال إثبات لا إعلان. ولا يقفل شهر فيه جرد غير معتمد'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>المخزن</th><th>الفترة</th><th>رصيد الفتح</th><th>الوارد</th><th>المنصرف</th><th>التسويات</th><th>رصيد الإقفال</th><th>المعادلة تنطبق</th><th>جلسة الجرد</th><th>تاريخ الإقفال</th><th>الحالة</th></tr></thead>
+        <thead><tr><th>المخزن</th><th>الفترة</th><th>رصيد الفتح</th><th>الوارد</th><th>المنصرف</th><th>التسويات</th><th>رصيد الإقفال</th><th>المعادلة تنطبق</th><th>جلسة الجرد</th><th>تاريخ الإقفال</th><th>الحالة</th><th>معرف الإقفال</th><th>الشهر</th><th>سندات إدخال الشهر</th><th>سندات صرف الشهر</th><th>تحويلات الشهر</th><th>فروق جرد مسواة</th><th>عهد مفتوحة مرحلة</th><th>قيمة المخزون الختامية</th><th>مطابقة المالية</th><th>حالة الإقفال</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -93,41 +93,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ((int) $r['count_ref'] > 0 ? (int) $r['count_ref'] : '') ?></td>
                 <td><?= htmlspecialchars((string) $r['closed_at']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-            </tr>
+            <td><?= ems_sf($r, 'closing_uid') ?></td><td><?= ems_sf($r, 'month') ?></td><td><?= ems_sf($r, 'month_grn_notes') ?></td><td><?= ems_sf($r, 'month_issue_notes') ?></td><td><?= ems_sf($r, 'month_transfers') ?></td><td><?= ems_sf($r, 'settled_count_variances') ?></td><td><?= ems_sf($r, 'open_custodies_carried') ?></td><td><?= ems_sf($r, 'closing_stock_value') ?></td><td><?= ems_sf($r, 'finance_match') ?></td><td><?= ems_sf($r, 'closing_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_month_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإقفال' => 'g17',
-            'الشهر' => 'g18',
-            'المخزن' => 'g19',
-            'سندات إدخال الشهر' => 'g20',
-            'سندات صرف الشهر' => 'g21',
-            'تحويلات الشهر' => 'g22',
-            'فروق جرد مسواة' => 'g23',
-            'عهد مفتوحة مرحلة' => 'g24',
-            'قيمة المخزون الختامية' => 'g25',
-            'مطابقة المالية' => 'g26',
-            'حالة الإقفال' => 'g27',
-            'المنشئ' => 'g28',
-            'تاريخ الإنشاء' => 'g29',
-            'المراجع' => 'g30',
-            'المعتمد' => 'g31',
-            'تاريخ الاعتماد' => 'g32',
-            'حالة البيانات' => 'g33',
-            'مرجع المصدر' => 'g34',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_month_close');
-        echo ems_w14_grid('emsList_wh_month_close', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإقفال الشهري للمخازن'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

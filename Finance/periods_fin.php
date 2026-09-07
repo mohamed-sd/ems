@@ -240,7 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-              </tr></thead>
+              <th>معرف الفترة</th><th>الشهر</th><th>قيود الفترة</th><th>قيود معلقة</th><th>مطابقة المخازن</th><th>مطابقة الخزينة</th><th>الإقفالات التشغيلية الواردة</th><th>فروق معالجة</th><th>قرار الإقفال</th><th>قرار إعادة الفتح</th><th>حالة الفترة</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                 <?php
                 $period_rows = fin_gate($is_super_admin)->select('fin_financial_periods', array('orderBy' => 'fiscal_year DESC, period_type ASC, period_no ASC'));
@@ -263,7 +263,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars((string)$row['end_date']) . "</td>";
                     echo "<td>" . ($row['posting_allowed'] ? "<span class='badge badge-success'>نعم</span>" : "<span class='badge badge-secondary'>لا</span>") . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($period_states[$st] ?? $st) . "</span></td>";
-                    echo "</tr>";
+                    echo "" . "<td>" . ems_sf($row, 'period_uid') . "</td>" . "<td>" . ems_sf($row, 'month') . "</td>" . "<td>" . ems_sf($row, 'period_entries') . "</td>" . "<td>" . ems_sf($row, 'pending_entries') . "</td>" . "<td>" . ems_sf($row, 'warehouse_match') . "</td>" . "<td>" . ems_sf($row, 'treasury_match') . "</td>" . "<td>" . ems_sf($row, 'incoming_ops_closures') . "</td>" . "<td>" . ems_sf($row, 'processing_variances') . "</td>" . "<td>" . ems_sf($row, 'closing_decision') . "</td>" . "<td>" . ems_sf($row, 'reopen_decision') . "</td>" . "<td>" . ems_sf($row, 'period_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
                 }
                 ?>
                 </tbody>
@@ -332,43 +332,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_fina_periods_fin')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الفترة' => 'g35',
-            'الشهر' => 'g36',
-            'قيود الفترة' => 'g37',
-            'قيود معلقة' => 'g38',
-            'مطابقة المخازن' => 'g39',
-            'مطابقة الخزينة' => 'g40',
-            'الإقفالات التشغيلية الواردة' => 'g41',
-            'فروق معالجة' => 'g42',
-            'قرار الإقفال' => 'g43',
-            'قرار إعادة الفتح' => 'g44',
-            'حالة الفترة' => 'g45',
-            'المنشئ' => 'g46',
-            'تاريخ الإنشاء' => 'g47',
-            'المراجع' => 'g48',
-            'المعتمد' => 'g49',
-            'تاريخ الاعتماد' => 'g50',
-            'حالة البيانات' => 'g51',
-            'مرجع المصدر' => 'g52',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_periods_fin');
-        echo ems_w14_grid('emsList_fina_periods_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التقويم المحاسبي للفترات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

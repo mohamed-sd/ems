@@ -69,7 +69,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أسطر عناية يومية', 'المهمة تنفذ بقائمة النوع. والنتيجة غير الطبيعية تفتح بلاغا'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>التاريخ</th><th>المعدة</th><th>قائمة النوع</th><th>المهمة</th><th>النتيجة</th><th>ملاحظة غير طبيعية</th><th>بلاغ متفرع</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
+        <thead><tr><th>#</th><th>التاريخ</th><th>المعدة</th><th>قائمة النوع</th><th>المهمة</th><th>النتيجة</th><th>ملاحظة غير طبيعية</th><th>بلاغ متفرع</th><th>حالة السطر</th><th>قاعدة الحالة</th><th>معرف السطر</th><th>كود المعدة</th><th>قائمة العناية للنوع</th><th>المنفذ</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -83,56 +83,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ($r['breakdown_id'] === null || (int) $r['breakdown_id'] === 0) ? '—' : (int) $r['breakdown_id'] ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'equipment_code') ?></td><td><?= ems_sf($r, 'care_checklist_for_type') ?></td><td><?= ems_sf($r, 'executor') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا أسطر عناية يومية.</td></tr>
+            <tr><td colspan="18">لا أسطر عناية يومية.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_daily_care"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_daily_care
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g117',
-            'التاريخ' => 'g118',
-            'كود المعدة' => 'g119',
-            'قائمة العناية للنوع' => 'checklist_ref',
-            'المهمة' => 'g120',
-            'المنفذ' => 'g121',
-            'النتيجة' => 'g122',
-            'ملاحظة غير طبيعية' => 'g123',
-            'بلاغ متفرع' => 'breakdown_id',
-            'حالة السطر' => 'g124',
-            'المنشئ' => 'g125',
-            'تاريخ الإنشاء' => 'g126',
-            'حالة البيانات' => 'g127',
-            'مرجع المصدر' => 'g128',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_daily_care');
-        echo ems_w14_grid('emsList_mnt_daily_care', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في العناية اليومية والتشحيم'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('العنايه اليوميه والتشحيم', 'العناية اليومية والتشحيم'),
-        'table'    => 'mnt_daily_care',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'Maintenance/daily_care.php',
-    )); ?>
-
-    </div></div></div>
 </div>
 </body></html>

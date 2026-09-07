@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-06 23:22:45
+-- المصدر: equipation_manage · التوليد: 2026-09-07 05:10:20
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -837,7 +837,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (1010,'فتح الطوارئ الموقوت','Governance/break_glass_open.php',15,NULL,0,0,'fa fa-triangle-exclamation',617,NULL),
 (1011,'تحكم الروابط','Settings/links_control.php',NULL,NULL,1,0,'fa fa-link',100,NULL),
 (1012,'النسخ الاحتياطي لقاعدة البيانات','Settings/db_backup.php',15,5992,'yes',0,'fa fa-database',618,NULL),
-(1013,'مراقبة ناقل الأحداث','Governance/bus_monitor.php',15,6507,'yes',0,'fa fa-satellite-dish',619,NULL);
+(1013,'مراقبة ناقل الأحداث','Governance/bus_monitor.php',15,6507,'yes',0,'fa fa-satellite-dish',619,NULL),
+(1014,'فحص جاهزية الالتزام','Governance/round_check.php',15,NULL,0,0,'fa fa-clipboard-check',82,'DEP-08');
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -5001,7 +5002,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9857,5,1011,1,0,1,0),
 (9858,12,1011,1,0,1,0),
 (9864,15,1012,1,1,1,0),
-(9865,15,1013,1,0,0,0);
+(9865,15,1013,1,0,0,0),
+(9866,15,1014,1,1,1,1);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -8261,7 +8263,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (417,24,'REC',201,131,'تصنيفات الأعطال والبلاغات','Tickets/ticket_categories_config.php','fa fa-tags',16,NULL,'Tickets/ticket_categories_config.php',1,0,'2026-07-26 13:01:37','2026-08-12 04:45:04'),
 (418,24,'DAILY',4928,134,'مصفوفة مهل المعالجة للبلاغات','Tickets/ticket_sla_config.php','fa fa-stopwatch',31,NULL,'Tickets/ticket_sla_config.php',1,0,'2026-08-03 08:47:41','2026-09-01 16:15:44'),
 (422,24,'SET',201,11,'الإعدادات','Settings/settings.php','fa fa-cog',60,NULL,'Settings/settings.php',0,1,'2026-07-26 13:01:37','2026-09-06 21:30:47'),
-(464,1,'DAILY',5651,139,'التقارير والتحليلات الشخصية','main/role_board.php','fa fa-house',50,NULL,'main/role_board.php',1,0,'2026-08-03 08:47:41','2026-08-30 12:19:27'),
+(464,1,'DAILY',5651,139,'التقارير والتحليلات الشخصية','main/role_board.php','fa fa-house',50,NULL,'main/role_board.php',1,1,'2026-08-03 08:47:41','2026-09-07 00:31:09'),
 (465,2,'DAILY',5683,139,'التقارير والتحليلات الشخصية','main/role_board.php','fa fa-house',50,NULL,'main/role_board.php',1,0,'2026-08-03 08:47:41','2026-08-30 12:19:27'),
 (466,3,'DAILY',5708,139,'التقارير والتحليلات الشخصية','main/role_board.php','fa fa-house',50,NULL,'main/role_board.php',1,0,'2026-08-03 08:47:41','2026-08-30 12:19:27'),
 (467,4,'DAILY',5740,139,'التقارير والتحليلات الشخصية','main/role_board.php','fa fa-house',50,NULL,'main/role_board.php',1,0,'2026-08-03 08:47:41','2026-08-30 12:19:27'),
@@ -10722,7 +10724,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28965,1,'DAILY',5615,978,'احتياج الغد وتوزيع الموارد','Operations/ops_tomorrow_dispatch.php','fa fa-file',2003,NULL,'operations/ops_tomorrow_dispatch.php',1,0,'2026-09-01 11:07:59','2026-09-05 04:17:49'),
 (28966,1,'DAILY',5615,979,'طلب وقرار حركة الموارد','Operations/ops_resource_move_orders.php','fa fa-file',2004,NULL,'operations/ops_resource_move_orders.php',1,0,'2026-09-01 11:07:59','2026-09-05 04:17:49'),
 (28967,1,'DAILY',5616,980,'توزيع زمن الوردية وحالاته','Operations/ops_shift_time_states.php','fa fa-file',3002,NULL,'operations/ops_shift_time_states.php',1,0,'2026-09-01 11:07:59','2026-09-05 04:17:49'),
-(28968,1,'DAILY',5618,981,'قرارات التوقف','Operations/ops_stop_decisions.php','fa fa-file',5001,NULL,'operations/ops_stop_decisions.php',1,0,'2026-09-01 11:07:59','2026-09-05 04:17:49'),
+(28968,1,'DAILY',5618,981,'قرارات التوقف','Operations/ops_stop_decisions.php','fa fa-file',5001,NULL,'operations/ops_stop_decisions.php',1,1,'2026-09-01 11:07:59','2026-09-07 00:31:13'),
 (28969,1,'DAILY',5619,982,'تقرير الانحراف والتصعيد','Operations/ops_deviation_escalation.php','fa fa-file',6001,NULL,'operations/ops_deviation_escalation.php',1,0,'2026-09-01 11:07:59','2026-09-05 04:17:49'),
 (28970,13,'DAILY',4363,983,'شجرة الأعطال المرجعية','Maintenance/fault_tree.php','fa fa-file',2001,NULL,'maintenance/fault_tree.php',1,0,'2026-09-01 11:10:41','2026-09-05 04:17:49'),
 (28971,13,'DAILY',4246,984,'أوامر التفتيش الواردة من الأسطول','Maintenance/fleet_inspection_orders.php','fa fa-file',4002,NULL,'maintenance/fleet_inspection_orders.php',1,0,'2026-09-01 11:10:41','2026-09-05 04:17:49'),
@@ -10777,7 +10779,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (29022,29,'REC',NULL,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',900,NULL,'main/project_users.php',0,1,'2026-09-06 21:48:05','2026-09-06 21:48:05'),
 (29023,30,'REC',NULL,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',900,NULL,'main/project_users.php',0,1,'2026-09-06 21:48:05','2026-09-06 21:48:05'),
 (29024,15,'DAILY',6506,1012,'النسخ الاحتياطي لقاعدة البيانات','Settings/db_backup.php','fa fa-database',35,NULL,'Settings/db_backup.php',1,0,'2026-09-06 22:07:52','2026-09-06 22:15:01'),
-(29025,15,'APPR',6507,1013,'مراقبة ناقل الأحداث','Governance/bus_monitor.php','fa fa-satellite-dish',1,NULL,'Governance/bus_monitor.php',1,0,'2026-09-06 22:35:00','2026-09-06 22:35:00');
+(29025,15,'APPR',6507,1013,'مراقبة ناقل الأحداث','Governance/bus_monitor.php','fa fa-satellite-dish',1,NULL,'Governance/bus_monitor.php',1,0,'2026-09-06 22:35:00','2026-09-06 22:35:00'),
+(29026,15,'GOV',5480,1014,'فحص جاهزية الالتزام','Governance/round_check.php','fa fa-clipboard-check',94,NULL,'Governance/round_check.php',1,0,'2026-09-07 01:49:49','2026-09-07 02:03:16');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;

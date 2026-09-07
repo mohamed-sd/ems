@@ -632,7 +632,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                            </tr>
+                            <th>رقم المشروع</th><th>رقم العميل</th><th>اسم العميل (بحث)</th><th>الوصف</th><th>الموقع (نطاق تنفيذ)</th><th>القطاع</th><th>حالة المشروع</th><th>تاريخ البداية</th><th>المسؤول التجاري</th><th>القيمة التقديرية ($)</th><th>القيمة التقديرية (ج.س)</th><th>عدد العقود</th><th>ملاحظات</th><th>كود المشروع لدى العميل</th><th>الإقليم/الولاية</th><th>تسلسل مشروع العميل</th><th>نوع الخدمة</th><th>نموذج العمل</th><th>أساس التسمية والحدود</th><th>قاعدة التجميع</th><th>مستوى الحجية</th></tr>
                     </thead>
                     <tbody>
                         <?php
@@ -763,7 +763,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> غير نشط</span></td>";
                                 }
 
-                                echo "</tr>";
+                                echo "" . "<td>" . ems_sf($row, 'project_no') . "</td>" . "<td>" . ems_sf($row, 'client_no') . "</td>" . "<td>" . ems_sf($row, 'client_name_search') . "</td>" . "<td>" . ems_sf($row, 'description') . "</td>" . "<td>" . ems_sf($row, 'execution_scope_location') . "</td>" . "<td>" . ems_sf($row, 'sector') . "</td>" . "<td>" . ems_sf($row, 'project_state') . "</td>" . "<td>" . ems_sf($row, 'start_date') . "</td>" . "<td>" . ems_sf($row, 'commercial_officer') . "</td>" . "<td>" . ems_sf($row, 'estimated_value_usd') . "</td>" . "<td>" . ems_sf($row, 'estimated_value_sdg') . "</td>" . "<td>" . ems_sf($row, 'contracts_count') . "</td>" . "<td>" . ems_sf($row, 'notes') . "</td>" . "<td>" . ems_sf($row, 'client_side_project_code') . "</td>" . "<td>" . ems_sf($row, 'region_state') . "</td>" . "<td>" . ems_sf($row, 'client_project_sequence') . "</td>" . "<td>" . ems_sf($row, 'service_type') . "</td>" . "<td>" . ems_sf($row, 'work_model') . "</td>" . "<td>" . ems_sf($row, 'naming_and_bounds_basis') . "</td>" . "<td>" . ems_sf($row, 'grouping_rule') . "</td>" . "<td>" . ems_sf($row, 'evidence_level') . "</td>" . "</tr>";
                             }
                         }
                         ?>
@@ -772,42 +772,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_projects
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المشروع' => 'g212',
-            'رقم العميل' => 'g213',
-            'اسم العميل (بحث)' => 'g214',
-            'اسم المشروع' => 'g215',
-            'الوصف' => 'g216',
-            'الموقع (نطاق تنفيذ)' => 'g217',
-            'القطاع' => 'g218',
-            'حالة المشروع' => 'g219',
-            'تاريخ البداية' => 'g220',
-            'المسؤول التجاري' => 'g221',
-            'القيمة التقديرية ($)' => 'g222',
-            'القيمة التقديرية (ج.س)' => 'g223',
-            'عدد العقود' => 'g224',
-            'ملاحظات' => 'g225',
-            'كود المشروع لدى العميل' => 'g226',
-            'الإقليم/الولاية' => 'g227',
-            'تسلسل مشروع العميل' => 'g228',
-            'نوع الخدمة' => 'g229',
-            'نموذج العمل' => 'g230',
-            'أساس التسمية والحدود' => 'g231',
-            'قاعدة التجميع' => 'g232',
-            'مستوى الحجية' => 'g233',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_projects');
-        echo ems_w14_grid('emsList_sal_projects', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المشاريع'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <!-- نافذة عرض تفاصيل المشروع تُولَّد ديناميكياً عبر النظام الموحّد EmsDetailsModal (assets/js/ems-details-modal.js) -->

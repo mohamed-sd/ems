@@ -593,7 +593,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
-                    </tr></thead>
+                    <th>تاريخ الأمر</th><th>رقم المحضر</th><th>رقم المورد</th><th>عقد إطاري مرجعي</th><th>عدد البنود تفصيلها ش07-2</th><th>القيمة الإجمالية</th><th>مكان التسليم</th><th>غرامة التأخير</th><th>حالة الأمر</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
                 <tbody>
                     <?php
                     // ترطيب ثنائي: الأوامر ثم أسماء الموردين بجلبٍ واحد (دلالة LEFT JOIN)
@@ -661,48 +661,13 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . ($e18 ? implode(' ', $e18) : "<span class='text-muted'>—</span>") . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['fin_approval_ref'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";
-                        echo "</tr>";
+                        echo "" . "<td>" . ems_sf($row, 'order_date') . "</td>" . "<td>" . ems_sf($row, 'minutes_no') . "</td>" . "<td>" . ems_sf($row, 'supplier_no') . "</td>" . "<td>" . ems_sf($row, 'framework_contract_ref') . "</td>" . "<td>" . ems_sf($row, 'items_count_ref_sh07_2') . "</td>" . "<td>" . ems_sf($row, 'total_value') . "</td>" . "<td>" . ems_sf($row, 'delivery_place') . "</td>" . "<td>" . ems_sf($row, 'delay_penalty') . "</td>" . "<td>" . ems_sf($row, 'order_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
                     } }
                     ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_orders_proc
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الأمر' => 'g91',
-            'تاريخ الأمر' => 'g92',
-            'رقم المحضر' => 'g93',
-            'رقم المورد' => 'g94',
-            'عقد إطاري مرجعي' => 'g95',
-            'عدد البنود تفصيلها ش07-2' => 'g96',
-            'القيمة الإجمالية' => 'g97',
-            'العملة' => 'g98',
-            'وقت الدفع' => 'g99',
-            'نوع الاستلام' => 'g100',
-            'مكان التسليم' => 'g101',
-            'تاريخ التوريد المتفق' => 'g102',
-            'غرامة التأخير' => 'g103',
-            'حالة الأمر' => 'g104',
-            'المنشئ' => 'g105',
-            'تاريخ الإنشاء' => 'g106',
-            'المراجع' => 'g107',
-            'المعتمد' => 'g108',
-            'تاريخ الاعتماد' => 'g109',
-            'حالة البيانات' => 'g110',
-            'مرجع المصدر' => 'g111',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_orders_proc');
-        echo ems_w14_grid('emsList_prc_orders_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أوامر الشراء'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

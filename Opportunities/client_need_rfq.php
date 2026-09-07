@@ -170,10 +170,10 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="created_at" data-slice="1">تاريخ الإنشاء</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
-    </tr></thead>
+    <th>رقم الطلب</th><th>رقم العميل</th><th>اسم العميل (بحث)</th><th>رقم المشروع</th><th>رقم الفرصة</th><th>نوع الطلب</th><th>نطاق الطلب</th><th>الخدمة المطلوبة</th><th>نموذج العمل المطلوب</th><th>الوحدة</th><th>الكمية/الحجم المطلوب</th><th>أنواع الآليات المطلوبة</th><th>عدد الآليات</th><th>المدة (أشهر)</th><th>البداية المتوقعة</th><th>النهاية المتوقعة</th><th>أساس البداية المتوقعة</th><th>أساس النهاية المتوقعة</th><th>حالة بيانات التواريخ</th><th>المتطلبات التجارية الأساسية</th><th>تاريخ الاستلام</th><th>موعد الرد بالعرض</th><th>مرجع العقد الناتج</th><th>ملاحظات</th><th>مفتاح دورة الالتزام المصدر</th><th>مستوى الحجية</th><th>أساس القيمة الرجعية</th></tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا احتياج مسجل بعد</td></tr>
+      <tr><td colspan="39" class="text-center text-muted">لا احتياج مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
@@ -190,52 +190,10 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         <td><?= htmlspecialchars((string) $r['required_from'], ENT_QUOTES, 'UTF-8') ?: '—' ?></td>
         <td><?= htmlspecialchars((string) $r['state'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= (int) $r['created_by'] ?></td>
-      </tr>
+      <td><?= ems_sf($r, 'request_no') ?></td><td><?= ems_sf($r, 'client_no') ?></td><td><?= ems_sf($r, 'client_name_search') ?></td><td><?= ems_sf($r, 'project_no') ?></td><td><?= ems_sf($r, 'opportunity_no') ?></td><td><?= ems_sf($r, 'request_type') ?></td><td><?= ems_sf($r, 'request_scope') ?></td><td><?= ems_sf($r, 'requested_service') ?></td><td><?= ems_sf($r, 'required_work_model') ?></td><td><?= ems_sf($r, 'unit') ?></td><td><?= ems_sf($r, 'requested_qty_or_volume') ?></td><td><?= ems_sf($r, 'required_machine_types') ?></td><td><?= ems_sf($r, 'machines_count') ?></td><td><?= ems_sf($r, 'duration_months') ?></td><td><?= ems_sf($r, 'expected_start') ?></td><td><?= ems_sf($r, 'expected_end') ?></td><td><?= ems_sf($r, 'expected_start_basis') ?></td><td><?= ems_sf($r, 'expected_end_basis') ?></td><td><?= ems_sf($r, 'dates_data_state') ?></td><td><?= ems_sf($r, 'core_commercial_requirements') ?></td><td><?= ems_sf($r, 'receipt_date') ?></td><td><?= ems_sf($r, 'offer_response_due') ?></td><td><?= ems_sf($r, 'resulting_contract_ref') ?></td><td><?= ems_sf($r, 'notes') ?></td><td><?= ems_sf($r, 'source_commitment_cycle_key') ?></td><td><?= ems_sf($r, 'evidence_level') ?></td><td><?= ems_sf($r, 'residual_value_basis') ?></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_client_need_rfq
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g60',
-            'رقم العميل' => 'g61',
-            'اسم العميل (بحث)' => 'g62',
-            'رقم المشروع' => 'g63',
-            'رقم الفرصة' => 'g64',
-            'نوع الطلب' => 'g65',
-            'نطاق الطلب' => 'g66',
-            'الخدمة المطلوبة' => 'g67',
-            'نموذج العمل المطلوب' => 'g68',
-            'الوحدة' => 'g69',
-            'الكمية/الحجم المطلوب' => 'g70',
-            'أنواع الآليات المطلوبة' => 'g71',
-            'عدد الآليات' => 'g72',
-            'المدة (أشهر)' => 'g73',
-            'البداية المتوقعة' => 'g74',
-            'النهاية المتوقعة' => 'g75',
-            'أساس البداية المتوقعة' => 'g76',
-            'أساس النهاية المتوقعة' => 'g77',
-            'حالة بيانات التواريخ' => 'g78',
-            'المتطلبات التجارية الأساسية' => 'g79',
-            'تاريخ الاستلام' => 'g80',
-            'موعد الرد بالعرض' => 'g81',
-            'الحالة' => 'g82',
-            'مرجع العقد الناتج' => 'g83',
-            'ملاحظات' => 'g84',
-            'مفتاح دورة الالتزام المصدر' => 'g85',
-            'مستوى الحجية' => 'g86',
-            'أساس القيمة الرجعية' => 'g87',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_client_need_rfq');
-        echo ems_w14_grid('emsList_sal_client_need_rfq', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في احتياج العميل وطلب العرض'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <script>
 /* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».

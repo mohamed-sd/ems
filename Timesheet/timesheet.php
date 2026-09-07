@@ -2099,7 +2099,7 @@ try {
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-            </tr>
+            <th>معرف السجل</th><th>يوم التشغيل</th><th>كود المعدة</th><th>نوع المعدة</th><th>المورد المقدم</th><th>وحدة عقد المشروع</th><th>مفتاح الحاوية السنوية</th><th>رقم الحاوية الشهرية</th><th>كود الخانة ونوع الإشغال</th><th>وسم خارج النافذة التعاقدية</th><th>الموقع الحالي</th><th>منطقة العمل</th><th>كود المشغل</th><th>نموذج العمل</th><th>سبب تعديل الافتراضي</th><th>الساعات المتاحة</th><th>الكمية المنفذة</th><th>وحدة القياس</th><th>قراءة العداد أول الوردية</th><th>قراءة العداد آخر الوردية</th><th>ساعات العداد</th><th>إجمالي الفعلي</th><th>إجمالي الاستعداد</th><th>إجمالي التوقف</th><th>تجاوز الطاقة؟</th><th>سبب التجاوز</th><th>المرجع الميداني</th><th>حالة المزامنة</th><th>حالة السجل</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
         </thead>
         <tbody>
           <?php $row_index = 1;
@@ -2144,7 +2144,7 @@ try {
             echo "<td><span data-ems-c='ts-64'>" . $totalall . "</span></td>";
             echo "<td><div data-ems-c='ts-65'>" . $status . "</div></td>";
             echo "";
-            echo "</tr>";
+            echo "" . "<td>" . ems_sf($row, 'record_uid') . "</td>" . "<td>" . ems_sf($row, 'operating_day') . "</td>" . "<td>" . ems_sf($row, 'equipment_code') . "</td>" . "<td>" . ems_sf($row, 'equipment_type') . "</td>" . "<td>" . ems_sf($row, 'submitting_supplier') . "</td>" . "<td>" . ems_sf($row, 'project_contract_unit') . "</td>" . "<td>" . ems_sf($row, 'annual_container_key') . "</td>" . "<td>" . ems_sf($row, 'monthly_container_no') . "</td>" . "<td>" . ems_sf($row, 'slot_code_and_occupancy') . "</td>" . "<td>" . ems_sf($row, 'outside_contract_window_flag') . "</td>" . "<td>" . ems_sf($row, 'current_location') . "</td>" . "<td>" . ems_sf($row, 'work_zone') . "</td>" . "<td>" . ems_sf($row, 'operator_code') . "</td>" . "<td>" . ems_sf($row, 'work_model') . "</td>" . "<td>" . ems_sf($row, 'default_change_reason') . "</td>" . "<td>" . ems_sf($row, 'available_hours') . "</td>" . "<td>" . ems_sf($row, 'executed_quantity') . "</td>" . "<td>" . ems_sf($row, 'measure_unit') . "</td>" . "<td>" . ems_sf($row, 'meter_start_of_shift') . "</td>" . "<td>" . ems_sf($row, 'meter_end_of_shift') . "</td>" . "<td>" . ems_sf($row, 'meter_hours') . "</td>" . "<td>" . ems_sf($row, 'actual_total') . "</td>" . "<td>" . ems_sf($row, 'standby_total') . "</td>" . "<td>" . ems_sf($row, 'downtime_total') . "</td>" . "<td>" . ems_sf($row, 'capacity_exceeded') . "</td>" . "<td>" . ems_sf($row, 'override_reason') . "</td>" . "<td>" . ems_sf($row, 'field_reference') . "</td>" . "<td>" . ems_sf($row, 'sync_state') . "</td>" . "<td>" . ems_sf($row, 'record_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
 
             $row_index++;
           }
@@ -2154,58 +2154,6 @@ try {
 
     </div>
   </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_timesheet
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السجل' => 'g1',
-            'يوم التشغيل' => 'g2',
-            'كود المعدة' => 'g3',
-            'نوع المعدة' => 'g4',
-            'المورد المقدم' => 'g5',
-            'رقم المشروع' => 'g6',
-            'وحدة عقد المشروع' => 'g7',
-            'مفتاح الحاوية السنوية' => 'g8',
-            'رقم الحاوية الشهرية' => 'g9',
-            'كود الخانة ونوع الإشغال' => 'g10',
-            'وسم خارج النافذة التعاقدية' => 'g11',
-            'الموقع الحالي' => 'g12',
-            'منطقة العمل' => 'g13',
-            'كود المشغل' => 'g14',
-            'الوردية' => 'g15',
-            'نموذج العمل' => 'g16',
-            'سبب تعديل الافتراضي' => 'g17',
-            'الساعات المتاحة' => 'g18',
-            'الكمية المنفذة' => 'g19',
-            'وحدة القياس' => 'g20',
-            'قراءة العداد أول الوردية' => 'g21',
-            'قراءة العداد آخر الوردية' => 'g22',
-            'ساعات العداد' => 'g23',
-            'إجمالي الفعلي' => 'g24',
-            'إجمالي الاستعداد' => 'g25',
-            'إجمالي التوقف' => 'g26',
-            'تجاوز الطاقة؟' => 'g27',
-            'سبب التجاوز' => 'g28',
-            'المرجع الميداني' => 'g29',
-            'حالة المزامنة' => 'g30',
-            'حالة السجل' => 'g31',
-            'المنشئ' => 'g32',
-            'تاريخ الإنشاء' => 'g33',
-            'المراجع' => 'g34',
-            'المعتمد' => 'g35',
-            'تاريخ الاعتماد' => 'g36',
-            'حالة البيانات' => 'g37',
-            'مرجع المصدر' => 'g38',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_timesheet');
-        echo ems_w14_grid('emsList_ops_timesheet', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل ساعات التشغيل اليومي'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <!-- jQuery -->

@@ -77,7 +77,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أسطر تقييم', 'السطر مشتق من التوريد والاستلام والمطابقة. ولا رقم بلا قاعدة اشتقاق'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>المورد</th><th>الفترة</th><th>عدد الأوامر</th><th>الالتزام بالموعد</th><th>نسبة الرفض</th><th>نسبة الفروق</th><th>الدرجة</th><th>الفئة</th><th>قاعدة الاشتقاق</th></tr></thead>
+        <thead><tr><th>المورد</th><th>الفترة</th><th>عدد الأوامر</th><th>الالتزام بالموعد</th><th>نسبة الرفض</th><th>نسبة الفروق</th><th>الدرجة</th><th>الفئة</th><th>قاعدة الاشتقاق</th><th>معرف السطر</th><th>رقم المورد</th><th>قيمتها</th><th>الالتزام بالمواعيد</th><th>متوسط التأخير</th><th>نسبة رفض الفحص</th><th>فروق المطابقة</th><th>المؤشر المركب</th><th>التصنيف الناتج</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -90,34 +90,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(number_format((float) $r['score'], 2)) ?></td>
                 <td><?= htmlspecialchars((string) $r['grade']) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['score_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'supplier_no') ?></td><td><?= ems_sf($r, 'its_value') ?></td><td><?= ems_sf($r, 'schedule_adherence') ?></td><td><?= ems_sf($r, 'average_delay') ?></td><td><?= ems_sf($r, 'inspection_rejection_rate') ?></td><td><?= ems_sf($r, 'match_variances') ?></td><td><?= ems_sf($r, 'composite_index') ?></td><td><?= ems_sf($r, 'resulting_classification') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_supplier_eval
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g53',
-            'الفترة' => 'g54',
-            'رقم المورد' => 'g55',
-            'عدد الأوامر' => 'g56',
-            'قيمتها' => 'g57',
-            'الالتزام بالمواعيد' => 'g58',
-            'متوسط التأخير' => 'g59',
-            'نسبة رفض الفحص' => 'g60',
-            'فروق المطابقة' => 'g61',
-            'المؤشر المركب' => 'g62',
-            'التصنيف الناتج' => 'g63',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_supplier_eval');
-        echo ems_w14_grid('emsList_prc_proc_supplier_eval', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقييم أداء التوريد'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

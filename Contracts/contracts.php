@@ -857,7 +857,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              </tr>
+              <th>كود العقد</th><th>رقم العميل</th><th>اسم العميل (بحث)</th><th>رقم المشروع</th><th>رقم العقد بالمنظومة</th><th>تسلسل الشركة</th><th>توقيع الوثيقة</th><th>البداية التعاقدية</th><th>النهاية التعاقدية</th><th>البداية التنفيذية</th><th>النهاية التنفيذية</th><th>عدد دورات الالتزام (التجديدات)</th><th>الوحدات المتعاقدة الحالية</th><th>السعة الشهرية الحالية</th><th>الحجية/مصدر التوثيق</th><th>العملة</th><th>أساس التسعير (كما ورد)</th><th>سعر الوحدة (كما ورد)</th><th>الضريبة</th><th>الدفع والفوترة</th><th>الوديعة/الدفعة المقدمة</th><th>الصيانة وقطع الغيار</th><th>النقل والتعبئة</th><th>المسؤول التجاري</th><th>ملاحظات</th><th>نوع الخدمة المقدمة</th><th>أساس التعاقد (الوحدة)</th><th>مكان إبرام العقد (مؤكد)</th><th>المكان المرجح تاريخيا</th><th>أساس المكان المرجح</th><th>مستوى حجية المكان المرجح</th><th>الحالة كما وردت بالمصدر</th><th>أساس تعديل الحالة</th><th>وحدة الفوترة</th><th>الحد الأدنى (كمية)</th><th>دورية الحد الأدنى</th><th>الكمية المضمونة</th><th>عتبة الفوترة</th><th>متحمل العجز</th><th>قاعدة العجز</th><th>بنية السعر</th><th>عدد النسخ/المكونات السعرية</th><th>مرجع تسعيري</th></tr>
           </thead>
           <tbody>
             <?php
@@ -1320,7 +1320,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                 // الحالة والإجراءات
                 echo "<td class='group-status'>" . $status . "</td>";
-                echo "</tr>";
+                echo "" . "<td>" . ems_sf($__a, 'contract_code') . "</td>" . "<td>" . ems_sf($__a, 'client_no') . "</td>" . "<td>" . ems_sf($__a, 'client_name_search') . "</td>" . "<td>" . ems_sf($__a, 'project_no') . "</td>" . "<td>" . ems_sf($__a, 'system_contract_no') . "</td>" . "<td>" . ems_sf($__a, 'company_sequence') . "</td>" . "<td>" . ems_sf($__a, 'document_signature') . "</td>" . "<td>" . ems_sf($__a, 'contractual_start') . "</td>" . "<td>" . ems_sf($__a, 'contractual_end') . "</td>" . "<td>" . ems_sf($__a, 'execution_start') . "</td>" . "<td>" . ems_sf($__a, 'execution_end') . "</td>" . "<td>" . ems_sf($__a, 'commitment_cycles_count') . "</td>" . "<td>" . ems_sf($__a, 'current_contracted_units') . "</td>" . "<td>" . ems_sf($__a, 'current_monthly_capacity') . "</td>" . "<td>" . ems_sf($__a, 'evidence_source') . "</td>" . "<td>" . ems_sf($__a, 'currency') . "</td>" . "<td>" . ems_sf($__a, 'pricing_basis_as_stated') . "</td>" . "<td>" . ems_sf($__a, 'unit_price_as_stated') . "</td>" . "<td>" . ems_sf($__a, 'tax') . "</td>" . "<td>" . ems_sf($__a, 'payment_and_billing') . "</td>" . "<td>" . ems_sf($__a, 'deposit_or_advance') . "</td>" . "<td>" . ems_sf($__a, 'maintenance_and_spares') . "</td>" . "<td>" . ems_sf($__a, 'transport_and_packing') . "</td>" . "<td>" . ems_sf($__a, 'commercial_officer') . "</td>" . "<td>" . ems_sf($__a, 'notes') . "</td>" . "<td>" . ems_sf($__a, 'provided_service_type') . "</td>" . "<td>" . ems_sf($__a, 'contracting_unit_basis') . "</td>" . "<td>" . ems_sf($__a, 'contract_signing_place') . "</td>" . "<td>" . ems_sf($__a, 'historically_likely_place') . "</td>" . "<td>" . ems_sf($__a, 'likely_place_basis') . "</td>" . "<td>" . ems_sf($__a, 'likely_place_evidence_level') . "</td>" . "<td>" . ems_sf($__a, 'source_state_as_stated') . "</td>" . "<td>" . ems_sf($__a, 'state_change_basis') . "</td>" . "<td>" . ems_sf($__a, 'billing_unit') . "</td>" . "<td>" . ems_sf($__a, 'min_quantity') . "</td>" . "<td>" . ems_sf($__a, 'min_level_frequency') . "</td>" . "<td>" . ems_sf($__a, 'guaranteed_quantity') . "</td>" . "<td>" . ems_sf($__a, 'billing_threshold') . "</td>" . "<td>" . ems_sf($__a, 'shortage_bearer') . "</td>" . "<td>" . ems_sf($__a, 'shortage_rule') . "</td>" . "<td>" . ems_sf($__a, 'price_structure') . "</td>" . "<td>" . ems_sf($__a, 'price_versions_count') . "</td>" . "<td>" . ems_sf($__a, 'pricing_ref') . "</td>" . "</tr>";
               }
             }
             ?>
@@ -1329,80 +1329,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
     </div>
   </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_contracts
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود العقد' => 'g1',
-            'رقم العميل' => 'g2',
-            'اسم العميل (بحث)' => 'g3',
-            'رقم المشروع' => 'g4',
-            'نموذج العمل' => 'g5',
-            'رقم العقد بالمنظومة' => 'g6',
-            'تسلسل الشركة' => 'g7',
-            'توقيع الوثيقة' => 'g8',
-            'البداية التعاقدية' => 'g9',
-            'النهاية التعاقدية' => 'g10',
-            'البداية التنفيذية' => 'g11',
-            'النهاية التنفيذية' => 'g12',
-            'حالة العقد' => 'g13',
-            'عدد دورات الالتزام (التجديدات)' => 'g14',
-            'الوحدات المتعاقدة الحالية' => 'g15',
-            'السعة الشهرية الحالية' => 'g16',
-            'حالة خط الأساس' => 'g17',
-            'الحجية/مصدر التوثيق' => 'g18',
-            'العملة' => 'g19',
-            'أساس التسعير (كما ورد)' => 'g20',
-            'سعر الوحدة (كما ورد)' => 'g21',
-            'الضريبة' => 'g22',
-            'الدفع والفوترة' => 'g23',
-            'الوديعة/الدفعة المقدمة' => 'g24',
-            'الوقود' => 'g25',
-            'السكن والإعاشة' => 'g26',
-            'الصيانة وقطع الغيار' => 'g27',
-            'التأمين' => 'g28',
-            'المشغلون' => 'g29',
-            'النقل والتعبئة' => 'g30',
-            'الحد الأدنى للساعات' => 'g31',
-            'ضمان التشغيل' => 'g32',
-            'جدول عمل الموقع' => 'g33',
-            'خصم ساعات المخالفة' => 'g34',
-            'التوقف غير المدفوع' => 'g35',
-            'الإنهاء' => 'g36',
-            'التجديد' => 'g37',
-            'القانون الحاكم' => 'g38',
-            'المسؤول التجاري' => 'g39',
-            'ملاحظات' => 'g40',
-            'نوع الخدمة المقدمة' => 'g41',
-            'أساس التعاقد (الوحدة)' => 'g42',
-            'مكان إبرام العقد (مؤكد)' => 'g43',
-            'المكان المرجح تاريخيا' => 'g44',
-            'أساس المكان المرجح' => 'g45',
-            'مستوى حجية المكان المرجح' => 'g46',
-            'الحالة كما وردت بالمصدر' => 'g47',
-            'أساس تعديل الحالة' => 'g48',
-            'نموذج التسعير' => 'g49',
-            'وحدة الفوترة' => 'g50',
-            'الحد الأدنى (كمية)' => 'g51',
-            'دورية الحد الأدنى' => 'g52',
-            'الكمية المضمونة' => 'g53',
-            'عتبة الفوترة' => 'g54',
-            'متحمل العجز' => 'g55',
-            'قاعدة العجز' => 'g56',
-            'بنية السعر' => 'g57',
-            'عدد النسخ/المكونات السعرية' => 'g58',
-            'مرجع تسعيري' => 'g59',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_contracts');
-        echo ems_w14_grid('emsList_sal_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل عقود المشاريع'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
-
   <!-- jQuery -->
   <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
   <!-- DataTables JS -->

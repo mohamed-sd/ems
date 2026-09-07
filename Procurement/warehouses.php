@@ -87,10 +87,10 @@ echo ems_states_bundle('لا مستودعات مسجلة بعد',
         <th>الحال</th>
         <th>ملاحظات</th>
         <th>أنشئ</th>
-      </tr></thead>
+      <th>كود المخزن</th><th>اسم المخزن</th><th>نوع المخزن</th><th>الأمين النافذ اليوم</th><th>أسلوب العهدة</th><th>ترخيص خاص</th><th>سعة التخزين</th><th>ضوابط السلامة</th><th>حالة المخزن</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" class="whx-empty-cell">لا صف مسجل بعد.</td></tr>
+        <tr><td colspan="115" class="whx-empty-cell">لا صف مسجل بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['code'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -100,7 +100,7 @@ echo ems_states_bundle('لا مستودعات مسجلة بعد',
           <td><?php echo htmlspecialchars((string) $x['status'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['notes'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
-        </tr>
+        <td><?= ems_sf($x, 'warehouse_code') ?></td><td><?= ems_sf($x, 'warehouse_name') ?></td><td><?= ems_sf($x, 'warehouse_type') ?></td><td><?= ems_sf($x, 'custodian_on_duty') ?></td><td><?= ems_sf($x, 'custody_method') ?></td><td><?= ems_sf($x, 'special_licence') ?></td><td><?= ems_sf($x, 'storage_capacity') ?></td><td><?= ems_sf($x, 'safety_controls') ?></td><td><?= ems_sf($x, 'warehouse_state') ?></td><td><?= ems_sf($x, 'creator_name') ?></td><td><?= ems_sf($x, 'created_date') ?></td><td><?= ems_sf($x, 'reviewer') ?></td><td><?= ems_sf($x, 'approver') ?></td><td><?= ems_sf($x, 'approval_date') ?></td><td><?= ems_sf($x, 'data_state') ?></td><td><?= ems_sf($x, 'source_ref') ?></td></tr>
       <?php endforeach; endif; ?>
       </tbody>
     </table>
@@ -109,35 +109,4 @@ echo ems_states_bundle('لا مستودعات مسجلة بعد',
     </p>
   </div></div>
   <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_warehouses
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود المخزن' => 'g35',
-            'اسم المخزن' => 'g36',
-            'نوع المخزن' => 'g37',
-            'الموقع' => 'g38',
-            'الأمين النافذ اليوم' => 'g39',
-            'أسلوب العهدة' => 'g40',
-            'ترخيص خاص' => 'g41',
-            'سعة التخزين' => 'g42',
-            'ضوابط السلامة' => 'g43',
-            'حالة المخزن' => 'g44',
-            'المنشئ' => 'g45',
-            'تاريخ الإنشاء' => 'g46',
-            'المراجع' => 'g47',
-            'المعتمد' => 'g48',
-            'تاريخ الاعتماد' => 'g49',
-            'حالة البيانات' => 'g50',
-            'مرجع المصدر' => 'g51',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_warehouses');
-        echo ems_w14_grid('emsList_wh_warehouses', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المخازن وأنواعها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

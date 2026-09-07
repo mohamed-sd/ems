@@ -71,7 +71,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا بنود تجهيز مغادرة', 'التجهيز يفتح على أمر ترحيل. ولا مغادرة قبل اكتماله'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر الترحيل</th><th>بند التجهيز</th><th>النتيجة</th><th>محضر التسليم الأصلي</th><th>صور ما قبل النقل</th><th>مخاطر المسار</th><th>وقت الإنجاز</th><th>حالة البند</th><th>قاعدة الحالة</th></tr></thead>
+        <thead><tr><th>#</th><th>أمر الترحيل</th><th>بند التجهيز</th><th>النتيجة</th><th>محضر التسليم الأصلي</th><th>صور ما قبل النقل</th><th>مخاطر المسار</th><th>وقت الإنجاز</th><th>حالة البند</th><th>قاعدة الحالة</th><th>معرف البند</th><th>رقم الأمر</th><th>المنفذ</th><th>صور حالة ما قبل النقل</th><th>تقييم مخاطر المسار</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -85,49 +85,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['done_at']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'item_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'executor') ?></td><td><?= ems_sf($r, 'pre_transfer_photos') ?></td><td><?= ems_sf($r, 'route_risk_assessment') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا بنود تجهيز مغادرة.</td></tr>
+            <tr><td colspan="19">لا بنود تجهيز مغادرة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_origin_handover
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف البند' => 'g147',
-            'رقم الأمر' => 'g148',
-            'بند التجهيز' => 'g149',
-            'المنفذ' => 'g150',
-            'النتيجة' => 'g151',
-            'محضر التسليم الأصلي' => 'g152',
-            'صور حالة ما قبل النقل' => 'g153',
-            'تقييم مخاطر المسار' => 'g154',
-            'وقت الإنجاز' => 'g155',
-            'حالة البند' => 'g156',
-            'المنشئ' => 'g157',
-            'تاريخ الإنشاء' => 'g158',
-            'حالة البيانات' => 'g159',
-            'مرجع المصدر' => 'g160',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_origin_handover');
-        echo ems_w14_grid('emsList_trp_transfer_origin_handover', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تجهيز المغادرة والتسليم الأصلي'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('تجهيز المغادره والتسليم الاصلي', 'تجهيز المغادرة والتسليم الأصلي'),
-        'table'    => 'trp_transfer_origin_handover',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'Transport/transfer_origin_handover.php',
-    )); ?>
-
-    </div></div></div>
 </div>
 </body></html>

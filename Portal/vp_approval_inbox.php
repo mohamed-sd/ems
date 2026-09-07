@@ -94,7 +94,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="table-container">
         <table class="ems-data-table">
-            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة المصدر</th><th>البيان</th><th>النطاق</th><th>التاريخ</th><th>فعله عند فاعله</th></tr></thead>
+            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة المصدر</th><th>البيان</th><th>النطاق</th><th>التاريخ</th><th>فعله عند فاعله</th><th>Request_ID</th><th>Source_Department</th><th>Request_Type</th><th>Deputy_Role</th><th>Approval_Scope</th><th>Amount</th><th>Currency</th><th>Previous_Approval</th><th>Recommendation</th><th>Documents</th><th>Risk</th><th>Status</th><th>Deputy_Decision</th><th>Conditions</th><th>Decision_Date</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x0): ?>
                 <tr>
@@ -105,9 +105,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['mine']) ?></td>
                     <td><?= htmlspecialchars($x0['at']) ?></td>
                     <td><a href="<?= htmlspecialchars($x0['link']) ?>"><?= htmlspecialchars($x0['label']) ?></a></td>
-                </tr>
+                <td><?= ems_sf($x0, 'request_uid') ?></td><td><?= ems_sf($x0, 'source_department') ?></td><td><?= ems_sf($x0, 'request_type') ?></td><td><?= ems_sf($x0, 'deputy_role') ?></td><td><?= ems_sf($x0, 'approval_scope') ?></td><td><?= ems_sf($x0, 'amount') ?></td><td><?= ems_sf($x0, 'currency') ?></td><td><?= ems_sf($x0, 'previous_approval') ?></td><td><?= ems_sf($x0, 'recommendation') ?></td><td><?= ems_sf($x0, 'documents') ?></td><td><?= ems_sf($x0, 'risk') ?></td><td><?= ems_sf($x0, 'status') ?></td><td><?= ems_sf($x0, 'deputy_decision') ?></td><td><?= ems_sf($x0, 'conditions') ?></td><td><?= ems_sf($x0, 'decision_date') ?></td><td><?= ems_sf($x0, 'creator_name') ?></td><td><?= ems_sf($x0, 'created_date') ?></td><td><?= ems_sf($x0, 'data_state') ?></td><td><?= ems_sf($x0, 'source_ref') ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="7">لا وارد منتظرا في الرافدين</td></tr><?php endif; ?>
+            <?php if (!$rows): ?><tr><td colspan="26">لا وارد منتظرا في الرافدين</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -117,44 +117,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         يحكمه محرك الاعتماد بمصفوفته، ونطاق نيابتك يعلم على الصف من سجل التكليفات والرؤية اوسع من الصلاحية.
         الفعل في صندوق الاعتمادات وبوابة الطلبات ولا كتابة هنا.
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_exec_request_queue')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'Request_ID' => 'g108',
-            'Source_Department' => 'g109',
-            'Request_Type' => 'g111',
-            'Deputy_Role' => 'g3',
-            'Approval_Scope' => 'g4',
-            'Amount' => 'g115',
-            'Currency' => 'g116',
-            'Previous_Approval' => 'g120',
-            'Recommendation' => 'g127',
-            'Documents' => 'g126',
-            'Risk' => 'g119',
-            'Status' => 'g5',
-            'Deputy_Decision' => 'g6',
-            'Conditions' => 'g129',
-            'Decision_Date' => 'g130',
-            'المنشئ' => 'g131',
-            'تاريخ الإنشاء' => 'g132',
-            'حالة البيانات' => 'g133',
-            'مرجع المصدر' => 'g134',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('exec_request_queue');
-        echo ems_w14_grid('emsList_exec_request_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق اعتمادات النائب'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

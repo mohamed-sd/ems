@@ -78,7 +78,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="table-wrap"><table class="data-table">
         <thead><tr><th>#</th><th>كود البلاغ</th><th>المعدة</th><th>وقت البلاغ</th><th>الجهة المبلغة</th>
-            <th>أوقفت المعدة</th><th>الوصف</th><th>حالة البلاغ</th><th>أمر العمل</th></tr></thead>
+            <th>أوقفت المعدة</th><th>الوصف</th><th>حالة البلاغ</th><th>أمر العمل</th><th>معرف الاستقبال</th><th>رقم البلاغ</th><th>تاريخ البلاغ</th><th>المبلغ</th><th>كود المعدة</th><th>الموقع</th><th>وصف العطل</th><th>عقدة الشجرة المبدئية</th><th>درجة الخطورة</th><th>المعدة متوقفة؟</th><th>أثر الإيقاف</th><th>قرار الاستقبال</th><th>رقم طلب الفحص المتفرع</th><th>حالة الاستقبال</th><th>شدة العطل الفني</th><th>مدة التوقف</th><th>الأثر التشغيلي</th><th>قابلية المنع</th><th>التكرار</th><th>أداء الاستجابة</th><th>سبب التأخير</th><th>سلسلة المسؤولية</th><th>وقت توقف المعدة</th><th>وقت إبلاغ المشغل</th><th>وقت استلام الصيانة</th><th>وقت بدء التشخيص</th><th>وقت انتهاء التشخيص</th><th>وقت طلب القطعة</th><th>وقت توفر القطعة</th><th>وقت وصولها للموقع</th><th>وقت حضور الفني</th><th>وقت بدء الإصلاح</th><th>وقت انتهاء الإصلاح</th><th>وقت الاختبار</th><th>وقت التصديق</th><th>وقت عودة المعدة للخدمة</th><th>إجمالي التوقف</th><th>زمن الإصلاح الفعلي</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; $bid = (int) $r['id']; ?>
             <tr><td><?= $i ?></td>
@@ -90,73 +90,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><small><?= htmlspecialchars(mb_substr((string) $r['description'], 0, 120)) ?></small></td>
                 <td><?= htmlspecialchars((string) $r['state']) ?></td>
                 <td><?= isset($ordered[$bid]) ? htmlspecialchars($ordered[$bid]) : 'لم يفتح بعد' ?></td>
-            </tr>
+            <td><?= ems_sf($r, 'intake_uid') ?></td><td><?= ems_sf($r, 'report_no') ?></td><td><?= ems_sf($r, 'report_date') ?></td><td><?= ems_sf($r, 'amount') ?></td><td><?= ems_sf($r, 'equipment_code') ?></td><td><?= ems_sf($r, 'location') ?></td><td><?= ems_sf($r, 'fault_description') ?></td><td><?= ems_sf($r, 'initial_tree_node') ?></td><td><?= ems_sf($r, 'severity_degree') ?></td><td><?= ems_sf($r, 'equipment_stopped') ?></td><td><?= ems_sf($r, 'stoppage_impact') ?></td><td><?= ems_sf($r, 'intake_decision') ?></td><td><?= ems_sf($r, 'branched_inspection_req_no') ?></td><td><?= ems_sf($r, 'intake_state') ?></td><td><?= ems_sf($r, 'fault_severity') ?></td><td><?= ems_sf($r, 'downtime_duration') ?></td><td><?= ems_sf($r, 'operational_impact') ?></td><td><?= ems_sf($r, 'preventability') ?></td><td><?= ems_sf($r, 'recurrence') ?></td><td><?= ems_sf($r, 'response_performance') ?></td><td><?= ems_sf($r, 'delay_reason') ?></td><td><?= ems_sf($r, 'chain_of_responsibility') ?></td><td><?= ems_sf($r, 'equipment_stop_time') ?></td><td><?= ems_sf($r, 'operator_report_time') ?></td><td><?= ems_sf($r, 'maintenance_receipt_time') ?></td><td><?= ems_sf($r, 'diagnosis_start_time') ?></td><td><?= ems_sf($r, 'diagnosis_end_time') ?></td><td><?= ems_sf($r, 'part_request_time') ?></td><td><?= ems_sf($r, 'part_available_time') ?></td><td><?= ems_sf($r, 'site_arrival_time') ?></td><td><?= ems_sf($r, 'technician_arrival_time') ?></td><td><?= ems_sf($r, 'repair_start_time') ?></td><td><?= ems_sf($r, 'repair_end_time') ?></td><td><?= ems_sf($r, 'test_time') ?></td><td><?= ems_sf($r, 'certification_time') ?></td><td><?= ems_sf($r, 'equipment_back_in_service_time') ?></td><td><?= ems_sf($r, 'downtime_total') ?></td><td><?= ems_sf($r, 'actual_repair_time') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا بلاغات محالة إلى الصيانة.</td></tr>
+            <tr><td colspan="51">لا بلاغات محالة إلى الصيانة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_breakdown_intake"></table>
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_breakdown_intake
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الاستقبال' => 'g1',
-            'رقم البلاغ' => 'g2',
-            'تاريخ البلاغ' => 'g3',
-            'المبلغ' => 'g4',
-            'كود المعدة' => 'g5',
-            'الموقع' => 'g6',
-            'وصف العطل' => 'g7',
-            'عقدة الشجرة المبدئية' => 'g8',
-            'درجة الخطورة' => 'g9',
-            'المعدة متوقفة؟' => 'g10',
-            'أثر الإيقاف' => 'g11',
-            'قرار الاستقبال' => 'g12',
-            'رقم طلب الفحص المتفرع' => 'g13',
-            'حالة الاستقبال' => 'g14',
-            'شدة العطل الفني' => 'g15',
-            'مدة التوقف' => 'g16',
-            'الأثر التشغيلي' => 'g17',
-            'قابلية المنع' => 'g18',
-            'التكرار' => 'g19',
-            'أداء الاستجابة' => 'g20',
-            'سبب التأخير' => 'g21',
-            'سلسلة المسؤولية' => 'g22',
-            'وقت توقف المعدة' => 'g23',
-            'وقت إبلاغ المشغل' => 'g24',
-            'وقت استلام الصيانة' => 'g25',
-            'وقت بدء التشخيص' => 'g26',
-            'وقت انتهاء التشخيص' => 'g27',
-            'وقت طلب القطعة' => 'g28',
-            'وقت توفر القطعة' => 'g29',
-            'وقت وصولها للموقع' => 'g30',
-            'وقت حضور الفني' => 'g31',
-            'وقت بدء الإصلاح' => 'g32',
-            'وقت انتهاء الإصلاح' => 'g33',
-            'وقت الاختبار' => 'g34',
-            'وقت التصديق' => 'g35',
-            'وقت عودة المعدة للخدمة' => 'g36',
-            'إجمالي التوقف' => 'g37',
-            'زمن الإصلاح الفعلي' => 'g38',
-            'المنشئ' => 'g39',
-            'تاريخ الإنشاء' => 'g40',
-            'حالة البيانات' => 'g41',
-            'مرجع المصدر' => 'g42',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_breakdown_intake');
-        echo ems_w14_grid('emsList_mnt_breakdown_intake', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البلاغ الفني واستقبال العطل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

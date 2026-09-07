@@ -551,7 +551,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                     <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                    </tr></thead>
+                    <th>الجهة الطالبة</th><th>مرجع المصدر</th><th>المشروع المحمل</th><th>عدد البنود تفصيلها ش02-2</th><th>التاريخ المطلوب</th><th>التقدير المبدئي</th><th>حالة الطلب</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th></tr></thead>
                 <tbody>
                     <?php
                     // ترطيب ثنائي: الطلبات ثم عدّ سطورها بجلبٍ واحد
@@ -630,46 +630,13 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         echo "<td>" . htmlspecialchars((string)$row['fin_approval_state']) . "</td>";
                         echo "<td>" . intval($row['line_count']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['created_at']) . "</td>";
-                        echo "</tr>";
+                        echo "" . "<td>" . ems_sf($row, 'requesting_party') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "<td>" . ems_sf($row, 'charged_project') . "</td>" . "<td>" . ems_sf($row, 'items_count_ref_sh02_2') . "</td>" . "<td>" . ems_sf($row, 'required_date') . "</td>" . "<td>" . ems_sf($row, 'initial_estimate') . "</td>" . "<td>" . ems_sf($row, 'request_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "</tr>";
                     } }
                     ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g138',
-            'تاريخ الطلب' => 'g139',
-            'الجهة الطالبة' => 'g140',
-            'مصدر الاحتياج' => 'g141',
-            'مرجع المصدر' => 'g142',
-            'التصنيف التشغيلي' => 'g143',
-            'الأولوية' => 'g144',
-            'المشروع المحمل' => 'g145',
-            'مركز التكلفة' => 'g146',
-            'عدد البنود تفصيلها ش02-2' => 'g147',
-            'التاريخ المطلوب' => 'g148',
-            'التقدير المبدئي' => 'g149',
-            'حالة الطلب' => 'g150',
-            'المنشئ' => 'g151',
-            'تاريخ الإنشاء' => 'g152',
-            'المراجع' => 'g153',
-            'المعتمد' => 'g154',
-            'تاريخ الاعتماد' => 'g155',
-            'حالة البيانات' => 'g156',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_requests');
-        echo ems_w14_grid('emsList_prc_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الشراء'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

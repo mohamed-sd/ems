@@ -92,10 +92,10 @@ echo ems_states_bundle('لا صفوف خطة شهرية لهذا الكيان', 
         <th>ساعات استعداد</th>
         <th>نسبة الإنجاز</th>
         <th>الحال</th>
-      </tr></thead>
+      <th>معرف سطر الخطة</th><th>شهر الخطة</th><th>رقم المشروع</th><th>اسم المشروع</th><th>كود عقد العميل</th><th>كود المعدة</th><th>نوع المعدة</th><th>نموذج العمل</th><th>المستهدف التعاقدي</th><th>مستهدف الخطة</th><th>وحدة القياس</th><th>أيام العمل المخططة</th><th>ورديات اليوم</th><th>الساعات المتاحة/وردية</th><th>معامل الموسم</th><th>المستهدف المعاير بالموسم</th><th>مبرر الفارق عن التعاقدي</th><th>حالة السطر</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" class="mpl-empty-cell">لا صف مسجل بعد.</td></tr>
+        <tr><td colspan="124" class="mpl-empty-cell">لا صف مسجل بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['month_ref'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -107,7 +107,7 @@ echo ems_states_bundle('لا صفوف خطة شهرية لهذا الكيان', 
           <td><?php echo htmlspecialchars((string) $x['hours_standby'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['pct_achievement'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $x['status_label'], ENT_QUOTES, 'UTF-8'); ?></td>
-        </tr>
+        <td><?= ems_sf($x, 'plan_line_uid') ?></td><td><?= ems_sf($x, 'plan_month') ?></td><td><?= ems_sf($x, 'project_no') ?></td><td><?= ems_sf($x, 'project_name') ?></td><td><?= ems_sf($x, 'client_contract_code') ?></td><td><?= ems_sf($x, 'equipment_code') ?></td><td><?= ems_sf($x, 'equipment_type') ?></td><td><?= ems_sf($x, 'work_model') ?></td><td><?= ems_sf($x, 'contractual_target') ?></td><td><?= ems_sf($x, 'plan_target') ?></td><td><?= ems_sf($x, 'measure_unit') ?></td><td><?= ems_sf($x, 'planned_work_days') ?></td><td><?= ems_sf($x, 'day_shifts') ?></td><td><?= ems_sf($x, 'available_hours_per_shift') ?></td><td><?= ems_sf($x, 'season_factor') ?></td><td><?= ems_sf($x, 'season_adjusted_target') ?></td><td><?= ems_sf($x, 'contractual_variance_reason') ?></td><td><?= ems_sf($x, 'line_state') ?></td><td><?= ems_sf($x, 'creator_name') ?></td><td><?= ems_sf($x, 'created_date') ?></td><td><?= ems_sf($x, 'reviewer') ?></td><td><?= ems_sf($x, 'approver') ?></td><td><?= ems_sf($x, 'approval_date') ?></td><td><?= ems_sf($x, 'data_state') ?></td><td><?= ems_sf($x, 'source_ref') ?></td></tr>
       <?php endforeach; endif; ?>
       </tbody>
     </table>
@@ -116,43 +116,4 @@ echo ems_states_bundle('لا صفوف خطة شهرية لهذا الكيان', 
     </p>
   </div></div>
   <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_monthly_plan
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف سطر الخطة' => 'g39',
-            'شهر الخطة' => 'g40',
-            'رقم المشروع' => 'g41',
-            'اسم المشروع' => 'g42',
-            'كود عقد العميل' => 'g43',
-            'كود المعدة' => 'g44',
-            'نوع المعدة' => 'g45',
-            'نموذج العمل' => 'g46',
-            'المستهدف التعاقدي' => 'g47',
-            'مستهدف الخطة' => 'g48',
-            'وحدة القياس' => 'g49',
-            'أيام العمل المخططة' => 'g50',
-            'ورديات اليوم' => 'g51',
-            'الساعات المتاحة/وردية' => 'g52',
-            'معامل الموسم' => 'g53',
-            'المستهدف المعاير بالموسم' => 'g54',
-            'مبرر الفارق عن التعاقدي' => 'g55',
-            'حالة السطر' => 'g56',
-            'المنشئ' => 'g57',
-            'تاريخ الإنشاء' => 'g58',
-            'المراجع' => 'g59',
-            'المعتمد' => 'g60',
-            'تاريخ الاعتماد' => 'g61',
-            'حالة البيانات' => 'g62',
-            'مرجع المصدر' => 'g63',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_monthly_plan');
-        echo ems_w14_grid('emsList_ops_monthly_plan', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الخطة الشهرية للتشغيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

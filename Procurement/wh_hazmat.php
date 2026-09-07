@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أصناف بضوابط خطر', 'الضوابط سجل لكل صنف لا قائمة واحدة. والتصريح شرط صرف لا توصية'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>الصنف</th><th>الفئة</th><th>فئة الخطر</th><th>ضوابط التخزين</th><th>ضوابط المناولة</th><th>يوجب تصريحا</th><th>مرجع التصريح</th><th>بوابة الصرف</th><th>ما لا يخزن بجواره</th></tr></thead>
+        <thead><tr><th>الصنف</th><th>الفئة</th><th>فئة الخطر</th><th>ضوابط التخزين</th><th>ضوابط المناولة</th><th>يوجب تصريحا</th><th>مرجع التصريح</th><th>بوابة الصرف</th><th>ما لا يخزن بجواره</th><th>معرف السطر</th><th>كود الصنف</th><th>فئة الخطورة</th><th>التصريح النظامي</th><th>موقع العزل</th><th>أمين العهدة المخول</th><th>تتبع الدفعة إلزامي؟</th><th>سلطة الصرف</th><th>رقابة مزدوجة؟</th><th>قيد الصلاحية</th><th>مسار الإتلاف</th><th>حالة الضوابط</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): $it = isset($items[(int) $r['item_id']]) ? $items[(int) $r['item_id']] : null; ?>
             <tr>
@@ -89,39 +89,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['permit_ref']) ?></td>
                 <td><?= htmlspecialchars((string) $r['issue_gate']) ?></td>
                 <td><?= htmlspecialchars((string) $r['separation_rule']) ?></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'item_code') ?></td><td><?= ems_sf($r, 'severity_category') ?></td><td><?= ems_sf($r, 'statutory_permit') ?></td><td><?= ems_sf($r, 'isolation_location') ?></td><td><?= ems_sf($r, 'authorized_custodian') ?></td><td><?= ems_sf($r, 'batch_tracking_required') ?></td><td><?= ems_sf($r, 'disbursement_authority') ?></td><td><?= ems_sf($r, 'dual_control') ?></td><td><?= ems_sf($r, 'validity_constraint') ?></td><td><?= ems_sf($r, 'disposal_route') ?></td><td><?= ems_sf($r, 'controls_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_hazmat
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g1',
-            'كود الصنف' => 'g2',
-            'فئة الخطورة' => 'g3',
-            'التصريح النظامي' => 'g4',
-            'موقع العزل' => 'g5',
-            'أمين العهدة المخول' => 'g6',
-            'تتبع الدفعة إلزامي؟' => 'g7',
-            'سلطة الصرف' => 'g8',
-            'رقابة مزدوجة؟' => 'g9',
-            'قيد الصلاحية' => 'g10',
-            'مسار الإتلاف' => 'g11',
-            'حالة الضوابط' => 'g12',
-            'المنشئ' => 'g13',
-            'تاريخ الإنشاء' => 'g14',
-            'حالة البيانات' => 'g15',
-            'مرجع المصدر' => 'g16',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_hazmat');
-        echo ems_w14_grid('emsList_wh_hazmat', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ضوابط المواد الخطرة والمتفجرات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

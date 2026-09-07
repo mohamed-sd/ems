@@ -318,7 +318,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    </tr>
+                    <th>معرف السطر</th><th>العملة</th><th>مقابل</th><th>تاريخ السريان</th><th>المصدر/التوثيق</th><th>حالة السطر</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
             </thead>
             <tbody>
             <?php foreach ($currencies as $code => $c):
@@ -360,7 +360,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <span class="fin-cur-ok">—</span>
                         <?php endif; ?>
                     </td>
-                </tr>
+                <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'currency') ?></td><td><?= ems_sf($r, 'counterparty') ?></td><td><?= ems_sf($r, 'effective_date') ?></td><td><?= ems_sf($r, 'source_documentation') ?></td><td><?= ems_sf($r, 'line_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -391,32 +391,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
     <?php endif; ?>
 
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g200',
-            'العملة' => 'g201',
-            'مقابل' => 'g202',
-            'نوع السعر' => 'g203',
-            'السعر' => 'g204',
-            'تاريخ السريان' => 'g205',
-            'المصدر/التوثيق' => 'g206',
-            'حالة السطر' => 'g207',
-            'المنشئ' => 'g208',
-            'تاريخ الإنشاء' => 'g209',
-            'حالة البيانات' => 'g210',
-            'مرجع المصدر' => 'g211',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_currencies');
-        echo ems_w14_grid('emsList_sup_contract_line', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أسعار الصرف'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 </body>

@@ -161,10 +161,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
-    </tr></thead>
+    <th>رقم الأمر</th><th>رقم الطلب</th><th>فحص اكتمال الاعتماد</th><th>المستفيد</th><th>القيمة</th><th>الوعاء الصارف</th><th>فحص رصيد الوعاء</th><th>الموقع الأول</th><th>الموقع الثاني</th><th>فحص سريان التفويض</th><th>مرجع التنفيذ البنكي</th><th>تاريخ التنفيذ</th><th>انعكاس الذمم</th><th>حالة الأمر</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="10" class="text-center text-muted">لا دفعة دفع مفتوحة بعد</td></tr>
+      <tr><td colspan="34" class="text-center text-muted">لا دفعة دفع مفتوحة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
@@ -191,44 +191,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <td><?= (int) $r['prepared_by'] ?></td>
         <td><?= (int) $r['executed_by'] ?: '—' ?></td>
         <td><?= htmlspecialchars((string) $r['bank_ref'], ENT_QUOTES, 'UTF-8') ?: '—' ?></td>
-      </tr>
+      <td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'request_no') ?></td><td><?= ems_sf($r, 'approval_completeness_check') ?></td><td><?= ems_sf($r, 'beneficiary') ?></td><td><?= ems_sf($r, 'value') ?></td><td><?= ems_sf($r, 'disbursing_vessel') ?></td><td><?= ems_sf($r, 'vessel_balance_check') ?></td><td><?= ems_sf($r, 'first_location') ?></td><td><?= ems_sf($r, 'second_location') ?></td><td><?= ems_sf($r, 'delegation_validity_check') ?></td><td><?= ems_sf($r, 'bank_execution_ref') ?></td><td><?= ems_sf($r, 'execution_date') ?></td><td><?= ems_sf($r, 'receivables_effect') ?></td><td><?= ems_sf($r, 'order_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الأمر' => 'g22',
-            'رقم الطلب' => 'g23',
-            'فحص اكتمال الاعتماد' => 'g24',
-            'المستفيد' => 'g25',
-            'القيمة' => 'g26',
-            'العملة' => 'g27',
-            'الوعاء الصارف' => 'g28',
-            'فحص رصيد الوعاء' => 'g29',
-            'الموقع الأول' => 'g30',
-            'الموقع الثاني' => 'g31',
-            'فحص سريان التفويض' => 'g32',
-            'مرجع التنفيذ البنكي' => 'g33',
-            'تاريخ التنفيذ' => 'g34',
-            'انعكاس الذمم' => 'g35',
-            'حالة الأمر' => 'g36',
-            'المنشئ' => 'g37',
-            'تاريخ الإنشاء' => 'g38',
-            'المراجع' => 'g39',
-            'المعتمد' => 'g40',
-            'تاريخ الاعتماد' => 'g41',
-            'حالة البيانات' => 'g42',
-            'مرجع المصدر' => 'g43',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tre_pay_batch');
-        echo ems_w14_grid('emsList_tre_pay_batch', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أمر الدفع والتنفيذ'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>

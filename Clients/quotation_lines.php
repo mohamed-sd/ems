@@ -165,10 +165,10 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
       <th>الخصم ٪</th><th>الإجمالي</th><th>العملة</th><th>أضافه</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
-    </tr></thead>
+    <th>رقم البند</th><th>رقم العرض</th><th>مرجع العقد</th><th>نوع البند</th><th>نوع الخدمة</th><th>نوع المعدة/البند</th><th>نموذج العمل</th><th>عدد المعدات</th><th>أساس الوحدة الشهري</th><th>المدة (أشهر)</th><th>الكمية/المستهدف</th><th>وحدة القياس</th><th>القيمة</th><th>سريان النسخة السعرية</th><th>أساس السعر</th><th>الضريبة كما وردت</th><th>نص السعر كما ورد بالمصدر</th><th>حالة البيانات</th><th>ملاحظات تجارية</th><th>مفتاح دورة الالتزام المصدر</th><th>مستوى الحجية</th><th>أساس القيمة الرجعية</th></tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا بند مسجل بعد</td></tr>
+      <tr><td colspan="33" class="text-center text-muted">لا بند مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>
@@ -181,48 +181,10 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         <td><strong><?= number_format((float) $r['line_total'], 2) ?></strong></td>
         <td><?= htmlspecialchars((string) $r['currency'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= (int) $r['created_by'] ?></td>
-      </tr>
+      <td><?= ems_sf($r, 'item_no') ?></td><td><?= ems_sf($r, 'offer_no') ?></td><td><?= ems_sf($r, 'contract_ref') ?></td><td><?= ems_sf($r, 'item_type') ?></td><td><?= ems_sf($r, 'service_type') ?></td><td><?= ems_sf($r, 'equipment_or_item_type') ?></td><td><?= ems_sf($r, 'work_model') ?></td><td><?= ems_sf($r, 'equipment_count') ?></td><td><?= ems_sf($r, 'monthly_unit_basis') ?></td><td><?= ems_sf($r, 'duration_months') ?></td><td><?= ems_sf($r, 'quantity_or_target') ?></td><td><?= ems_sf($r, 'measure_unit') ?></td><td><?= ems_sf($r, 'value') ?></td><td><?= ems_sf($r, 'price_version_effective_from') ?></td><td><?= ems_sf($r, 'price_basis') ?></td><td><?= ems_sf($r, 'tax_as_stated') ?></td><td><?= ems_sf($r, 'price_text_as_stated') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'commercial_notes') ?></td><td><?= ems_sf($r, 'source_commitment_cycle_key') ?></td><td><?= ems_sf($r, 'evidence_level') ?></td><td><?= ems_sf($r, 'residual_value_basis') ?></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotation_lines
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم البند' => 'g117',
-            'رقم العرض' => 'g118',
-            'مرجع العقد' => 'g119',
-            'نوع البند' => 'g120',
-            'نوع الخدمة' => 'g121',
-            'نوع المعدة/البند' => 'g122',
-            'نموذج العمل' => 'g123',
-            'عدد المعدات' => 'g124',
-            'أساس الوحدة الشهري' => 'g125',
-            'المدة (أشهر)' => 'g126',
-            'الكمية/المستهدف' => 'g127',
-            'وحدة القياس' => 'g128',
-            'سعر الوحدة' => 'g129',
-            'العملة' => 'g130',
-            'القيمة' => 'g131',
-            'سريان النسخة السعرية' => 'g132',
-            'أساس السعر' => 'g133',
-            'الضريبة كما وردت' => 'g134',
-            'نص السعر كما ورد بالمصدر' => 'g135',
-            'حالة البيانات' => 'g136',
-            'ملاحظات تجارية' => 'g137',
-            'مفتاح دورة الالتزام المصدر' => 'g138',
-            'مستوى الحجية' => 'g139',
-            'أساس القيمة الرجعية' => 'g140',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('sal_quotation_lines');
-        echo ems_w14_grid('emsList_sal_quotation_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في بنود العروض'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <script>
 /* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».

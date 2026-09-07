@@ -157,7 +157,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php if ($V('review_due')): ?><th>مراجعة قبل</th><?php endif; ?>
                 <?php if ($V('created_at')): ?><th>تاريخ الإنشاء</th><?php endif; ?>
                 <th>فتح</th>
-            </tr></thead>
+            <th>Risk_ID</th><th>عنوان الخطر</th><th>عقدة التصنيف</th><th>العائلة</th><th>مصدر التحديد</th><th>مفتاح الحدث/السجل الأصلي</th><th>الكيان المتأثر</th><th>مرجع الكيان</th><th>الوحدة التشغيلية المتأثرة</th><th>وصف الخطر</th><th>Risk_Owner</th><th>تاريخ التحديد</th><th>آخر تقييم</th><th>المستوى المتبقي الحالي</th><th>حالة الخطر</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
@@ -201,7 +201,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if ($V('created_at')): ?>
                     <td><?php echo htmlspecialchars((string) $x['created_at']); ?></td><?php endif; ?>
                     <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['id']; ?>">ملف الخطر</a></td>
-                </tr>
+                <td><?= ems_sf($x, 'risk_uid') ?></td><td><?= ems_sf($x, 'risk_title') ?></td><td><?= ems_sf($x, 'classification_node') ?></td><td><?= ems_sf($x, 'family') ?></td><td><?= ems_sf($x, 'identification_source') ?></td><td><?= ems_sf($x, 'source_event_key') ?></td><td><?= ems_sf($x, 'affected_entity') ?></td><td><?= ems_sf($x, 'entity_ref') ?></td><td><?= ems_sf($x, 'affected_operating_unit') ?></td><td><?= ems_sf($x, 'risk_description') ?></td><td><?= ems_sf($x, 'risk_owner') ?></td><td><?= ems_sf($x, 'identification_date') ?></td><td><?= ems_sf($x, 'last_assessment') ?></td><td><?= ems_sf($x, 'current_residual_level') ?></td><td><?= ems_sf($x, 'risk_state') ?></td><td><?= ems_sf($x, 'creator_name') ?></td><td><?= ems_sf($x, 'reviewer') ?></td><td><?= ems_sf($x, 'approver') ?></td><td><?= ems_sf($x, 'approval_date') ?></td><td><?= ems_sf($x, 'data_state') ?></td><td><?= ems_sf($x, 'source_ref') ?></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -262,42 +262,6 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });
     </script>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_register
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'Risk_ID' => 'g1',
-            'عنوان الخطر' => 'g2',
-            'عقدة التصنيف' => 'g3',
-            'العائلة' => 'g4',
-            'مصدر التحديد' => 'g5',
-            'مفتاح الحدث/السجل الأصلي' => 'g6',
-            'الكيان المتأثر' => 'g7',
-            'مرجع الكيان' => 'g8',
-            'الوحدة التشغيلية المتأثرة' => 'g9',
-            'وصف الخطر' => 'g10',
-            'Risk_Owner' => 'g11',
-            'تاريخ التحديد' => 'g12',
-            'آخر تقييم' => 'g13',
-            'المستوى المتبقي الحالي' => 'g14',
-            'حالة الخطر' => 'g15',
-            'المنشئ' => 'g16',
-            'تاريخ الإنشاء' => 'g17',
-            'المراجع' => 'g18',
-            'المعتمد' => 'g19',
-            'تاريخ الاعتماد' => 'g20',
-            'حالة البيانات' => 'g21',
-            'مرجع المصدر' => 'g22',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('rsk_risk_register');
-        echo ems_w14_grid('emsList_rsk_risk_register', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المخاطر المؤسسي'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

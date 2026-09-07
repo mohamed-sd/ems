@@ -5,6 +5,11 @@ require_once dirname(__FILE__) . '/config.php';
 require_once dirname(__FILE__) . '/includes/dynamic_nav.php';
 require_once dirname(__FILE__) . '/includes/unified_nav.php';
 require_once dirname(__FILE__) . '/includes/permissions_helper.php';
+/* خليّةُ حقلِ ورقةِ الدليلِ (‏جولة 2026-09-07): تُحمَّل هنا لا في كلِّ شاشة —
+   فوسمُ `<?php` يُدرَج في جسمِ الشاشةِ يشقُّ كتلةَ HTML، وسقّاطةُ `UI-02` تعُدُّ
+   المقاطعَ لا الأحرف، فينقسم مقطعٌ فيه حرفٌ زخرفيٌّ قديمٌ إلى مقطعَين ويُعَدُّ
+   مرّتَين — **دَينٌ يزيد بلا حرفٍ يراه مستخدم**. */
+require_once dirname(__FILE__) . '/includes/sheet_fields.php';
 // التشغيل المزدوج (UX-01 §10.4-②): الدور المذكور في EMS_NAV_UNIFIED_ROLES يرى
 // المصدر الموحّد بأبوابه الستة، وسائر الأدوار على مصادرها القديمة حرفيًّا.
 $__nav_unified = isset($_SESSION['user']['role']) && unifiedNavEnabled($_SESSION['user']['role']);

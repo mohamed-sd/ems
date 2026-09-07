@@ -84,7 +84,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا طلبات صرف واردة', 'الطلب من الجهة والسند من المخزن. وخفض المعتمد عن المطلوب بسبب مكتوب'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رمز الطلب</th><th>المخزن</th><th>الجهة الطالبة</th><th>الغرض</th><th>تاريخ الحاجة</th><th>الأولوية</th><th>سند الصرف</th><th>الحالة</th><th>سبب الرفض</th><th>البنود</th></tr></thead>
+        <thead><tr><th>رمز الطلب</th><th>المخزن</th><th>الجهة الطالبة</th><th>الغرض</th><th>تاريخ الحاجة</th><th>الأولوية</th><th>سند الصرف</th><th>الحالة</th><th>سبب الرفض</th><th>البنود</th><th>معرف البند</th><th>رقم الطلب</th><th>كود الصنف</th><th>الكمية المطلوبة</th><th>الكمية المعتمدة</th><th>المصروف تراكميا</th><th>المتبقي</th><th>حالة البند</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th><th>تاريخ الورود</th><th>نوع الصرف</th><th>المرجع الموجب</th><th>فحص المرجع</th><th>البنود المطلوبة</th><th>فحص الرصيد</th><th>قرار المخزن</th><th>حالة الطلب</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -98,7 +98,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
                 <td><a href="?req=<?= (int) $r['id'] ?>">عرض البنود</a></td>
-            </tr>
+            <td><?= ems_sf($r, 'item_uid') ?></td><td><?= ems_sf($r, 'request_no') ?></td><td><?= ems_sf($r, 'item_code') ?></td><td><?= ems_sf($r, 'requested_quantity') ?></td><td><?= ems_sf($r, 'approved_quantity') ?></td><td><?= ems_sf($r, 'cumulative_spend') ?></td><td><?= ems_sf($r, 'remaining') ?></td><td><?= ems_sf($r, 'item_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td><td><?= ems_sf($r, 'arrival_date') ?></td><td><?= ems_sf($r, 'issue_type') ?></td><td><?= ems_sf($r, 'justifying_reference') ?></td><td><?= ems_sf($r, 'reference_check') ?></td><td><?= ems_sf($r, 'requested_items') ?></td><td><?= ems_sf($r, 'balance_check') ?></td><td><?= ems_sf($r, 'warehouse_decision') ?></td><td><?= ems_sf($r, 'request_state') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
@@ -123,72 +123,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </tbody>
     </table></div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_issue_request_lines
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف البند' => 'g67',
-            'رقم الطلب' => 'g68',
-            'كود الصنف' => 'g69',
-            'الكمية المطلوبة' => 'g70',
-            'الكمية المعتمدة' => 'g71',
-            'المصروف تراكميا' => 'g72',
-            'المتبقي' => 'g73',
-            'حالة البند' => 'g74',
-            'المنشئ' => 'g75',
-            'تاريخ الإنشاء' => 'g76',
-            'حالة البيانات' => 'g77',
-            'مرجع المصدر' => 'g78',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_issue_request_lines');
-        echo ems_w14_grid('emsList_wh_issue_request_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('بنود طلب الصرف الوارد', 'بنود طلب الصرف الوارد'),
-        'table'    => 'wh_issue_request_lines',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'Procurement/wh_issue_requests.php',
-    )); ?>
-
-    </div></div></div>
     <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_issue_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g52',
-            'تاريخ الورود' => 'g53',
-            'الجهة الطالبة' => 'g54',
-            'نوع الصرف' => 'g55',
-            'المرجع الموجب' => 'g56',
-            'فحص المرجع' => 'g57',
-            'البنود المطلوبة' => 'g58',
-            'فحص الرصيد' => 'g59',
-            'الأولوية' => 'g60',
-            'قرار المخزن' => 'g61',
-            'حالة الطلب' => 'g62',
-            'المنشئ' => 'g63',
-            'تاريخ الإنشاء' => 'g64',
-            'حالة البيانات' => 'g65',
-            'مرجع المصدر' => 'g66',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_issue_requests');
-        echo ems_w14_grid('emsList_wh_issue_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

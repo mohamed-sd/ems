@@ -146,7 +146,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              </tr></thead>
+              <th>معرف السطر</th><th>نوع البلاغ</th><th>الإدارة المسؤولة</th><th>Response SLA</th><th>Resolution SLA</th><th>سلم التصعيد</th><th>سريان المصفوفة</th><th>حالة السطر</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php
             $types = array();
@@ -172,38 +172,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<td>" . htmlspecialchars((string)$row['response_hours']) . "</td>";
                 echo "<td>" . htmlspecialchars((string)$row['resolution_hours']) . "</td>";
                 echo "<td>" . htmlspecialchars($row['remind_before_hours'] !== null ? (string)$row['remind_before_hours'] : '—') . "</td>";
-                echo "<td>" . tkt_active_badge($row['active']) . "</td></tr>";
+                echo "<td>" . tkt_active_badge($row['active']) . "</td>" . "<td>" . ems_sf($row, 'line_uid') . "</td>" . "<td>" . ems_sf($row, 'report_type') . "</td>" . "<td>" . ems_sf($row, 'responsible_department') . "</td>" . "<td>" . ems_sf($row, 'response_sla') . "</td>" . "<td>" . ems_sf($row, 'resolution_sla') . "</td>" . "<td>" . ems_sf($row, 'escalation_ladder') . "</td>" . "<td>" . ems_sf($row, 'matrix_effective_from') . "</td>" . "<td>" . ems_sf($row, 'line_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
             }
             ?>
             </tbody>
         </table>
-    </div></div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g103',
-            'نوع البلاغ' => 'g104',
-            'الأولوية' => 'g105',
-            'الإدارة المسؤولة' => 'g106',
-            'Response SLA' => 'g107',
-            'Resolution SLA' => 'g108',
-            'سلم التصعيد' => 'g109',
-            'سريان المصفوفة' => 'g110',
-            'حالة السطر' => 'g111',
-            'المنشئ' => 'g112',
-            'تاريخ الإنشاء' => 'g113',
-            'حالة البيانات' => 'g114',
-            'مرجع المصدر' => 'g115',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tkt_ticket_sla_config');
-        echo ems_w14_grid('emsList_tkt_ticket_sla_config', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مصفوفة مهل المعالجة للبلاغات'); /* /GUIDE_COLS */ ?>
     </div></div></div>
 </div>
 

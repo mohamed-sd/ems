@@ -137,7 +137,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              </tr></thead><tbody>
+              <th>رقم الموظف</th><th>مرفق مساند</th><th>مرجع دورة التناوب</th><th>حالة الطلب</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead><tbody>
         <?php $list = array();
         try {
             $list = $la_gate->scopedQuery(array('scope'=>array('la'=>'worker_leave_absence'), 'enrich'=>array('e'=>'employees','e2'=>'employees')),
@@ -175,42 +175,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['event_class']) ?></td><td><?= htmlspecialchars($r['event_type']) ?></td>
             <td><?= htmlspecialchars($r['date_from'] ?: '-') ?></td><td><?= htmlspecialchars($r['date_to'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['sname'] ?: '-') ?></td>
-            <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="9" class="wf-la-empty">لا توجد سجلات بعد.</td></tr><?php endif; ?>
+            <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td><td><?= ems_sf($s, 'employee_no') ?></td><td><?= ems_sf($s, 'supporting_attachment') ?></td><td><?= ems_sf($s, 'rotation_cycle_ref') ?></td><td><?= ems_sf($s, 'request_state') ?></td><td><?= ems_sf($s, 'creator_name') ?></td><td><?= ems_sf($s, 'reviewer') ?></td><td><?= ems_sf($s, 'approver') ?></td><td><?= ems_sf($s, 'data_state') ?></td><td><?= ems_sf($s, 'source_ref') ?></td></tr>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="35" class="wf-la-empty">لا توجد سجلات بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g280',
-            'رقم الموظف' => 'g281',
-            'نوع الإجازة' => 'g282',
-            'من تاريخ' => 'g283',
-            'إلى تاريخ' => 'g284',
-            'عدد الأيام' => 'g285',
-            'الرصيد قبل' => 'g286',
-            'الرصيد بعد' => 'g287',
-            'البديل المكلف' => 'g288',
-            'مرفق مساند' => 'g289',
-            'مرجع دورة التناوب' => 'g290',
-            'حالة الطلب' => 'g291',
-            'المنشئ' => 'g292',
-            'تاريخ الإنشاء' => 'g293',
-            'المراجع' => 'g294',
-            'المعتمد' => 'g295',
-            'تاريخ الاعتماد' => 'g296',
-            'حالة البيانات' => 'g297',
-            'مرجع المصدر' => 'g298',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_worker_leave_absence');
-        echo ems_w14_grid('emsList_hr_worker_leave_absence', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإجازات والغياب'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 <script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('lForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle('allforms-visible');});})();</script>

@@ -83,7 +83,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا محاضر ترسية', 'المحضر واحد لكل طلب عروض. والفائز غير الأدنى يلزمه سبب مكتوب'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رقم المحضر</th><th>طلب العروض</th><th>اللجنة</th><th>معايير التقييم</th><th>الفائز</th><th>مبلغ الفائز</th><th>الأدنى</th><th>مبلغ الأدنى</th><th>الفائز هو الأدنى</th><th>سبب اختيار غير الأدنى</th><th>الحالة</th></tr></thead>
+        <thead><tr><th>رقم المحضر</th><th>طلب العروض</th><th>اللجنة</th><th>معايير التقييم</th><th>الفائز</th><th>مبلغ الفائز</th><th>الأدنى</th><th>مبلغ الأدنى</th><th>الفائز هو الأدنى</th><th>سبب اختيار غير الأدنى</th><th>الحالة</th><th>رقم طلب العروض</th><th>العروض المقارنة</th><th>جدول المقارنة</th><th>العرض المرسى عليه</th><th>قيمة الترسية</th><th>مبرر الاختيار</th><th>تفصيل المبرر</th><th>أعضاء اللجنة</th><th>حالة الترسية</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): $q = isset($rfqs[(int) $r['rfq_id']]) ? $rfqs[(int) $r['rfq_id']] : null; ?>
             <tr>
@@ -98,40 +98,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= ((int) $r['is_lowest'] === 1 ? 'نعم' : 'لا') ?></td>
                 <td><?= htmlspecialchars((string) $r['award_why']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-            </tr>
+            <td><?= ems_sf($r, 'rfq_no') ?></td><td><?= ems_sf($r, 'compared_offers') ?></td><td><?= ems_sf($r, 'comparison_table') ?></td><td><?= ems_sf($r, 'awarded_offer') ?></td><td><?= ems_sf($r, 'award_value') ?></td><td><?= ems_sf($r, 'selection_justification') ?></td><td><?= ems_sf($r, 'justification_detail') ?></td><td><?= ems_sf($r, 'committee_members') ?></td><td><?= ems_sf($r, 'award_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_award_minutes
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المحضر' => 'g36',
-            'رقم طلب العروض' => 'g37',
-            'العروض المقارنة' => 'g38',
-            'جدول المقارنة' => 'g39',
-            'العرض المرسى عليه' => 'g40',
-            'قيمة الترسية' => 'g41',
-            'مبرر الاختيار' => 'g42',
-            'تفصيل المبرر' => 'g43',
-            'أعضاء اللجنة' => 'g44',
-            'حالة الترسية' => 'g45',
-            'المنشئ' => 'g46',
-            'تاريخ الإنشاء' => 'g47',
-            'المراجع' => 'g48',
-            'المعتمد' => 'g49',
-            'تاريخ الاعتماد' => 'g50',
-            'حالة البيانات' => 'g51',
-            'مرجع المصدر' => 'g52',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_award_minutes');
-        echo ems_w14_grid('emsList_prc_proc_award_minutes', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في محضر المقارنة والترسية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

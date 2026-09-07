@@ -72,7 +72,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أوامر ترحيل مقفلة', 'الإقفال يفتح بعد محضر الاستلام. والتكلفة تشتق من البنود ولا تدخل'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر الترحيل</th><th>محضر الاستلام</th><th>عدد بنود التكلفة</th><th>إجمالي التكلفة</th><th>التوزيع بالمتحمل</th><th>ترحيل قراءة العداد</th><th>الإحالة للمالية</th><th>حالة الإقفال</th><th>قاعدة الحالة</th><th>قاعدة الاشتقاق</th></tr></thead>
+        <thead><tr><th>#</th><th>أمر الترحيل</th><th>محضر الاستلام</th><th>عدد بنود التكلفة</th><th>إجمالي التكلفة</th><th>التوزيع بالمتحمل</th><th>ترحيل قراءة العداد</th><th>الإحالة للمالية</th><th>حالة الإقفال</th><th>قاعدة الحالة</th><th>قاعدة الاشتقاق</th><th>معرف الإقفال</th><th>رقم الأمر</th><th>فحص محضر الاستلام</th><th>ملاحظة الإقفال</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -87,41 +87,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'closing_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'receipt_minutes_check') ?></td><td><?= ems_sf($r, 'closing_note') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="11">لا أوامر ترحيل مقفلة.</td></tr>
+            <tr><td colspan="22">لا أوامر ترحيل مقفلة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_closure
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإقفال' => 'g115',
-            'رقم الأمر' => 'g116',
-            'فحص محضر الاستلام' => 'g117',
-            'عدد بنود التكلفة' => 'g118',
-            'إجمالي التكلفة' => 'g119',
-            'التوزيع بالمتحمل' => 'g120',
-            'ترحيل قراءة العداد' => 'g121',
-            'الإحالة للمالية' => 'g122',
-            'ملاحظة الإقفال' => 'g123',
-            'حالة الإقفال' => 'g124',
-            'المنشئ' => 'g125',
-            'تاريخ الإنشاء' => 'g126',
-            'المراجع' => 'g127',
-            'المعتمد' => 'g128',
-            'تاريخ الاعتماد' => 'g129',
-            'حالة البيانات' => 'g130',
-            'مرجع المصدر' => 'g131',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_closure');
-        echo ems_w14_grid('emsList_trp_transfer_closure', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في إقفال أمر الترحيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

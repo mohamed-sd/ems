@@ -634,7 +634,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                             <th class="ems-gov-th" data-gov="required_approver" data-slice="1" title="من يلزم اعتماده بحسب سلسلة الاعتماد">المعتمد المطلوب</th>
                             <th class="ems-gov-th none" data-gov="attachments" data-slice="3" title="مرفقات الإثبات">المرفقات</th>
-                            </tr>
+                            <th>تفاصيل الطلب</th><th>المرفق</th><th>الجهة المالكة للقرار</th><th>مسار الاعتماد</th><th>حالة الطلب</th><th>قرار الجهة</th><th>تاريخ القرار</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($rows as $r):
@@ -664,7 +664,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td>
                                 <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
                             </td>
-                        </tr>
+                        <td><?= ems_sf($r, 'request_details') ?></td><td><?= ems_sf($r, 'attachment') ?></td><td><?= ems_sf($r, 'decision_owner_party') ?></td><td><?= ems_sf($r, 'approval_route') ?></td><td><?= ems_sf($r, 'request_state') ?></td><td><?= ems_sf($r, 'party_decision') ?></td><td><?= ems_sf($r, 'decision_date') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -823,34 +823,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g47',
-            'تاريخ الطلب' => 'g48',
-            'نوع الطلب' => 'g49',
-            'تفاصيل الطلب' => 'g50',
-            'المرفق' => 'g51',
-            'الجهة المالكة للقرار' => 'g52',
-            'مسار الاعتماد' => 'g53',
-            'حالة الطلب' => 'g54',
-            'قرار الجهة' => 'g55',
-            'تاريخ القرار' => 'g56',
-            'المنشئ' => 'g57',
-            'تاريخ الإنشاء' => 'g58',
-            'حالة البيانات' => 'g59',
-            'مرجع المصدر' => 'g60',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_requests');
-        echo ems_w14_grid('emsList_my_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الطلبات المقدمة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

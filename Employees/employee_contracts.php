@@ -707,7 +707,7 @@ include('../insidebar.php'); ?>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              </tr>
+              <th>معرف العقد</th><th>رقم الموظف</th><th>نموذج الأجر</th><th>الأجر الأساسي</th><th>البدلات</th><th>من تاريخ</th><th>إلى تاريخ</th><th>مرجع المشروع</th><th>مرفق العقد الموقع</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
           </thead>
           <tbody>
             <?php
@@ -1069,48 +1069,13 @@ include('../insidebar.php'); ?>
 
               // الحالة والإجراءات
               echo "<td class='group-status'>" . $status . "</td>";
-              echo "</tr>";
+              echo "" . "<td>" . ems_sf($row, 'contract_uid') . "</td>" . "<td>" . ems_sf($row, 'employee_no') . "</td>" . "<td>" . ems_sf($row, 'wage_model') . "</td>" . "<td>" . ems_sf($row, 'basic_wage') . "</td>" . "<td>" . ems_sf($row, 'allowances') . "</td>" . "<td>" . ems_sf($row, 'date_from') . "</td>" . "<td>" . ems_sf($row, 'date_to') . "</td>" . "<td>" . ems_sf($row, 'project_ref') . "</td>" . "<td>" . ems_sf($row, 'signed_contract_attachment') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
             } }
             ?>
           </tbody>
         </table>
       </div>
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف العقد' => 'g259',
-            'رقم الموظف' => 'g260',
-            'فئة العقد' => 'g261',
-            'نوع العقد' => 'g262',
-            'نموذج الأجر' => 'g263',
-            'الأجر الأساسي' => 'g264',
-            'البدلات' => 'g265',
-            'العملة' => 'g266',
-            'من تاريخ' => 'g267',
-            'إلى تاريخ' => 'g268',
-            'فترة التجربة' => 'g269',
-            'مرجع المشروع' => 'g270',
-            'مرفق العقد الموقع' => 'g271',
-            'حالة العقد' => 'g272',
-            'المنشئ' => 'g273',
-            'تاريخ الإنشاء' => 'g274',
-            'المراجع' => 'g275',
-            'المعتمد' => 'g276',
-            'تاريخ الاعتماد' => 'g277',
-            'حالة البيانات' => 'g278',
-            'مرجع المصدر' => 'g279',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_employee_contracts');
-        echo ems_w14_grid('emsList_scr_project_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عقود الموظفين'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
   </div>
 
   <!-- jQuery -->

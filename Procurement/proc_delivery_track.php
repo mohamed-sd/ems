@@ -79,7 +79,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أحداث توريد', 'الحدث يسجل الوعد والشحن والوصول والتأخر. ومدة التأخر مشتقة لا تكتب'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>الأمر</th><th>المورد</th><th>نوع الحدث</th><th>تاريخ الحدث</th><th>الموعد الموعود</th><th>الكمية المتوقعة</th><th>الكمية الفعلية</th><th>أيام التأخر</th><th>سبب التأخر</th><th>سند الإدخال</th></tr></thead>
+        <thead><tr><th>الأمر</th><th>المورد</th><th>نوع الحدث</th><th>تاريخ الحدث</th><th>الموعد الموعود</th><th>الكمية المتوقعة</th><th>الكمية الفعلية</th><th>أيام التأخر</th><th>سبب التأخر</th><th>سند الإدخال</th><th>معرف السطر</th><th>رقم الأمر</th><th>الكمية المشمولة</th><th>رقم سند الإدخال</th><th>نتيجة الفحص</th><th>أيام التأخير</th><th>إخطار المورد</th><th>حالة السطر</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): $o = isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : null; ?>
             <tr>
@@ -93,37 +93,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= (int) $r['delay_days'] ?></td>
                 <td><?= htmlspecialchars((string) $r['delay_why']) ?></td>
                 <td><?= ((int) $r['receipt_id'] > 0 ? (int) $r['receipt_id'] : '') ?></td>
-            </tr>
+            <td><?= ems_sf($r, 'line_uid') ?></td><td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'covered_quantity') ?></td><td><?= ems_sf($r, 'grn_no') ?></td><td><?= ems_sf($r, 'inspection_result') ?></td><td><?= ems_sf($r, 'delay_days') ?></td><td><?= ems_sf($r, 'supplier_notification') ?></td><td><?= ems_sf($r, 'line_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_delivery_track
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g77',
-            'رقم الأمر' => 'g78',
-            'نوع الحدث' => 'g79',
-            'تاريخ الحدث' => 'g80',
-            'الكمية المشمولة' => 'g81',
-            'رقم سند الإدخال' => 'g82',
-            'نتيجة الفحص' => 'g83',
-            'أيام التأخير' => 'g84',
-            'إخطار المورد' => 'g85',
-            'حالة السطر' => 'g86',
-            'المنشئ' => 'g87',
-            'تاريخ الإنشاء' => 'g88',
-            'حالة البيانات' => 'g89',
-            'مرجع المصدر' => 'g90',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_delivery_track');
-        echo ems_w14_grid('emsList_prc_proc_delivery_track', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في متابعة التوريد والاستلام'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

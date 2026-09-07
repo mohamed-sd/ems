@@ -71,7 +71,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا مطالبات تلف ولا حوادث', 'المطالبة تفتح من محضر استلام موثق أو حدث رحلة. بقاعدة المتحمل من العقد'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>رقم المطالبة</th><th>أمر الترحيل</th><th>مرجع الواقعة</th><th>وصف التلف</th><th>المتحمل</th><th>قاعدة المتحمل</th><th>قيمة المطالبة</th><th>مسار المطالبة</th><th>قيمة التسوية</th><th>حالة المطالبة</th><th>قاعدة الحالة</th></tr></thead>
+        <thead><tr><th>#</th><th>رقم المطالبة</th><th>أمر الترحيل</th><th>مرجع الواقعة</th><th>وصف التلف</th><th>المتحمل</th><th>قاعدة المتحمل</th><th>قيمة المطالبة</th><th>مسار المطالبة</th><th>قيمة التسوية</th><th>حالة المطالبة</th><th>قاعدة الحالة</th><th>رقم الأمر</th><th>المتسبب المرجح</th><th>قيمة المطالبة المقدرة</th><th>مستندات الإثبات</th><th>قرار التسوية</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>المراجع</th><th>المعتمد</th><th>تاريخ الاعتماد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
             <tr>
@@ -87,53 +87,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['settlement_amount']) ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
+            <td><?= ems_sf($r, 'order_no') ?></td><td><?= ems_sf($r, 'likely_cause_party') ?></td><td><?= ems_sf($r, 'estimated_claim_value') ?></td><td><?= ems_sf($r, 'evidence_documents') ?></td><td><?= ems_sf($r, 'settlement_decision') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'created_date') ?></td><td><?= ems_sf($r, 'reviewer') ?></td><td><?= ems_sf($r, 'approver') ?></td><td><?= ems_sf($r, 'approval_date') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="12">لا مطالبات تلف ولا حوادث.</td></tr>
+            <tr><td colspan="24">لا مطالبات تلف ولا حوادث.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_damage_claims
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المطالبة' => 'g97',
-            'رقم الأمر' => 'g98',
-            'مرجع الواقعة' => 'g99',
-            'وصف التلف' => 'g100',
-            'المتسبب المرجح' => 'g101',
-            'قيمة المطالبة المقدرة' => 'g102',
-            'مستندات الإثبات' => 'g103',
-            'مسار المطالبة' => 'g104',
-            'قرار التسوية' => 'g105',
-            'قيمة التسوية' => 'g106',
-            'حالة المطالبة' => 'g107',
-            'المنشئ' => 'g108',
-            'تاريخ الإنشاء' => 'g109',
-            'المراجع' => 'g110',
-            'المعتمد' => 'g111',
-            'تاريخ الاعتماد' => 'g112',
-            'حالة البيانات' => 'g113',
-            'مرجع المصدر' => 'g114',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_damage_claims');
-        echo ems_w14_grid('emsList_trp_transfer_damage_claims', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطالبات التلف والحوادث'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('مطالبات التلف والحوادث', 'مطالبات التلف والحوادث'),
-        'table'    => 'trp_transfer_damage_claims',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'Transport/transfer_damage_claims.php',
-    )); ?>
-
-    </div></div></div>
 </div>
 </body></html>

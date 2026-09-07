@@ -328,7 +328,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-              </tr></thead>
+              <th>معرف الاستحقاق</th><th>رقم فاتورة المورد</th><th>رقم المورد</th><th>مصدر الاستحقاق</th><th>مرجع المصدر</th><th>فحص البوابة</th><th>الضريبة</th><th>حالة الاستحقاق</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th></tr></thead>
                 <tbody>
                 <?php
                 require_once __DIR__ . '/../includes/receivable_source_guard.php';
@@ -375,7 +375,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                     echo "<td>" . htmlspecialchars((string)($row['due_date'] ?? '—')) . $e06 . "</td>";
                     echo "<td><span class='badge badge-" . $st_tone . "'>" . ($st_lbl[$st] ?? $st) . "</span></td>";
-                    echo "</tr>";
+                    echo "" . "<td>" . ems_sf($row, 'due_uid') . "</td>" . "<td>" . ems_sf($row, 'supplier_invoice_no') . "</td>" . "<td>" . ems_sf($row, 'supplier_no') . "</td>" . "<td>" . ems_sf($row, 'due_source') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "<td>" . ems_sf($row, 'gate_check') . "</td>" . "<td>" . ems_sf($row, 'tax') . "</td>" . "<td>" . ems_sf($row, 'due_state') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "</tr>";
                 } }
                 ?>
                 </tbody>
@@ -410,39 +410,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endforeach; ?>
     </tbody>
   </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الاستحقاق' => 'g160',
-            'رقم فاتورة المورد' => 'g161',
-            'رقم المورد' => 'g162',
-            'مصدر الاستحقاق' => 'g163',
-            'مرجع المصدر' => 'g164',
-            'فحص البوابة' => 'g165',
-            'قيمة الاستحقاق' => 'g166',
-            'الضريبة' => 'g167',
-            'العملة' => 'g168',
-            'تاريخ الاستحقاق' => 'g169',
-            'المسدد' => 'g170',
-            'المتبقي' => 'g171',
-            'حالة الاستحقاق' => 'g172',
-            'المنشئ' => 'g173',
-            'تاريخ الإنشاء' => 'g174',
-            'المراجع' => 'g175',
-            'المعتمد' => 'g176',
-            'تاريخ الاعتماد' => 'g177',
-            'حالة البيانات' => 'g178',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_dues');
-        echo ems_w14_grid('emsList_tre_payment_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في فواتير الموردين والمستحقات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

@@ -887,7 +887,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                         <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                         <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                        </tr>
+                        <th>رقم الموظف</th><th>الرقم الوطني</th><th>النوع</th><th>الحالة الاجتماعية</th><th>تاريخ المباشرة</th><th>مشغل تشغيلي؟</th><th>كود المشغل بالقوى</th><th>بيانات التواصل</th><th>شخص الطوارئ</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr>
                 </thead>
                 <tbody>
                     <?php
@@ -1010,7 +1010,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td><span class='badge badge-info'>" . $row['numcontracts'] . " عقد</span></td>";
                         echo "<td>" . $classificationBadge . "</td>";
                         echo "<td>" . $statusBadge . "</td>";
-                        echo "</tr>";
+                        echo "" . "<td>" . ems_sf($row, 'employee_no') . "</td>" . "<td>" . ems_sf($row, 'national_id') . "</td>" . "<td>" . ems_sf($row, 'type') . "</td>" . "<td>" . ems_sf($row, 'marital_status') . "</td>" . "<td>" . ems_sf($row, 'commencement_date') . "</td>" . "<td>" . ems_sf($row, 'is_operational_operator') . "</td>" . "<td>" . ems_sf($row, 'workforce_operator_code') . "</td>" . "<td>" . ems_sf($row, 'contact_details') . "</td>" . "<td>" . ems_sf($row, 'emergency_contact') . "</td>" . "<td>" . ems_sf($row, 'creator_name') . "</td>" . "<td>" . ems_sf($row, 'reviewer') . "</td>" . "<td>" . ems_sf($row, 'approver') . "</td>" . "<td>" . ems_sf($row, 'data_state') . "</td>" . "<td>" . ems_sf($row, 'source_ref') . "</td>" . "</tr>";
                     } }
                     ?>
                 </tbody>
@@ -1019,44 +1019,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الموظف' => 'g164',
-            'الاسم الرباعي' => 'g165',
-            'الرقم الوطني' => 'g166',
-            'تاريخ الميلاد' => 'g167',
-            'النوع' => 'g168',
-            'الحالة الاجتماعية' => 'g169',
-            'المؤهل' => 'g170',
-            'المسمى الوظيفي' => 'g171',
-            'الإدارة' => 'g172',
-            'الموقع' => 'g173',
-            'تاريخ المباشرة' => 'g174',
-            'مشغل تشغيلي؟' => 'g175',
-            'كود المشغل بالقوى' => 'g176',
-            'بيانات التواصل' => 'g177',
-            'شخص الطوارئ' => 'g178',
-            'الحساب البنكي' => 'g179',
-            'حالة الخدمة' => 'g180',
-            'المنشئ' => 'g181',
-            'تاريخ الإنشاء' => 'g182',
-            'المراجع' => 'g183',
-            'المعتمد' => 'g184',
-            'تاريخ الاعتماد' => 'g185',
-            'حالة البيانات' => 'g186',
-            'مرجع المصدر' => 'g187',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_employees');
-        echo ems_w14_grid('emsList_hr_employees', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الموظفين'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

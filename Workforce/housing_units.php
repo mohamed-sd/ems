@@ -116,7 +116,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-              </tr></thead><tbody>
+              <th>المشغولة</th><th>الشاغرة</th><th>المشرف</th><th>حالة الصيانة</th><th>حالة الوحدة</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead><tbody>
         <?php $list = array();
         try {
             $list = $hu_gate->scopedQuery(array('scope' => array('h' => 'housing_unit'), 'enrich' => array('p' => 'project')),
@@ -143,36 +143,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php if($can_delete): ?><a href="housing_units.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
             <td><strong><?= htmlspecialchars($r['name']) ?></strong></td><td><?= htmlspecialchars($r['pname'] ?: '-') ?></td>
-            <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="5" class="hu-empty-cell">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
+            <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td><td><?= ems_sf($r, 'occupied_count') ?></td><td><?= ems_sf($r, 'vacant_count') ?></td><td><?= ems_sf($r, 'supervisor') ?></td><td><?= ems_sf($r, 'maintenance_state') ?></td><td><?= ems_sf($r, 'unit_state') ?></td><td><?= ems_sf($r, 'creator_name') ?></td><td><?= ems_sf($r, 'data_state') ?></td><td><?= ems_sf($r, 'source_ref') ?></td></tr>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="34" class="hu-empty-cell">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wf_housing_units
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود الوحدة' => 'g11',
-            'الموقع' => 'g12',
-            'نوع الوحدة' => 'g13',
-            'السعة' => 'g14',
-            'المشغولة' => 'g15',
-            'الشاغرة' => 'g16',
-            'المشرف' => 'g17',
-            'حالة الصيانة' => 'g18',
-            'حالة الوحدة' => 'g19',
-            'المنشئ' => 'g20',
-            'تاريخ الإنشاء' => 'g21',
-            'حالة البيانات' => 'g22',
-            'مرجع المصدر' => 'g23',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wf_housing_units');
-        echo ems_w14_grid('emsList_wf_housing_units', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في وحدات السكن والإعاشة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 <script>(function(){
