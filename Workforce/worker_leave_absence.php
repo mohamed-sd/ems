@@ -175,7 +175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['event_class']) ?></td><td><?= htmlspecialchars($r['event_type']) ?></td>
             <td><?= htmlspecialchars($r['date_from'] ?: '-') ?></td><td><?= htmlspecialchars($r['date_to'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['sname'] ?: '-') ?></td>
-            <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td><?= ems_sf_cells($s, array('employee_no', 'supporting_attachment', 'rotation_cycle_ref', 'request_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
+            <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td><?= ems_sf_cells($r, array('employee_no', 'supporting_attachment', 'rotation_cycle_ref', 'request_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="35" class="wf-la-empty">لا توجد سجلات بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>

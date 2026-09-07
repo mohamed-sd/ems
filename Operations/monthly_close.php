@@ -232,6 +232,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="monthly_closeTable">
             <thead><tr>
             <th>رقم المحضر</th>
@@ -265,55 +266,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-            </tr></thead>
+            <th>معرف الإقفال</th><th>شهر الإقفال</th><th>أيام الشهر</th><th>أيام معتمدة كاملا</th><th>أيام ناقصة</th><th>سجلات معلقة</th><th>قرارات توقف مفتوحة</th><th>إجمالي الوحدات المعتمدة</th><th>إجمالي ساعات الفعلي</th><th>إجمالي التوقف</th><th>نسبة تحقق الخطة</th><th>قائمة الاستثناءات المرحلة</th><th>حالة الإقفال</th><th>المنشئ</th><th>المراجع</th><th>المعتمد</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="31" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="49" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('closing_uid', 'closing_month', 'month_days', 'fully_approved_days', 'incomplete_days', 'pending_records', 'open_stop_decisions', 'approved_units_total', 'actual_hours_total', 'downtime_total', 'plan_achievement_rate', 'carried_exceptions_list', 'closing_state', 'creator_name', 'reviewer', 'approver', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_monthly_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإقفال' => 'g85',
-            'شهر الإقفال' => 'g86',
-            'أيام الشهر' => 'g87',
-            'أيام معتمدة كاملا' => 'g88',
-            'أيام ناقصة' => 'g89',
-            'سجلات معلقة' => 'g90',
-            'قرارات توقف مفتوحة' => 'g91',
-            'إجمالي الوحدات المعتمدة' => 'g92',
-            'إجمالي ساعات الفعلي' => 'g93',
-            'إجمالي التوقف' => 'g94',
-            'نسبة تحقق الخطة' => 'g95',
-            'قائمة الاستثناءات المرحلة' => 'g96',
-            'حالة الإقفال' => 'g97',
-            'المنشئ' => 'g98',
-            'تاريخ الإنشاء' => 'g99',
-            'المراجع' => 'g100',
-            'المعتمد' => 'g101',
-            'تاريخ الاعتماد' => 'g102',
-            'حالة البيانات' => 'g103',
-            'مرجع المصدر' => 'g104',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_monthly_close');
-        echo ems_w14_grid('emsList_ops_monthly_close', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإقفال الشهري للتشغيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

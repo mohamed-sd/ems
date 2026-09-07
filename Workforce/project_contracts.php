@@ -162,7 +162,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — عقود المشاريع المؤقتة</h5>
+            <h5><i class="fa fa-plus"></i> إضافة: عقود المشاريع المؤقتة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_1759_36dca">رقم العقد</label>
@@ -209,7 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f20" maxlength="190" id="emsf_1779_2a0cb"></div>
                 <div class="form-group"><label for="emsf_1780_a810e">إذن الخروج</label>
                     <input type="text" name="f21" maxlength="190" id="emsf_1780_a810e"></div>
-                <div class="form-group"><label for="emsf_1781_98975">المعتمد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1781_98975">المعتمد - الاسم والصفة</label>
                     <input type="text" name="f22" maxlength="190" id="emsf_1781_98975"></div>
                 <div class="form-group"><label for="emsf_1782_451b2">تاريخ الاعتماد</label>
                     <input type="date" name="f23" id="emsf_1782_451b2"></div>
@@ -227,9 +227,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="project_contractsTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات - لا صف بلا كيان مالك">الكيان</th>
             <th>رقم العقد</th>
             <th>فئة العقد</th>
             <th>المتعاقد معه</th>
@@ -252,56 +253,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>مهلة التنبيه قبل الانتهاء</th>
             <th>حالة التصفية</th>
             <th class="ems-fn-th none" data-fn="1">إذن الخروج</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة - لا اسم مجرد">المنشئ - الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد - الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد - وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد - تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr></thead>
+            <th>معرف السطر</th><th>معرف العقد</th><th>رقم الموظف</th><th>Project_ID المشروع الرابط الأساسي</th><th>احتياج التوظيف المرجعي</th><th>عقد المورد محفزا لا رابطا</th><th>محفز الانتهاء المتفق</th><th>محفز الانتهاء الواقع</th><th>تاريخ الوقوع</th><th>فترة الإخطار</th><th>مرجع التصفية</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="28" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="43" class="text-center text-muted">لا بيانات بعد - أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td<?php echo $v === '-' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('line_uid', 'contract_uid', 'employee_no', 'project_link_uid', 'reference_hiring_need', 'supplier_contract_as_trigger', 'agreed_end_trigger', 'actual_end_trigger', 'occurrence_date', 'notice_period', 'settlement_ref', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g120',
-            'معرف العقد' => 'g121',
-            'رقم الموظف' => 'g122',
-            'Project_ID المشروع الرابط الأساسي' => 'g123',
-            'احتياج التوظيف المرجعي' => 'g124',
-            'عقد المورد محفزا لا رابطا' => 'g125',
-            'محفز الانتهاء المتفق' => 'g126',
-            'محفز الانتهاء الواقع' => 'g127',
-            'تاريخ الوقوع' => 'g128',
-            'فترة الإخطار' => 'g129',
-            'مرجع التصفية' => 'g130',
-            'حالة التصفية' => 'g131',
-            'المنشئ' => 'g132',
-            'تاريخ الإنشاء' => 'g133',
-            'حالة البيانات' => 'g134',
-            'مرجع المصدر' => 'g135',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_project_contracts');
-        echo ems_w14_grid('emsList_hr_project_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عقود المشاريع المؤقتة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

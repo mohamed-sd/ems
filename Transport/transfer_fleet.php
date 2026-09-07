@@ -154,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — اللوابد والمركبات الناقلة</h5>
+            <h5><i class="fa fa-plus"></i> إضافة: اللوابد والمركبات الناقلة</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_1517_27254">كود الناقل</label>
@@ -187,7 +187,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f13" maxlength="190" id="emsf_1530_7d546"></div>
                 <div class="form-group"><label for="emsf_1531_96871">الحالة</label>
                     <select name="f14" id="emsf_1531_96871"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label for="emsf_1532_ae1ac">المعتمد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1532_ae1ac">المعتمد - الاسم والصفة</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_1532_ae1ac"></div>
                 <div class="form-group"><label for="emsf_1533_ea667">تاريخ الاعتماد</label>
                     <input type="date" name="f16" id="emsf_1533_ea667"></div>
@@ -207,6 +207,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="transfer_fleetTable">
             <thead><tr>
             <th>كود الناقل</th>
@@ -224,61 +225,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>التعرفة</th>
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات - لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة - لا اسم مجرد">المنشئ - الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد - الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد - وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد - تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه - خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
-            </tr></thead>
+            <th>كود الناقلة</th><th>مرجع المورد عند التأجير</th><th>السعة الوزنية (طن)</th><th>الطول والعرض المسموحان</th><th>عدد المحاور</th><th>رخصة السير وانتهاؤها</th><th>تأمين البضاعة وانتهاؤه</th><th>تصاريح المسار السارية</th><th>فحص المطابقة مع الحمولة</th><th>حالة الناقلة</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="24" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="37" class="text-center text-muted">لا بيانات بعد - أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td<?php echo $v === '-' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('carrier_code', 'rental_supplier_ref', 'weight_capacity_tons', 'allowed_length_and_width', 'axles_count', 'road_licence_and_expiry', 'cargo_insurance_and_expiry', 'valid_route_permits', 'cargo_match_check', 'carrier_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_fleet
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود الناقلة' => 'g26',
-            'النوع' => 'g27',
-            'رقم اللوحة' => 'g28',
-            'المالك' => 'g29',
-            'مرجع المورد عند التأجير' => 'g30',
-            'السعة الوزنية (طن)' => 'g31',
-            'الطول والعرض المسموحان' => 'g32',
-            'عدد المحاور' => 'g33',
-            'رخصة السير وانتهاؤها' => 'g34',
-            'تأمين البضاعة وانتهاؤه' => 'g35',
-            'تصاريح المسار السارية' => 'g36',
-            'فحص المطابقة مع الحمولة' => 'g37',
-            'حالة الناقلة' => 'g38',
-            'المنشئ' => 'g39',
-            'تاريخ الإنشاء' => 'g40',
-            'حالة البيانات' => 'g41',
-            'مرجع المصدر' => 'g42',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_fleet');
-        echo ems_w14_grid('emsList_trp_transfer_fleet', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في اللوابد والمركبات الناقلة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

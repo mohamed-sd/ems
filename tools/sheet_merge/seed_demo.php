@@ -167,7 +167,8 @@ function parent_table(mysqli $c, $tbl, $col) {
                    'requester' => 'users', 'from_wh' => 'proc_warehouse',
                    'to_wh' => 'proc_warehouse', 'delivery_doc' => 'proc_delivery_event', 'lowest' => 'proc_offer',
                    'maintenance_order' => 'mnt_order', 'work_order' => 'mnt_order',
-                   'approved_by' => 'users', 'reviewed_by' => 'users', 'closed_by' => 'users');
+                   'approved_by' => 'users', 'reviewed_by' => 'users', 'closed_by' => 'users',
+                   'person_user' => 'users', 'actor_user' => 'users', 'owner_user' => 'users');
     if (isset($ALIAS[$base])) { array_unshift($try, $ALIAS[$base]); }
     if (in_array($base, array('created_by', 'prepared_by', 'user'), true)) { array_unshift($try, 'users'); }
     foreach ($try as $t) {

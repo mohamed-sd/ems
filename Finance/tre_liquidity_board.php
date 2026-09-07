@@ -65,8 +65,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_liquidity_board')); ?>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
     <table id="emsList_tre_liquidity_board" class="data-table">
-        <thead><tr><th>الرقم</th><th>الوعاء</th><th>الاتجاه</th><th>المبلغ</th><th>العملة</th><th>المرجع</th><th>فرق صرف</th><th>الوقت</th></tr></thead>
+        <thead><tr><th>الرقم</th><th>الوعاء</th><th>الاتجاه</th><th>المبلغ</th><th>العملة</th><th>المرجع</th><th>فرق صرف</th><th>الوقت</th><th>معرف المؤشر</th><th>المؤشر KPI Catalog</th><th>القيمة</th><th>الحالة</th><th>آخر تحديث</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -78,29 +79,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars((string) $r["ref_kind"]) ?></td>
                     <td><?= ((int) $r["is_fx_diff"] === 1 ? "نعم" : "لا") ?></td>
                     <td><?= htmlspecialchars((string) $r["moved_at"]) ?></td>
-            </tr>
+            <?= ems_sf_cells($r, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'state', 'last_update')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المؤشر' => 'g216',
-            'المؤشر KPI Catalog' => 'g217',
-            'القيمة' => 'g218',
-            'العملة' => 'g219',
-            'الحالة' => 'g220',
-            'آخر تحديث' => 'g221',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tre_dashboard_kpi');
-        echo ems_w14_grid('emsList_tre_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة الخزينة والسيولة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

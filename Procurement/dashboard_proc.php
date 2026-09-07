@@ -180,6 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <div class="card-header"><h5><i class="fa fa-triangle-exclamation"></i> القطع الحرجة</h5></div>
         <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
             <table id="procTable" class="display nowrap alltables proc-dash-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
@@ -193,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-                    </tr></thead>
+                    <th>معرف المؤشر</th><th>المؤشر KPI Catalog</th><th>القيمة</th><th>الوحدة</th><th>آخر تحديث</th></tr></thead>
                 <tbody>
                     <?php
                     $critical_rows = $g->select('proc_item', array(
@@ -209,33 +210,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$row['min_qty']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['safety_stock']) . "</td>";
                         echo "<td>" . intval($row['lead_time_days']) . "</td>";
-                        echo "</tr>";
+                        echo "" . ems_sf_cells($row, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'last_update')) . "</tr>";
                     } }
                     ?>
                 </tbody>
             </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_dashboard_kpi
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المؤشر' => 'g167',
-            'المؤشر KPI Catalog' => 'g168',
-            'القيمة' => 'g169',
-            'الوحدة' => 'g170',
-            'الحالة' => 'g171',
-            'آخر تحديث' => 'g172',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_dashboard_kpi');
-        echo ems_w14_grid('emsList_prc_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المشتريات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <style>

@@ -129,6 +129,7 @@ function fin_stmt_rows($rows, $type_lbl)
     <!-- المركز المالي -->
     <div class="card"><div class="card-body">
         <h5 class="fin-stmt-h5"><i class="fas fa-scale-balanced"></i> قائمة المركز المالي (الميزانية العمومية)</h5>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <div class="table-container"><table class="alltables no-datatable fin-stmt-tbl" data-no-dt="1">
             <thead><tr><th>الكود</th><th>الحساب</th><th class="fin-stmt-num">الرصيد الحالي</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -157,17 +158,17 @@ function fin_stmt_rows($rows, $type_lbl)
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-              </tr></thead>
+              <th>معرف السطر</th><th>القائمة</th><th>القيمة</th><th>فترة المقارنة</th><th>ملاحظة إفصاح</th></tr></thead>
             <tbody>
-                <tr><th colspan="3" class="fin-stmt-sec-ast">الأصول</th></tr>
+                <tr><th colspan="8" class="fin-stmt-sec-ast">الأصول</th></tr>
                 <?php echo fin_stmt_rows($byType['asset'], $type_lbl); ?>
-                <tr><th colspan="2">إجمالي الأصول</th><th class="fin-stmt-num"><?php echo number_format($total_assets, 2); ?></th></tr>
-                <tr><th colspan="3" class="fin-stmt-sec-neg">الخصوم</th></tr>
+                <tr><th colspan="7">إجمالي الأصول</th><th class="fin-stmt-num"><?php echo number_format($total_assets, 2); ?></th></tr>
+                <tr><th colspan="8" class="fin-stmt-sec-neg">الخصوم</th></tr>
                 <?php echo fin_stmt_rows($byType['liability'], $type_lbl); ?>
-                <tr><th colspan="3" class="fin-stmt-sec-eqt">حقوق الملكية</th></tr>
+                <tr><th colspan="8" class="fin-stmt-sec-eqt">حقوق الملكية</th></tr>
                 <?php echo fin_stmt_rows($byType['equity'], $type_lbl); ?>
-                <tr><td>—</td><td>الأرباح المحتجزة (نتيجة الفترة)</td><td class="fin-stmt-num"><?php echo number_format($net_profit, 2); ?></td></tr>
-                <tr><th colspan="2">إجمالي الخصوم + حقوق الملكية</th><th class="fin-stmt-num"><?php echo number_format($total_liab_equity, 2); ?></th></tr>
+                <tr><td>—</td><td>الأرباح المحتجزة (نتيجة الفترة)</td><td class="fin-stmt-num"><?php echo number_format($net_profit, 2); ?></td><?= ems_sf_cells($r, array('line_uid', 'list_name', 'value', 'comparison_period', 'disclosure_note')) ?></tr>
+                <tr><th colspan="7">إجمالي الخصوم + حقوق الملكية</th><th class="fin-stmt-num"><?php echo number_format($total_liab_equity, 2); ?></th></tr>
             </tbody>
             <tfoot><tr><th colspan="2">التوازن (الأصول = الخصوم + حقوق الملكية)</th>
                 <th class="fin-stmt-num"><span class="badge badge-<?php echo $balanced ? 'success' : 'danger'; ?>"><?php echo $balanced ? 'متوازن ✔' : 'غير متوازن ✘'; ?></span></th></tr></tfoot>
@@ -186,33 +187,6 @@ function fin_stmt_rows($rows, $type_lbl)
                 <th class="fin-stmt-num"><span class="badge badge-<?php echo $net_cash >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_cash, 2); ?></span></th></tr></tfoot>
         </table></div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_fina_financial_statements_fin')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g212',
-            'الفترة' => 'g213',
-            'القائمة' => 'g214',
-            'البند' => 'g215',
-            'القيمة' => 'g216',
-            'فترة المقارنة' => 'g217',
-            'التغير' => 'g218',
-            'ملاحظة إفصاح' => 'g219',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_financial_statements_fin');
-        echo ems_w14_grid('emsList_fina_financial_statements_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القوائم المالية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

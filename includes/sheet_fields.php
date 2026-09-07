@@ -22,6 +22,10 @@ if (!function_exists('ems_sf')) {
     {
         $v = null;
         if (is_array($row) && array_key_exists($col, $row))      { $v = $row[$col]; }
+        /* صفٌّ أُعيد تشكيلُه قبلَ التصيير (‏CMP-03: id·payload·status…) يحمل
+           صفَّه الخامَّ في `raw` — والعمودُ المدموجُ هناك لا في المُعاد تشكيلُه. */
+        elseif (is_array($row) && isset($row['raw']) && is_array($row['raw'])
+                && array_key_exists($col, $row['raw']))          { $v = $row['raw'][$col]; }
         elseif (is_object($row) && isset($row->$col))            { $v = $row->$col; }
         if ($v === null || $v === '') { return '<span class="ems-gov-empty">—</span>'; }
         return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');

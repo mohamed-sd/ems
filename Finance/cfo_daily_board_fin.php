@@ -164,6 +164,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card fin-cfo-panel"><div class="card-body">
         <h5 class="fin-cfo-h5"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h5>
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <div class="table-container"><table class="alltables fin-cfo-table">
             <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يتخذ</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -175,37 +176,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              </tr></thead>
+              <th>معرف المؤشر</th><th>المؤشر KPI Catalog</th><th>القيمة</th><th>الوحدة</th><th>العملة</th><th>آخر تحديث</th></tr></thead>
             <tbody>
-                <tr><td>ماذا نصرف اليوم؟</td><td>المسوى الجاهز (<?php echo number_format($settled_ready, 0); ?>) مقابل النقد (<?php echo number_format($cash, 0); ?>)</td><td><a href="payments_fin.php">المدفوعات</a></td></tr>
-                <tr><td>ماذا نحصل اليوم؟</td><td>الذمم المتأخرة (<?php echo number_format($overdue, 0); ?>)</td><td><a href="dues_fin.php">الذمم</a></td></tr>
-                <tr><td>هل نحتاج تمويلا؟</td><td>صافي الأسبوع (<?php echo number_format($wk_net, 0); ?>) وأقساط 7 أيام (<?php echo number_format($inst7, 0); ?>)</td><td><a href="cash_forecast_fin.php">السيولة</a></td></tr>
-                <tr><td>هل التشغيل يربح؟</td><td>هامش الوحدة الجاري (<?php echo number_format($margin_mo, 0); ?>)</td><td><a href="unit_records_fin.php">كشف الوحدات</a></td></tr>
-                <tr><td>أين نتدخل؟</td><td>انحرافات فوق الحد (<?php echo number_format($var_over, 0); ?>)</td><td><a href="budget_form_fin.php">الميزانيات</a></td></tr>
+                <tr><td>ماذا نصرف اليوم؟</td><td>المسوى الجاهز (<?php echo number_format($settled_ready, 0); ?>) مقابل النقد (<?php echo number_format($cash, 0); ?>)</td><td><a href="payments_fin.php">المدفوعات</a></td><?= ems_sf_cells($c, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'currency', 'last_update')) ?></tr>
+                <tr><td>ماذا نحصل اليوم؟</td><td>الذمم المتأخرة (<?php echo number_format($overdue, 0); ?>)</td><td><a href="dues_fin.php">الذمم</a></td><?= ems_sf_cells($c, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'currency', 'last_update')) ?></tr>
+                <tr><td>هل نحتاج تمويلا؟</td><td>صافي الأسبوع (<?php echo number_format($wk_net, 0); ?>) وأقساط 7 أيام (<?php echo number_format($inst7, 0); ?>)</td><td><a href="cash_forecast_fin.php">السيولة</a></td><?= ems_sf_cells($c, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'currency', 'last_update')) ?></tr>
+                <tr><td>هل التشغيل يربح؟</td><td>هامش الوحدة الجاري (<?php echo number_format($margin_mo, 0); ?>)</td><td><a href="unit_records_fin.php">كشف الوحدات</a></td><?= ems_sf_cells($c, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'currency', 'last_update')) ?></tr>
+                <tr><td>أين نتدخل؟</td><td>انحرافات فوق الحد (<?php echo number_format($var_over, 0); ?>)</td><td><a href="budget_form_fin.php">الميزانيات</a></td><?= ems_sf_cells($c, array('indicator_uid', 'kpi_catalog_indicator', 'value', 'unit', 'currency', 'last_update')) ?></tr>
             </tbody>
         </table></div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المؤشر' => 'g153',
-            'المؤشر KPI Catalog' => 'g154',
-            'القيمة' => 'g155',
-            'الوحدة' => 'g156',
-            'العملة' => 'g157',
-            'الحالة' => 'g158',
-            'آخر تحديث' => 'g159',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_dashboard_kpi');
-        echo ems_w14_grid('emsList_exec_board_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المالية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 </body>

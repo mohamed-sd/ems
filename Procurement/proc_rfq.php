@@ -81,8 +81,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا طلبات عروض', 'الطلب يصدر عن حزمة واحدة. والمظروف لا يقرأ قبل موعد فتحه المعلن'); ?>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رمز الطلب</th><th>الحزمة</th><th>العنوان</th><th>آخر موعد للتقديم</th><th>موعد فتح المظاريف</th><th>تاريخ الفتح</th><th>الدعوات</th><th>العروض</th><th>الحالة</th><th>الدعوات</th></tr></thead>
+        <thead><tr><th>رمز الطلب</th><th>الحزمة</th><th>العنوان</th><th>آخر موعد للتقديم</th><th>موعد فتح المظاريف</th><th>تاريخ الفتح</th><th>الدعوات</th><th>العروض</th><th>الحالة</th><th>الدعوات</th><th>معرف الدعوة</th><th>معرف RFQ</th><th>رقم المورد</th><th>تاريخ الدعوة</th><th>تأكيد الاستلام</th><th>الاستجابة</th><th>مرجع العرض الوارد</th><th>حالة الدعوة</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): $p = isset($pkgs[(int) $r['package_id']]) ? $pkgs[(int) $r['package_id']] : null; ?>
             <tr>
@@ -96,7 +97,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= (int) $r['offer_count'] ?></td>
                 <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
                 <td><a href="?rfq=<?= (int) $r['id'] ?>">عرض المدعوين</a></td>
-            </tr>
+            <?= ems_sf_cells($r, array('invitation_uid', 'rfq_uid', 'supplier_no', 'invitation_date', 'receipt_confirmation', 'response', 'incoming_offer_ref', 'invitation_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
@@ -121,31 +122,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </tbody>
     </table></div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_rfq
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الدعوة' => 'g112',
-            'معرف RFQ' => 'g113',
-            'رقم المورد' => 'g114',
-            'تاريخ الدعوة' => 'g115',
-            'تأكيد الاستلام' => 'g116',
-            'الاستجابة' => 'g117',
-            'مرجع العرض الوارد' => 'g118',
-            'حالة الدعوة' => 'g119',
-            'المنشئ' => 'g120',
-            'تاريخ الإنشاء' => 'g121',
-            'حالة البيانات' => 'g122',
-            'مرجع المصدر' => 'g123',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_rfq');
-        echo ems_w14_grid('emsList_prc_proc_rfq', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في دعوات الموردين للعروض'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body></html>

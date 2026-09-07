@@ -24,3 +24,20 @@ batch,screen,owner_table,decided_by,decided_at,note
 2,Transport/transfer_orders_report.php,trp_kpi_period,owner,2026-09-07,
 2,Procurement/stock_proc.php,proc_stock_state,owner,2026-09-07,الجدول فارغ — يبذر
 2,Risk/risk_reports.php,risk_export_log,owner,2026-09-07,قرار المالك خلافا لترجيحي
+3,Maintenance/workshop.php,scr_workshop,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Operations/attendance.php,scr_attendance,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Operations/monthly_close.php,scr_monthly_close,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Operations/site_gate_equip.php,scr_site_gate_equip,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Transport/transfer_fleet.php,scr_transfer_fleet,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Workforce/project_contracts.php,scr_project_contracts,owner,2026-09-07,سجل CMP-03 الحاكم
+3,Procurement/proc_rfq.php,proc_rfq,owner,2026-09-07,فارغ — يبذر
+3,Portal/my_tasks.php,work_items,owner,2026-09-07,
+3,Workforce/worker_worklog.php,worker_qualification,owner,2026-09-07,قرار المالك خلافا لترجيحي
+3,Portal/vp_pending_actions.php,exec_approvals,owner,2026-09-07,حارس BR-CEO-08 قد يرد تعديل الموقع
+3,Finance/financial_statements_fin.php,fin_chart_of_accounts,owner,2026-09-07,
+3,Finance/cfo_daily_board_fin.php,fin_budget_lines,owner,2026-09-07,
+3,Portal/my_portal.php,work_items,owner,2026-09-07,يشارك work_items مع my_tasks.php — لا تكرار
+3,Finance/tre_liquidity_board.php,tre_cash_move,owner,2026-09-07,
+3,Procurement/dashboard_proc.php,proc_request,owner,2026-09-07,
+3,user_capacities.php,user_capacities,owner,2026-09-07,الجدول موجود 76 صفا
+3,Portal/my_achievement.php,achievement_records,owner,2026-09-07,لا عمود إدارة — يبقى بلا فرز إداري

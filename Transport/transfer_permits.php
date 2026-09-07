@@ -229,7 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                <?= ems_sf_cells($c, array('permit_uid', 'order_no', 'permit_scope', 'permit_attachment', 'permit_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
+                <?= ems_sf_cells($r, array('permit_uid', 'order_no', 'permit_scope', 'permit_attachment', 'permit_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>

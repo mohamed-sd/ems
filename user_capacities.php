@@ -181,6 +181,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> كل الصفات (<?php echo count($allCaps); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display nowrap uc-w100">
             <thead><tr><th>#</th><th>كود الحساب</th><th>الشخص</th><th>الصفة</th><th>الدور</th>
                 <th>النطاق</th><th>المصدر</th><th>الحال</th><th>تجميد</th>
@@ -200,7 +201,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                 <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                </tr></thead>
+                <th>معرف الصفة</th><th>مصدرها</th><th>سارية من</th><th>إلى</th><th>نشطة الآن؟</th><th>مرجع التفويض عند الإنابة</th><th>حالة الصفة</th></tr></thead>
             <tbody>
             <?php foreach ($allCaps as $c): ?>
                 <tr>
@@ -225,41 +226,12 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                             <button type="submit" class="btn-primary">جمد</button>
                         </form>
                     <?php endif; ?></td>
-                </tr>
+                <?= ems_sf_cells($c, array('capacity_uid', 'her_source', 'valid_from', 'range_to', 'active_now', 'delegation_ref', 'capacity_state')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div></div></div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_my_user_capacities')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_user_capacities
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الصفة' => 'g37',
-            'الصفة' => 'g38',
-            'مصدرها' => 'g39',
-            'النطاق' => 'g40',
-            'سارية من' => 'g41',
-            'إلى' => 'g42',
-            'نشطة الآن؟' => 'g43',
-            'آخر تبديل' => 'g44',
-            'مرجع التفويض عند الإنابة' => 'g45',
-            'حالة الصفة' => 'g46',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_user_capacities');
-        echo ems_w14_grid('emsList_my_user_capacities', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الصفات الوظيفية والتبديل بينها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

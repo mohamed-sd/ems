@@ -153,7 +153,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — الورش والفنيون</h5>
+            <h5><i class="fa fa-plus"></i> إضافة: الورش والفنيون</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_755_0c662">رقم التكليف</label>
@@ -184,7 +184,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f12" maxlength="190" id="emsf_767_557f1"></div>
                 <div class="form-group"><label for="emsf_768_a8c31">الحالة</label>
                     <select name="f13" id="emsf_768_a8c31"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label for="emsf_769_72186">المعتمد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_769_72186">المعتمد - الاسم والصفة</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_769_72186"></div>
                 <div class="form-group"><label for="emsf_770_ed4fb">تاريخ الاعتماد</label>
                     <input type="date" name="f15" id="emsf_770_ed4fb"></div>
@@ -208,6 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="workshopTable">
             <thead><tr>
             <th>رقم التكليف</th>
@@ -224,67 +225,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>الورشة</th>
             <th>كلفه</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات - لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد - الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد - وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد - تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه - خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-            </tr></thead>
+            <th>كود القدرة</th><th>النوع</th><th>الاسم</th><th>الموقع</th><th>التخصصات</th><th>مستوى الفني</th><th>الشهادات وصلاحيتها</th><th>الطاقة اليومية (ساعات/أوامر)</th><th>متاح الآن؟</th><th>التبعية</th><th>مرجع العقد عند الخارجي</th><th>حالة القدرة</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="23" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="38" class="text-center text-muted">لا بيانات بعد - أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td<?php echo $v === '-' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('capability_code', 'type', 'name', 'location', 'specialities', 'technician_level', 'certificates_and_validity', 'daily_capacity', 'available_now', 'reporting_line', 'external_contract_ref', 'capability_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_workshop"></table>
-    </div></div></div>
-
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_workshop
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود القدرة' => 'g43',
-            'النوع' => 'g44',
-            'الاسم' => 'g45',
-            'الموقع' => 'g46',
-            'التخصصات' => 'g47',
-            'مستوى الفني' => 'g48',
-            'الشهادات وصلاحيتها' => 'g49',
-            'الطاقة اليومية (ساعات/أوامر)' => 'g50',
-            'متاح الآن؟' => 'g51',
-            'التبعية' => 'g52',
-            'مرجع العقد عند الخارجي' => 'g53',
-            'حالة القدرة' => 'g54',
-            'المنشئ' => 'g55',
-            'تاريخ الإنشاء' => 'g56',
-            'حالة البيانات' => 'g57',
-            'مرجع المصدر' => 'g58',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_workshop');
-        echo ems_w14_grid('emsList_mnt_workshop', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الورش والفنيون'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

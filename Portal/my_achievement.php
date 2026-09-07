@@ -118,6 +118,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         المؤشرات السبعة — <?php echo htmlspecialchars($from . ' → ' . $to); ?>
         <small class="ems-pta-muted">(لقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display nowrap ems-pta-w100" data-no-dt="1">
             <thead><tr><th>المؤشر</th><th>الفترة</th><th>الفترة السابقة (بالطول نفسه)</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -137,7 +138,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">تاريخ التوليد</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-              </tr></thead>
+              <th>معرف السطر</th><th>الحساب</th><th>المدى</th><th>مؤشر الإنجاز</th><th>القيمة</th><th>الوحدة</th><th>بلغة الدور</th><th>مقارنة بالمدى السابق</th><th>آخر تحديث</th></tr></thead>
             <tbody>
             <?php foreach ($LABELS as $k => $lbl):
                 $cur = $res['metrics'][$k] ?? array();
@@ -156,7 +157,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php else: ?>
                             <small><?php echo htmlspecialchars(json_encode($pv, JSON_UNESCAPED_UNICODE)); ?></small>
                         <?php endif; ?></td>
-                </tr>
+                <?= ems_sf_cells($lbl, array('line_uid', 'account', 'range_label', 'achievement_indicator', 'value', 'unit', 'in_role_language', 'vs_previous_range', 'last_update')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -165,29 +166,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         بل يخفى بنص <strong>لا ينطبق</strong> — فالمقارنة تبقى عادلة» (USR-01 §6).</p>
     </div></div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_achievement
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g11',
-            'الحساب' => 'g12',
-            'المدى' => 'g13',
-            'مؤشر الإنجاز' => 'g14',
-            'القيمة' => 'g15',
-            'الوحدة' => 'g16',
-            'بلغة الدور' => 'g17',
-            'مقارنة بالمدى السابق' => 'g18',
-            'آخر تحديث' => 'g19',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_achievement');
-        echo ems_w14_grid('emsList_my_achievement', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مؤشرات الإنجاز الشخصي'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

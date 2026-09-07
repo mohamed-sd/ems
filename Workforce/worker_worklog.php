@@ -94,6 +94,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
     <?php endif; ?>
 
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
     <div class="table-wrap"><table class="data-table wl-table-full">
         <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهلة</th><th>إجازات/غياب</th><th>تحركات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -104,7 +105,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              </tr></thead><tbody>
+              <th>معرف الحدث</th><th>وقت الحدث</th><th>نوع الحدث</th><th>مصدره</th><th>المشروع</th><th>الموقع</th><th>المعدة</th><th>ملخص الحدث</th><th>مرجع السجل الأصلي</th><th>درجة الأهمية</th></tr></thead><tbody>
         <?php
         // الـViews مسجَّلتان T_CHILD (الأب employees) — select() يعزلهما بـEXISTS على الأب
         // المملوك، وهو عين ما كان يفعله JOIN employees في الأصل. الدمج (presence) في PHP.
@@ -143,33 +144,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php // محرّك الأحداث: حوافز/جزاءات معتمدةٌ فقط (state معتمد/مرحّل) بدل إجماليّات كل الحالات.
             $ev = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0]; ?>
             <td><?= intval($r['evaluation_count']) ?></td><td><?= number_format(floatval($ev['incentive']),2) ?></td>
-            <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" class="wl-empty-cell">لا توجد بيانات بعد (طبق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
+            <td><?= number_format(floatval($ev['penalty']),2) ?></td><?= ems_sf_cells($r, array('business_event_uid', 'event_time', 'event_type', 'its_source', 'project_label', 'location', 'equipment', 'event_summary', 'origin_record_ref', 'importance_degree')) ?></tr>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="30" class="wl-empty-cell">لا توجد بيانات بعد (طبق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_worker_worklog
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الحدث' => 'g105',
-            'وقت الحدث' => 'g106',
-            'نوع الحدث' => 'g107',
-            'مصدره' => 'g108',
-            'المشروع' => 'g109',
-            'الموقع' => 'g110',
-            'المعدة' => 'g111',
-            'ملخص الحدث' => 'g112',
-            'مرجع السجل الأصلي' => 'g113',
-            'درجة الأهمية' => 'g114',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_worker_worklog');
-        echo ems_w14_grid('emsList_ops_worker_worklog', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأحداث التشغيلية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 </body></html>

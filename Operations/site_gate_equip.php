@@ -150,7 +150,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — أذون دخول وخروج المعدات</h5>
+            <h5><i class="fa fa-plus"></i> إضافة: أذون دخول وخروج المعدات</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_918_79776">رقم الإذن</label>
@@ -203,9 +203,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="site_gate_equipTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات - لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الإذن</th>
             <th>نوع الإذن</th>
             <th>الموقع</th>
@@ -221,58 +222,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>رحلة الترحيل</th>
             <th>حالة الجاهزية</th>
             <th>حالة الوثائق</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة - لا اسم مجرد">المنشئ - الاسم والصفة</th>
             <th>اعتماد مدير الموقع</th>
             <th>اعتماد مدير التشغيل</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد - وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد - تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr></thead>
+            <th>نوع الكيان</th><th>مرجع الكيان</th><th>اتجاه الحركة</th><th>وقت الحركة</th><th>كود الموقع</th><th>مرجع التخصيص الساري</th><th>مطابقة التخصيص</th><th>مرافق/سائق</th><th>الغرض</th><th>مصدر الإذن</th><th>واقعة بلا إذن؟</th><th>حالة الإذن</th><th>المنشئ</th><th>تاريخ الإنشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="22" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="38" class="text-center text-muted">لا بيانات بعد - أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td<?php echo $v === '-' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('entity_type', 'entity_ref', 'movement_direction', 'movement_time', 'site_code', 'active_allocation_ref', 'allocation_match', 'escort_or_driver', 'purpose', 'pass_source', 'event_without_pass', 'pass_state', 'creator_name', 'created_date', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_site_gate_equip
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الإذن' => 'g1',
-            'نوع الكيان' => 'g2',
-            'مرجع الكيان' => 'g3',
-            'اتجاه الحركة' => 'g4',
-            'وقت الحركة' => 'g5',
-            'كود الموقع' => 'g6',
-            'مرجع التخصيص الساري' => 'g7',
-            'مطابقة التخصيص' => 'g8',
-            'مرافق/سائق' => 'g9',
-            'الغرض' => 'g10',
-            'مصدر الإذن' => 'g11',
-            'واقعة بلا إذن؟' => 'g12',
-            'حالة الإذن' => 'g13',
-            'المنشئ' => 'g14',
-            'تاريخ الإنشاء' => 'g15',
-            'حالة البيانات' => 'g16',
-            'مرجع المصدر' => 'g17',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('site_gate_equip');
-        echo ems_w14_grid('emsList_site_gate_equip', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أذون دخول وخروج المعدات والمشغلين'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

@@ -7709,5 +7709,1545 @@
     "reuse": false
    }
   ]
+ },
+ {
+  "file": "Maintenance/workshop.php",
+  "owner": "scr_workshop",
+  "rows_now": 20,
+  "sheet_tables": [
+   "mnt_workshop"
+  ],
+  "base_cols": [
+   "رقم التكليف",
+   "أمر العمل",
+   "الفني",
+   "الوظيفة",
+   "التخصص",
+   "الدور في الأمر",
+   "تاريخ البدء",
+   "تاريخ الانتهاء",
+   "الساعات الفعلية",
+   "تكلفة الساعة",
+   "إجمالي التكلفة",
+   "الورشة",
+   "كلفه",
+   "الحالة",
+   "الكيان",
+   "تاريخ الإنشاء",
+   "المعتمد — الاسم والصفة",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "المرفق",
+   "مركز التكلفة",
+   "سعر الصرف ومصدره"
+  ],
+  "cols": [
+   {
+    "label": "كود القدرة",
+    "col": "capability_code",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "النوع",
+    "col": "type",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الاسم",
+    "col": "name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الموقع",
+    "col": "location",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "التخصصات",
+    "col": "specialities",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مستوى الفني",
+    "col": "technician_level",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الشهادات وصلاحيتها",
+    "col": "certificates_and_validity",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الطاقة اليومية (ساعات/أوامر)",
+    "col": "daily_capacity",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "متاح الآن؟",
+    "col": "available_now",
+    "type": "TINYINT(1) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "التبعية",
+    "col": "reporting_line",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع العقد عند الخارجي",
+    "col": "external_contract_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة القدرة",
+    "col": "capability_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Operations/attendance.php",
+  "owner": "scr_attendance",
+  "rows_now": 20,
+  "sheet_tables": [
+   "hr_attendance"
+  ],
+  "base_cols": [
+   "الشهر",
+   "كود الموظف",
+   "التاريخ",
+   "رمز الحالة",
+   "وصف الحالة",
+   "وقت الدخول",
+   "وقت الخروج",
+   "ساعات الدوام",
+   "تأخير بالدقائق",
+   "أثر الراتب",
+   "أثر الحافز",
+   "أثر التواجد",
+   "أثر الفوترة",
+   "أثر استحقاق المورد",
+   "المستند المؤيد",
+   "سجله",
+   "الحالة",
+   "الكيان",
+   "تاريخ الإنشاء",
+   "المعتمد — الاسم والصفة",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "مركز التكلفة",
+   "سعر الصرف ومصدره",
+   "سجل الاطلاع"
+  ],
+  "cols": [
+   {
+    "label": "معرف السجل",
+    "col": "record_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "رقم الموظف",
+    "col": "employee_no",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "ساعات إضافية",
+    "col": "overtime_hours",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المأمورية",
+    "col": "mission_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع الإجازة",
+    "col": "leave_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدر التسجيل",
+    "col": "registration_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "ملاحظة",
+    "col": "note",
+    "type": "VARCHAR(500) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة السجل",
+    "col": "record_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Operations/monthly_close.php",
+  "owner": "scr_monthly_close",
+  "rows_now": 20,
+  "sheet_tables": [
+   "ops_monthly_close"
+  ],
+  "base_cols": [
+   "رقم المحضر",
+   "الشهر",
+   "العقد",
+   "الموقع",
+   "الوحدة التعاقدية",
+   "الساعات التعاقدية",
+   "الساعات حسب سجلنا",
+   "الساعات المعتمدة من العميل",
+   "الفرق",
+   "سبب الفرق",
+   "الكمية المنفذة",
+   "الكمية المعتمدة",
+   "قيمة الاستحقاق",
+   "العملة",
+   "أعده",
+   "اعتمده التشغيل",
+   "اعتمدته المالية",
+   "تاريخ الإقفال",
+   "الحالة",
+   "الكيان",
+   "تاريخ الإنشاء",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "المرفق",
+   "مفتاح منع التكرار",
+   "درجة الأثر",
+   "معكوس ب",
+   "عكس عن",
+   "مركز التكلفة",
+   "سعر الصرف ومصدره"
+  ],
+  "cols": [
+   {
+    "label": "معرف الإقفال",
+    "col": "closing_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "شهر الإقفال",
+    "col": "closing_month",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "أيام الشهر",
+    "col": "month_days",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "أيام معتمدة كاملا",
+    "col": "fully_approved_days",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "أيام ناقصة",
+    "col": "incomplete_days",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "سجلات معلقة",
+    "col": "pending_records",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "قرارات توقف مفتوحة",
+    "col": "open_stop_decisions",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "إجمالي الوحدات المعتمدة",
+    "col": "approved_units_total",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "إجمالي ساعات الفعلي",
+    "col": "actual_hours_total",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "إجمالي التوقف",
+    "col": "downtime_total",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "نسبة تحقق الخطة",
+    "col": "plan_achievement_rate",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "قائمة الاستثناءات المرحلة",
+    "col": "carried_exceptions_list",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة الإقفال",
+    "col": "closing_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المراجع",
+    "col": "reviewer",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المعتمد",
+    "col": "approver",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Operations/site_gate_equip.php",
+  "owner": "scr_site_gate_equip",
+  "rows_now": 20,
+  "sheet_tables": [
+   "site_gate_equip"
+  ],
+  "base_cols": [
+   "الكيان",
+   "رقم الإذن",
+   "نوع الإذن",
+   "الموقع",
+   "كود المعدة",
+   "نوع المعدة",
+   "مصدر المعدة",
+   "الجهة المرافقة",
+   "سبب الحركة",
+   "المستند المرجعي",
+   "تاريخ الحركة المخطط",
+   "تاريخ الحركة الفعلي",
+   "قراءة العداد عند الحركة",
+   "رحلة الترحيل",
+   "حالة الجاهزية",
+   "حالة الوثائق",
+   "المنشئ — الاسم والصفة",
+   "اعتماد مدير الموقع",
+   "اعتماد مدير التشغيل",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "الحالة"
+  ],
+  "cols": [
+   {
+    "label": "نوع الكيان",
+    "col": "entity_type",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع الكيان",
+    "col": "entity_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "اتجاه الحركة",
+    "col": "movement_direction",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "وقت الحركة",
+    "col": "movement_time",
+    "type": "DATETIME NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "كود الموقع",
+    "col": "site_code",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع التخصيص الساري",
+    "col": "active_allocation_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مطابقة التخصيص",
+    "col": "allocation_match",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرافق/سائق",
+    "col": "escort_or_driver",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الغرض",
+    "col": "purpose",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدر الإذن",
+    "col": "pass_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "واقعة بلا إذن؟",
+    "col": "event_without_pass",
+    "type": "TINYINT(1) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة الإذن",
+    "col": "pass_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تاريخ الإنشاء",
+    "col": "created_date",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Transport/transfer_fleet.php",
+  "owner": "scr_transfer_fleet",
+  "rows_now": 20,
+  "sheet_tables": [
+   "trp_transfer_fleet"
+  ],
+  "base_cols": [
+   "كود الناقل",
+   "النوع",
+   "الوصف",
+   "الملكية",
+   "المالك",
+   "السعة القصوى",
+   "رقم اللوحة",
+   "الرخصة",
+   "تاريخ انتهاء الرخصة",
+   "التأمين",
+   "تاريخ انتهاء التأمين",
+   "السائق المكلف",
+   "التعرفة",
+   "العملة",
+   "الحالة",
+   "الكيان",
+   "المنشئ — الاسم والصفة",
+   "تاريخ الإنشاء",
+   "المعتمد — الاسم والصفة",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "المرفق",
+   "سجل الاطلاع"
+  ],
+  "cols": [
+   {
+    "label": "كود الناقلة",
+    "col": "carrier_code",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المورد عند التأجير",
+    "col": "rental_supplier_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "السعة الوزنية (طن)",
+    "col": "weight_capacity_tons",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الطول والعرض المسموحان",
+    "col": "allowed_length_and_width",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "عدد المحاور",
+    "col": "axles_count",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "رخصة السير وانتهاؤها",
+    "col": "road_licence_and_expiry",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تأمين البضاعة وانتهاؤه",
+    "col": "cargo_insurance_and_expiry",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تصاريح المسار السارية",
+    "col": "valid_route_permits",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "فحص المطابقة مع الحمولة",
+    "col": "cargo_match_check",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة الناقلة",
+    "col": "carrier_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Workforce/project_contracts.php",
+  "owner": "scr_project_contracts",
+  "rows_now": 20,
+  "sheet_tables": [
+   "hr_project_contracts"
+  ],
+  "base_cols": [
+   "الكيان",
+   "رقم العقد",
+   "فئة العقد",
+   "المتعاقد معه",
+   "التبعية",
+   "المورد المرتبط",
+   "عقد المورد",
+   "المشروع",
+   "الموقع",
+   "المسمى",
+   "نموذج الأجر",
+   "الأجر الشهري",
+   "العملة",
+   "تاريخ البدء",
+   "تاريخ الانتهاء المخطط",
+   "محفز الانتهاء 1",
+   "محفز الانتهاء 2",
+   "محفز الانتهاء 3",
+   "المحفز الواقع",
+   "تاريخ الانتهاء الفعلي",
+   "مهلة التنبيه قبل الانتهاء",
+   "حالة التصفية",
+   "إذن الخروج",
+   "المنشئ — الاسم والصفة",
+   "المعتمد — الاسم والصفة",
+   "تاريخ الاعتماد",
+   "مرجع التفويض",
+   "الحالة"
+  ],
+  "cols": [
+   {
+    "label": "معرف السطر",
+    "col": "line_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "معرف العقد",
+    "col": "contract_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "رقم الموظف",
+    "col": "employee_no",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "Project_ID المشروع الرابط الأساسي",
+    "col": "project_link_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "احتياج التوظيف المرجعي",
+    "col": "reference_hiring_need",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "عقد المورد محفزا لا رابطا",
+    "col": "supplier_contract_as_trigger",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "محفز الانتهاء المتفق",
+    "col": "agreed_end_trigger",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "محفز الانتهاء الواقع",
+    "col": "actual_end_trigger",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تاريخ الوقوع",
+    "col": "occurrence_date",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "فترة الإخطار",
+    "col": "notice_period",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع التصفية",
+    "col": "settlement_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تاريخ الإنشاء",
+    "col": "created_date",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Procurement/proc_rfq.php",
+  "owner": "proc_rfq",
+  "rows_now": 0,
+  "sheet_tables": [
+   "prc_proc_rfq"
+  ],
+  "base_cols": [
+   "رمز الطلب",
+   "الحزمة",
+   "العنوان",
+   "آخر موعد للتقديم",
+   "موعد فتح المظاريف",
+   "تاريخ الفتح",
+   "الدعوات",
+   "العروض",
+   "الحالة",
+   "الدعوات"
+  ],
+  "cols": [
+   {
+    "label": "معرف الدعوة",
+    "col": "invitation_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "معرف RFQ",
+    "col": "rfq_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "رقم المورد",
+    "col": "supplier_no",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تاريخ الدعوة",
+    "col": "invitation_date",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تأكيد الاستلام",
+    "col": "receipt_confirmation",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الاستجابة",
+    "col": "response",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع العرض الوارد",
+    "col": "incoming_offer_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة الدعوة",
+    "col": "invitation_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المنشئ",
+    "col": "creator_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "تاريخ الإنشاء",
+    "col": "created_date",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة البيانات",
+    "col": "data_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع المصدر",
+    "col": "source_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Portal/my_tasks.php",
+  "owner": "work_items",
+  "rows_now": 5424,
+  "sheet_tables": [
+   "my_tasks"
+  ],
+  "base_cols": [
+   "رقم المهمة",
+   "العنوان والمخرج",
+   "المصدر",
+   "المستند المرتبط",
+   "النطاق",
+   "مسندها",
+   "المنفذ",
+   "المهلة",
+   "المتبقي",
+   "الأولوية",
+   "الحالة",
+   "الإجراء",
+   "وقت الإنجاز",
+   "الكيان"
+  ],
+  "cols": [
+   {
+    "label": "معرف المهمة",
+    "col": "task_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "نوع المهمة",
+    "col": "task_type",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدر المهمة",
+    "col": "task_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الشاشة الأصلية",
+    "col": "origin_screen",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المرجع",
+    "col": "reference",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مهلة المهمة",
+    "col": "task_deadline",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة المهمة",
+    "col": "task_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "سبب التأجيل",
+    "col": "postponement_reason",
+    "type": "VARCHAR(500) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Workforce/worker_worklog.php",
+  "owner": "worker_qualification",
+  "rows_now": 4,
+  "sheet_tables": [
+   "ops_worker_worklog"
+  ],
+  "base_cols": [
+   "عرض",
+   "#",
+   "الموظف",
+   "الفئة",
+   "الحالة",
+   "الحالة الميدانية",
+   "العمليات",
+   "ساعات مؤهلة",
+   "إجازات/غياب",
+   "تحركات",
+   "تقييمات",
+   "حوافز (معتمدة)",
+   "جزاءات (معتمدة)",
+   "الكيان",
+   "المنشئ — الاسم والصفة",
+   "المعتمد — الاسم والصفة",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "تاريخ الإنشاء",
+   "تاريخ الاعتماد"
+  ],
+  "cols": [
+   {
+    "label": "معرف الحدث",
+    "col": "business_event_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "وقت الحدث",
+    "col": "event_time",
+    "type": "DATETIME NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "نوع الحدث",
+    "col": "event_type",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدره",
+    "col": "its_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المشروع",
+    "col": "project_label",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الموقع",
+    "col": "location",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المعدة",
+    "col": "equipment",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "ملخص الحدث",
+    "col": "event_summary",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع السجل الأصلي",
+    "col": "origin_record_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "درجة الأهمية",
+    "col": "importance_degree",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Portal/vp_pending_actions.php",
+  "owner": "exec_approvals",
+  "rows_now": 32,
+  "sheet_tables": [
+   "dvp_vp_pending_actions"
+  ],
+  "base_cols": [
+   "النوع",
+   "المرجع",
+   "الجهة",
+   "البيان",
+   "المهلة",
+   "فعله عند فاعله"
+  ],
+  "cols": [
+   {
+    "label": "معرف البند",
+    "col": "item_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "Deputy_Role",
+    "col": "deputy_role",
+    "type": null,
+    "reuse": true
+   },
+   {
+    "label": "المصدر",
+    "col": "source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "نوع الفعل",
+    "col": "action_type",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "أيام التأخير",
+    "col": "delay_days",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الأولوية",
+    "col": "priority_level",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الحالة",
+    "col": "state",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Finance/financial_statements_fin.php",
+  "owner": "fin_chart_of_accounts",
+  "rows_now": 298,
+  "sheet_tables": [
+   "fina_financial_statements_fin"
+  ],
+  "base_cols": [
+   "الكود",
+   "الحساب",
+   "الرصيد الحالي",
+   "الفترة",
+   "نوع القائمة",
+   "البند",
+   "رصيد الفترة السابقة",
+   "التغير",
+   "نسبة التغير",
+   "المستوى",
+   "البند الأب",
+   "حالة الإقفال",
+   "أعدها",
+   "راجعها",
+   "اعتمدها",
+   "المراجع الخارجي",
+   "الكيان",
+   "مرجع التفويض",
+   "تاريخ الاعتماد",
+   "تاريخ الإنشاء",
+   "المرجع الأب",
+   "الحالة",
+   "سجل الاطلاع",
+   "المرفق",
+   "مركز التكلفة",
+   "سعر الصرف ومصدره",
+   "العملة"
+  ],
+  "cols": [
+   {
+    "label": "معرف السطر",
+    "col": "line_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القائمة",
+    "col": "list_name",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القيمة",
+    "col": "value",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "فترة المقارنة",
+    "col": "comparison_period",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "ملاحظة إفصاح",
+    "col": "disclosure_note",
+    "type": "VARCHAR(500) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Finance/cfo_daily_board_fin.php",
+  "owner": "fin_budget_lines",
+  "rows_now": 102,
+  "sheet_tables": [
+   "fina_dashboard_kpi"
+  ],
+  "base_cols": [
+   "القرار",
+   "المؤشر",
+   "أين يتخذ",
+   "الكيان",
+   "المنشئ — الاسم والصفة",
+   "المعتمد — الاسم والصفة",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "تاريخ الإنشاء",
+   "تاريخ الاعتماد",
+   "الحالة"
+  ],
+  "cols": [
+   {
+    "label": "معرف المؤشر",
+    "col": "indicator_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المؤشر KPI Catalog",
+    "col": "kpi_catalog_indicator",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القيمة",
+    "col": "value",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الوحدة",
+    "col": "unit",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "العملة",
+    "col": "currency",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "آخر تحديث",
+    "col": "last_update",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Portal/my_portal.php",
+  "owner": "work_items",
+  "rows_now": 5424,
+  "sheet_tables": [
+   "my_portal"
+  ],
+  "base_cols": [
+   "الوقت",
+   "الفعل",
+   "الهدف",
+   "النتيجة",
+   "الموظف",
+   "الصفة",
+   "الإدارة",
+   "الموقع",
+   "المعدة المكلف عليها",
+   "المشغل الآخر على المعدة",
+   "مهام مفتوحة",
+   "موافقات تنتظرني",
+   "طلباتي المعلقة",
+   "بلاغاتي المفتوحة",
+   "إنجاز الشهر",
+   "آخر دخول",
+   "الكيان"
+  ],
+  "cols": [
+   {
+    "label": "معرف المكون",
+    "col": "component_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الحساب",
+    "col": "account",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الدور",
+    "col": "role_label",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المكون",
+    "col": "component",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "محتواه الحي",
+    "col": "live_content",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدره",
+    "col": "its_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "آخر تحديث",
+    "col": "last_update",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Finance/tre_liquidity_board.php",
+  "owner": "tre_cash_move",
+  "rows_now": 1,
+  "sheet_tables": [
+   "tre_dashboard_kpi"
+  ],
+  "base_cols": [
+   "الرقم",
+   "الوعاء",
+   "الاتجاه",
+   "المبلغ",
+   "العملة",
+   "المرجع",
+   "فرق صرف",
+   "الوقت"
+  ],
+  "cols": [
+   {
+    "label": "معرف المؤشر",
+    "col": "indicator_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المؤشر KPI Catalog",
+    "col": "kpi_catalog_indicator",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القيمة",
+    "col": "value",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الحالة",
+    "col": "state",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "آخر تحديث",
+    "col": "last_update",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Procurement/dashboard_proc.php",
+  "owner": "proc_request",
+  "rows_now": 26,
+  "sheet_tables": [
+   "prc_dashboard_kpi"
+  ],
+  "base_cols": [
+   "الكود",
+   "الصنف",
+   "الفئة",
+   "الحد الأدنى",
+   "مخزون الأمان",
+   "مدة التوريد (يوم)",
+   "الكيان",
+   "المنشئ — الاسم والصفة",
+   "المعتمد — الاسم والصفة",
+   "مرجع التفويض",
+   "المرجع الأب",
+   "تاريخ الإنشاء",
+   "تاريخ الاعتماد",
+   "الحالة"
+  ],
+  "cols": [
+   {
+    "label": "معرف المؤشر",
+    "col": "indicator_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المؤشر KPI Catalog",
+    "col": "kpi_catalog_indicator",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القيمة",
+    "col": "value",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الوحدة",
+    "col": "unit",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "آخر تحديث",
+    "col": "last_update",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "user_capacities.php",
+  "owner": "user_capacities",
+  "rows_now": 76,
+  "sheet_tables": [
+   "my_user_capacities"
+  ],
+  "base_cols": [
+   "#",
+   "كود الحساب",
+   "الشخص",
+   "الصفة",
+   "الدور",
+   "النطاق",
+   "المصدر",
+   "الحال",
+   "تجميد",
+   "الإدارة",
+   "سقف الاعتماد",
+   "من تاريخ",
+   "إلى تاريخ",
+   "الصفة النشطة الآن",
+   "آخر تبديل",
+   "الكيان",
+   "مرجع التفويض",
+   "تاريخ الاعتماد",
+   "تاريخ الإنشاء",
+   "المرجع الأب",
+   "المنشئ — الاسم والصفة",
+   "سجل الاطلاع",
+   "المرفق"
+  ],
+  "cols": [
+   {
+    "label": "معرف الصفة",
+    "col": "capacity_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مصدرها",
+    "col": "her_source",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "سارية من",
+    "col": "valid_from",
+    "type": null,
+    "reuse": true
+   },
+   {
+    "label": "إلى",
+    "col": "range_to",
+    "type": "DATE NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "نشطة الآن؟",
+    "col": "active_now",
+    "type": "TINYINT(1) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مرجع التفويض عند الإنابة",
+    "col": "delegation_ref",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "حالة الصفة",
+    "col": "capacity_state",
+    "type": "VARCHAR(60) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
+ },
+ {
+  "file": "Portal/my_achievement.php",
+  "owner": "achievement_records",
+  "rows_now": 0,
+  "sheet_tables": [
+   "my_achievement"
+  ],
+  "base_cols": [
+   "المؤشر",
+   "الفترة",
+   "الفترة السابقة (بالطول نفسه)",
+   "الموظف",
+   "الإدارة",
+   "المدى المختار",
+   "المهام المسندة",
+   "المنجزة في المهلة",
+   "المتأخرة",
+   "نسبة الالتزام",
+   "ساعات العمل",
+   "الإنتاج المنسوب",
+   "نسبة الإنجاز من المستهدف",
+   "البلاغات المرفوعة",
+   "البلاغات المعالجة",
+   "الترتيب في الإدارة",
+   "تاريخ التوليد",
+   "الكيان"
+  ],
+  "cols": [
+   {
+    "label": "معرف السطر",
+    "col": "line_uid",
+    "type": "VARCHAR(80) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الحساب",
+    "col": "account",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "المدى",
+    "col": "range_label",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مؤشر الإنجاز",
+    "col": "achievement_indicator",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "القيمة",
+    "col": "value",
+    "type": "DECIMAL(18,2) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "الوحدة",
+    "col": "unit",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "بلغة الدور",
+    "col": "in_role_language",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "مقارنة بالمدى السابق",
+    "col": "vs_previous_range",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   },
+   {
+    "label": "آخر تحديث",
+    "col": "last_update",
+    "type": "VARCHAR(190) NULL DEFAULT NULL",
+    "reuse": false
+   }
+  ]
  }
 ]

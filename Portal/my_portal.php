@@ -180,6 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         سجل نشاطي (لا يعدل ولا يحذف)</h5></div>
     <div class="card-body"><div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display nowrap ems-ptp-w100" data-no-dt="1">
             <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -197,7 +198,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">آخر دخول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-              </tr></thead>
+              <th>معرف المكون</th><th>الحساب</th><th>الدور</th><th>المكون</th><th>محتواه الحي</th><th>مصدره</th><th>آخر تحديث</th></tr></thead>
             <tbody>
             <?php foreach ($activity as $a): ?>
                 <tr><td><small><?php echo htmlspecialchars((string)$a['at']); ?></small></td>
@@ -205,38 +206,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars($a['target_type'] . ' ' . $a['target_id']); ?></td>
                     <td><?php echo (string)$a['result'] === 'ok'
                         ? "<span class='badge badge-success'>ok</span>"
-                        : "<span class='badge badge-danger'>denied</span>"; ?></td></tr>
+                        : "<span class='badge badge-danger'>denied</span>"; ?></td><?= ems_sf_cells($a, array('component_uid', 'account', 'role_label', 'component', 'live_content', 'its_source', 'last_update')) ?></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
     </div></div></div>
     <?php endif; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_my_portal')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_portal
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المكون' => 'g20',
-            'الحساب' => 'g21',
-            'الدور' => 'g22',
-            'المكون' => 'g23',
-            'محتواه الحي' => 'g24',
-            'مصدره' => 'g25',
-            'آخر تحديث' => 'g26',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_portal');
-        echo ems_w14_grid('emsList_my_portal', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البوابة الشخصية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

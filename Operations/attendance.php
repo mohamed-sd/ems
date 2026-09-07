@@ -158,7 +158,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — الحضور والانصراف</h5>
+            <h5><i class="fa fa-plus"></i> إضافة: الحضور والانصراف</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_776_4545a">الشهر</label>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f15" maxlength="190" id="emsf_791_12115"></div>
                 <div class="form-group"><label for="emsf_792_e0a86">الحالة</label>
                     <select name="f16" id="emsf_792_e0a86"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label for="emsf_793_2fd3b">المعتمد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_793_2fd3b">المعتمد - الاسم والصفة</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_793_2fd3b"></div>
                 <div class="form-group"><label for="emsf_794_e776a">تاريخ الاعتماد</label>
                     <input type="date" name="f18" id="emsf_794_e776a"></div>
@@ -217,6 +217,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="attendanceTable">
             <thead><tr>
             <th>الشهر</th>
@@ -236,58 +237,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>المستند المؤيد</th>
             <th>سجله</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات - لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد - الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد - وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد - تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه - خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
             <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
-            </tr></thead>
+            <th>معرف السجل</th><th>رقم الموظف</th><th>ساعات إضافية</th><th>مرجع المأمورية</th><th>مرجع الإجازة</th><th>مصدر التسجيل</th><th>ملاحظة</th><th>حالة السجل</th><th>المنشئ</th><th>حالة البيانات</th><th>مرجع المصدر</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="26" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
+                <tr><td colspan="37" class="text-center text-muted">لا بيانات بعد - أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td<?php echo $v === '-' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
-                </tr>
+                <?= ems_sf_cells($r, array('record_uid', 'employee_no', 'overtime_hours', 'mission_ref', 'leave_ref', 'registration_source', 'note', 'record_state', 'creator_name', 'data_state', 'source_ref')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السجل' => 'g188',
-            'رقم الموظف' => 'g189',
-            'التاريخ' => 'g190',
-            'رمز الحالة' => 'g191',
-            'ساعات إضافية' => 'g192',
-            'مرجع المأمورية' => 'g193',
-            'مرجع الإجازة' => 'g194',
-            'مصدر التسجيل' => 'g195',
-            'ملاحظة' => 'g196',
-            'حالة السجل' => 'g197',
-            'المنشئ' => 'g198',
-            'تاريخ الإنشاء' => 'g199',
-            'حالة البيانات' => 'g200',
-            'مرجع المصدر' => 'g201',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_attendance');
-        echo ems_w14_grid('emsList_hr_attendance', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الحضور والانصراف'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 <script>

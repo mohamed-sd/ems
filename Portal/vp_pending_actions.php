@@ -85,8 +85,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="ems-data-table">
-            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة</th><th>البيان</th><th>المهلة</th><th>فعله عند فاعله</th></tr></thead>
+            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة</th><th>البيان</th><th>المهلة</th><th>فعله عند فاعله</th><th>معرف البند</th><th>Deputy_Role</th><th>المصدر</th><th>نوع الفعل</th><th>أيام التأخير</th><th>الأولوية</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x0): ?>
                 <tr>
@@ -96,9 +97,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['desc']) ?></td>
                     <td><?= htmlspecialchars($x0['due']) ?></td>
                     <td><a href="<?= htmlspecialchars($x0['link']) ?>"><?= htmlspecialchars($x0['label']) ?></a></td>
-                </tr>
+                <?= ems_sf_cells($x0, array('item_uid', 'deputy_role', 'source', 'action_type', 'delay_days', 'priority_level', 'state')) ?></tr>
             <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="6">لا بنود منتظرة في الروافد الثلاثة</td></tr><?php endif; ?>
+            <?php if (!$rows): ?><tr><td colspan="13">لا بنود منتظرة في الروافد الثلاثة</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -107,34 +108,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         صف موحد يجمع من الروافد الثلاثة ولا يقرر: الاعتمادات غير المقررة والقرارات العليا المفتوحة بمهلها
         وتصعيدات المخاطر بلا اقرار، والمهل المتجاوزة تقاس بيوم القاعدة. الفعل عند فاعله المسمى في كل صف.
     </div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_dvp_vp_pending_actions')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف البند' => 'g31',
-            'Deputy_Role' => 'g32',
-            'المصدر' => 'g33',
-            'نوع الفعل' => 'g34',
-            'المرجع' => 'g35',
-            'المهلة' => 'g36',
-            'أيام التأخير' => 'g37',
-            'الأولوية' => 'g38',
-            'الحالة' => 'g39',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('dvp_vp_pending_actions');
-        echo ems_w14_grid('emsList_dvp_vp_pending_actions', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإجراءات والقرارات المطلوبة مني'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 </body>
 </html>

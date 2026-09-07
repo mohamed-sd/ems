@@ -6,30 +6,13 @@
 | # | الشاشة | سببُ التأجيل |
 |---:|---|---|
 | 1 | `Clients/client_contacts.php` | لا جدول عرض في الصفحة · جدول القاعدة clients تطالب به أكثر من شاشة |
-| 2 | `Contracts/commercial_board.php` | عدة جداول عرض ولا واحد منها يشترك مع الورقة في حقل · جدول القاعدة غير مؤكد بالاسم |
-| 3 | `Finance/cfo_daily_board_fin.php` | جدول القاعدة غير مؤكد بالاسم |
-| 4 | `Finance/financial_statements_fin.php` | جدول القاعدة غير مؤكد بالاسم |
-| 5 | `Finance/tre_liquidity_board.php` | جدول القاعدة غير مؤكد بالاسم |
-| 6 | `Fleet/fleet_schema_matrix.php` | جدول القاعدة غير مؤكد بالاسم |
-| 7 | `Maintenance/dashboard_mnt.php` | لا جدول عرض في الصفحة · جدول القاعدة غير مؤكد بالاسم |
-| 8 | `Maintenance/workshop.php` | جدول القاعدة غير مؤكد بالاسم |
-| 9 | `Operations/attendance.php` | جدول القاعدة غير مؤكد بالاسم |
-| 10 | `Operations/monthly_close.php` | جدول القاعدة غير مؤكد بالاسم |
-| 11 | `Operations/site_gate_equip.php` | جدول القاعدة غير مؤكد بالاسم |
-| 12 | `Portal/my_achievement.php` | جدول القاعدة غير مؤكد بالاسم |
-| 13 | `Portal/my_portal.php` | جدول القاعدة غير مؤكد بالاسم |
-| 14 | `Portal/my_tasks.php` | جدول القاعدة غير مؤكد بالاسم |
-| 15 | `Portal/vp_dashboard.php` | جدول القاعدة غير مؤكد بالاسم |
-| 16 | `Portal/vp_pending_actions.php` | جدول القاعدة غير مؤكد بالاسم |
-| 17 | `Procurement/dashboard_proc.php` | جدول القاعدة غير مؤكد بالاسم |
-| 18 | `Procurement/proc_rfq.php` | القاعدة ترجّح جدولا جانبيا ضيقا على القائمة الرئيسية |
-| 19 | `Tickets/gov_dept_crp.php` | لا جدول عرض في الصفحة · جدول القاعدة غير مؤكد بالاسم |
-| 20 | `Tickets/ticket_contextual_open.php` | لا جدول عرض في الصفحة |
-| 21 | `Transport/transfer_dashboard.php` | لا جدول عرض في الصفحة · جدول القاعدة transfer_orders تطالب به أكثر من شاشة |
-| 22 | `Transport/transfer_fleet.php` | جدول القاعدة غير مؤكد بالاسم |
-| 23 | `Workforce/project_contracts.php` | جدول القاعدة غير مؤكد بالاسم |
-| 24 | `Workforce/worker_worklog.php` | عدة جداول عرض ولا واحد منها يشترك مع الورقة في حقل |
-| 25 | `user_capacities.php` | جدول القاعدة غير مؤكد بالاسم |
+| 2 | `Contracts/commercial_board.php` | قرار المالك: تخطَّ |
+| 3 | `Fleet/fleet_schema_matrix.php` | قرار المالك: تخطَّ — شاشة مصفوفة مخطط لا بيانات عمل |
+| 4 | `Maintenance/dashboard_mnt.php` | لا جدول عرض في الصفحة · جدول القاعدة غير مؤكد بالاسم |
+| 5 | `Portal/vp_dashboard.php` | قرار المالك: تخطَّ |
+| 6 | `Tickets/gov_dept_crp.php` | لا جدول عرض في الصفحة · جدول القاعدة غير مؤكد بالاسم |
+| 7 | `Tickets/ticket_contextual_open.php` | لا جدول عرض في الصفحة |
+| 8 | `Transport/transfer_dashboard.php` | لا جدول عرض في الصفحة · جدول القاعدة transfer_orders تطالب به أكثر من شاشة |
 
 ## ما يحسمها
 

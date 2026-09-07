@@ -335,6 +335,10 @@ if (!function_exists('cmp03_store_rows')) {
             }
             $out[] = array(
                 'id' => intval($x['id']),
+                /* ◆ **الصفُّ الخامُّ يمرُّ كما هو**: `payload` يحمل ما تعرفه ورقةُ
+                 *   التسمياتِ وحدَها، وأعمدةُ الجدولِ التي تُضاف بعدَها (‏حقولُ
+                 *   ورقةِ الدليلِ المدموجة) لا موضعَ لها فيه — فتُقرَأ من `raw`. */
+                'raw' => $x,
                 'payload' => $payload,
                 'status' => $x['status'],
                 'created_by_name' => $x['created_by_name'],

@@ -244,6 +244,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
+<?php require_once __DIR__ . '/../includes/sheet_fields.php'; ?>
         <table class="alltables display" id="my_tasksTable">
             <thead><tr>
                 <th>رقم المهمة</th><th>العنوان والمخرج</th><th>المصدر</th><th>المستند المرتبط</th>
@@ -253,10 +254,10 @@ include '../insidebar.php';
                      يصير، والحلقة تقرا كل اعمدة الجدول فالقيمة حاضرة. -->
                 <th class="ems-fn-th" data-fn="1" data-fn-src="completed_at">وقت الإنجاز</th>
                 <th class="ems-gov-th" data-gov="entity" data-slice="1">الكيان</th>
-            </tr></thead>
+            <th>معرف المهمة</th><th>نوع المهمة</th><th>مصدر المهمة</th><th>الشاشة الأصلية</th><th>المرجع</th><th>مهلة المهمة</th><th>حالة المهمة</th><th>سبب التأجيل</th></tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="13" class="text-center text-muted">لا عناصر في هذا العرض — والعناصر تأتي من مصادرها لا من هنا (WF-01)</td></tr>
+                <tr><td colspan="22" class="text-center text-muted">لا عناصر في هذا العرض — والعناصر تأتي من مصادرها لا من هنا (WF-01)</td></tr>
             <?php else: foreach ($rows as $t):
                 $id = intval($t['id']);
                 $isExec = ($uid === intval($t['assigned_user_id']));
@@ -340,41 +341,12 @@ include '../insidebar.php';
                         <?php endif; ?>
                     </td>
                     <td><?php echo htmlspecialchars((string) $t['company_id']); ?></td>
-                </tr>
+                <?= ems_sf_cells($t, array('task_uid', 'task_type', 'task_source', 'origin_screen', 'reference', 'task_deadline', 'task_state', 'postponement_reason')) ?></tr>
             <?php endforeach; endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_my_tasks')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_tasks
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المهمة' => 'g27',
-            'نوع المهمة' => 'g28',
-            'مصدر المهمة' => 'g29',
-            'الشاشة الأصلية' => 'g30',
-            'المرجع' => 'g31',
-            'مهلة المهمة' => 'g32',
-            'الأولوية' => 'g33',
-            'حالة المهمة' => 'g34',
-            'سبب التأجيل' => 'g35',
-            'وقت الإنجاز' => 'g36',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_tasks');
-        echo ems_w14_grid('emsList_my_tasks', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المهام المسندة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
 </div>
 
 </body>
