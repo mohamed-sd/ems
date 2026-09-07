@@ -57,32 +57,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'لوحة قيادة النائب: المحرك العام نفسه والنطاق الافتراضي نطاق نيابتك'; $header_icon = 'fa fa-gauge'; $header_actions = array();
     $header_back = array('href' => 'vp_departments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الادارات نطاقي والشركة');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المؤشر' => 'g40',
-            'Deputy_Role' => 'g41',
-            'المحور' => 'g42',
-            'ضمن Default Scope؟' => 'g43',
-            'المؤشر' => 'g44',
-            'القيمة' => 'g45',
-            'الوحدة/العملة' => 'g46',
-            'المستهدف' => 'g47',
-            'الانحراف' => 'g48',
-            'الحالة' => 'g49',
-            'رابط النزول' => 'g50',
-            'آخر تحديث' => 'g51',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('dvp_dashboard_kpi');
-        echo ems_w14_grid('emsList_dvp_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة النائب'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
 
     <div class="ems-stat-cards">
@@ -161,6 +135,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         المحرك هو محرك لوحة القيادة التنفيذية نفسه، الحي يقاس لحظة الطلب والدوري من آخر لقطة اقفال معتمدة
         باسم فترتها، وكل مؤشر بمعادلته ومصدره في صفه. قراءة صرف ولا ادخال.
     </div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المؤشر' => 'g40',
+            'Deputy_Role' => 'g41',
+            'المحور' => 'g42',
+            'ضمن Default Scope؟' => 'g43',
+            'المؤشر' => 'g44',
+            'القيمة' => 'g45',
+            'الوحدة/العملة' => 'g46',
+            'المستهدف' => 'g47',
+            'الانحراف' => 'g48',
+            'الحالة' => 'g49',
+            'رابط النزول' => 'g50',
+            'آخر تحديث' => 'g51',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('dvp_dashboard_kpi');
+        echo ems_w14_grid('emsList_dvp_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة النائب'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body>
 </html>

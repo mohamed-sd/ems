@@ -149,36 +149,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الادارات نطاقي والشركة: بطاقة متابعة لكل ادارة والرؤية اوسع من الصلاحية'; $header_icon = 'fa fa-sitemap'; $header_actions = array();
     $header_back = array('href' => 'dept_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الادارات');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف البطاقة' => 'g17',
-            'وضع العرض' => 'g8',
-            'Deputy_Role' => 'g9',
-            'الإدارة' => 'g10',
-            'التبعية التنظيمية' => 'g21',
-            'ضمن نطاقي؟' => 'g11',
-            'خارج النطاق قراءة فقط' => 'g12',
-            'KPI' => 'g24',
-            'Pending_Requests' => 'g13',
-            'Overdue_Actions' => 'g28',
-            'Critical_Risks' => 'g14',
-            'Budget_Status' => 'g29',
-            'Daily_Report_Status' => 'g31',
-            'Monthly_Close_Status' => 'g33',
-            'Compliance_Status' => 'g30',
-            'رابط النزول' => 'g34',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('exec_org_project');
-        echo ems_w14_grid('emsList_exec_org_project', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإدارات نطاقي والشركة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
 
     <div class="ems-stat-cards">
@@ -258,6 +228,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         والالتزام من سياسات الادارة السارية. وما لا مصدر له منسوبا بعد يصرح بذلك ولا يختلق له رقم.
         قراءة صرف ولا ادخال من هذه الشاشة.
     </div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف البطاقة' => 'g17',
+            'وضع العرض' => 'g8',
+            'Deputy_Role' => 'g9',
+            'الإدارة' => 'g10',
+            'التبعية التنظيمية' => 'g21',
+            'ضمن نطاقي؟' => 'g11',
+            'خارج النطاق قراءة فقط' => 'g12',
+            'KPI' => 'g24',
+            'Pending_Requests' => 'g13',
+            'Overdue_Actions' => 'g28',
+            'Critical_Risks' => 'g14',
+            'Budget_Status' => 'g29',
+            'Daily_Report_Status' => 'g31',
+            'Monthly_Close_Status' => 'g33',
+            'Compliance_Status' => 'g30',
+            'رابط النزول' => 'g34',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_org_project');
+        echo ems_w14_grid('emsList_exec_org_project', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإدارات نطاقي والشركة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body>
 </html>

@@ -97,36 +97,6 @@ include 'insidebar.php';
 require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_my_user_capacities')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_user_capacities
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الصفة' => 'g37',
-            'الصفة' => 'g38',
-            'مصدرها' => 'g39',
-            'النطاق' => 'g40',
-            'سارية من' => 'g41',
-            'إلى' => 'g42',
-            'نشطة الآن؟' => 'g43',
-            'آخر تبديل' => 'g44',
-            'مرجع التفويض عند الإنابة' => 'g45',
-            'حالة الصفة' => 'g46',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_user_capacities');
-        echo ems_w14_grid('emsList_my_user_capacities', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الصفات الوظيفية والتبديل بينها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
-
     <?php
     $header_title = 'صفاتي ومبدل المساحة'; $header_icon = 'fa fa-id-badge';
     $header_actions = array();
@@ -261,6 +231,35 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
         </table>
     </div></div></div>
     <?php endif; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
+         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
+         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
+    require_once __DIR__ . '/includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_my_user_capacities')); ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_my_user_capacities
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الصفة' => 'g37',
+            'الصفة' => 'g38',
+            'مصدرها' => 'g39',
+            'النطاق' => 'g40',
+            'سارية من' => 'g41',
+            'إلى' => 'g42',
+            'نشطة الآن؟' => 'g43',
+            'آخر تبديل' => 'g44',
+            'مرجع التفويض عند الإنابة' => 'g45',
+            'حالة الصفة' => 'g46',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('my_user_capacities');
+        echo ems_w14_grid('emsList_my_user_capacities', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الصفات الوظيفية والتبديل بينها'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

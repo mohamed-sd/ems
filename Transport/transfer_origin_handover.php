@@ -53,6 +53,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تجهيز المغادرة والتسليم الأصلي'; $header_icon = 'fa fa-truck-ramp-box'; $header_actions = array();
     $header_back = array('href' => 'transfer_orders_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر الترحيل');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">بنود تجهيز</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $blocking ?></div><div class="ems-stat-label">تحجب المغادرة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $risky ?></div><div class="ems-stat-label">مخاطر مسار مرتفعة</div></div>
+    </div>
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w7_oh_r">النتيجة</label><select name="result" id="w7_oh_r" onchange="this.form.submit()">
+            <option value="">الكل</option>
+            <?php foreach (array_keys($choices) as $c): ?>
+                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا بنود تجهيز مغادرة', 'التجهيز يفتح على أمر ترحيل. ولا مغادرة قبل اكتماله'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th><th>أمر الترحيل</th><th>بند التجهيز</th><th>النتيجة</th><th>محضر التسليم الأصلي</th><th>صور ما قبل النقل</th><th>مخاطر المسار</th><th>وقت الإنجاز</th><th>حالة البند</th><th>قاعدة الحالة</th></tr></thead>
+        <tbody>
+        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
+            <tr>
+                <td><?= $i ?></td>
+                <td><?= htmlspecialchars(isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : ('#' . (int) $r['order_id'])) ?></td>
+                <td><?= htmlspecialchars((string) $r['item_ar']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['result'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $r['handover_ref']) ?></td>
+                <td><?= htmlspecialchars((string) $r['photo_ref']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['route_risk'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $r['done_at']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="10">لا بنود تجهيز مغادرة.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -92,42 +129,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     )); ?>
 
     </div></div></div>
-    <?php  ?>
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">بنود تجهيز</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $blocking ?></div><div class="ems-stat-label">تحجب المغادرة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $risky ?></div><div class="ems-stat-label">مخاطر مسار مرتفعة</div></div>
-    </div>
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w7_oh_r">النتيجة</label><select name="result" id="w7_oh_r" onchange="this.form.submit()">
-            <option value="">الكل</option>
-            <?php foreach (array_keys($choices) as $c): ?>
-                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا بنود تجهيز مغادرة', 'التجهيز يفتح على أمر ترحيل. ولا مغادرة قبل اكتماله'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر الترحيل</th><th>بند التجهيز</th><th>النتيجة</th><th>محضر التسليم الأصلي</th><th>صور ما قبل النقل</th><th>مخاطر المسار</th><th>وقت الإنجاز</th><th>حالة البند</th><th>قاعدة الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
-            <tr>
-                <td><?= $i ?></td>
-                <td><?= htmlspecialchars(isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : ('#' . (int) $r['order_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $r['item_ar']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['result'], $conn)) ?></td>
-                <td><?= htmlspecialchars((string) $r['handover_ref']) ?></td>
-                <td><?= htmlspecialchars((string) $r['photo_ref']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['route_risk'], $conn)) ?></td>
-                <td><?= htmlspecialchars((string) $r['done_at']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="10">لا بنود تجهيز مغادرة.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
 </div>
 </body></html>

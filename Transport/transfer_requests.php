@@ -152,37 +152,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'طلب جديد'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g63',
-            'تاريخ الطلب' => 'g64',
-            'الجهة الطالبة' => 'g65',
-            'مرجع أمر نقل الموارد' => 'g66',
-            'نوع الحمولة' => 'g67',
-            'كود المعدة/الصنف' => 'g68',
-            'الوزن/الأبعاد' => 'g69',
-            'من موقع' => 'g70',
-            'إلى موقع' => 'g71',
-            'التاريخ المطلوب' => 'g72',
-            'الأولوية' => 'g73',
-            'ملاحظات التحميل' => 'g74',
-            'حالة الطلب' => 'g75',
-            'المنشئ' => 'g76',
-            'تاريخ الإنشاء' => 'g77',
-            'حالة البيانات' => 'g78',
-            'مرجع المصدر' => 'g79',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_requests');
-        echo ems_w14_grid('emsList_trp_transfer_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلب الترحيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا طلبات ترحيل مقدمة بعد', 'قدم أول طلب بزر «طلب جديد» في رأس الشاشة');
@@ -288,6 +257,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
         ?>
         </tbody></table>
+    </div></div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_requests
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g63',
+            'تاريخ الطلب' => 'g64',
+            'الجهة الطالبة' => 'g65',
+            'مرجع أمر نقل الموارد' => 'g66',
+            'نوع الحمولة' => 'g67',
+            'كود المعدة/الصنف' => 'g68',
+            'الوزن/الأبعاد' => 'g69',
+            'من موقع' => 'g70',
+            'إلى موقع' => 'g71',
+            'التاريخ المطلوب' => 'g72',
+            'الأولوية' => 'g73',
+            'ملاحظات التحميل' => 'g74',
+            'حالة الطلب' => 'g75',
+            'المنشئ' => 'g76',
+            'تاريخ الإنشاء' => 'g77',
+            'حالة البيانات' => 'g78',
+            'مرجع المصدر' => 'g79',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_requests');
+        echo ems_w14_grid('emsList_trp_transfer_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلب الترحيل'); /* /GUIDE_COLS */ ?>
     </div></div></div>
 </div>
 

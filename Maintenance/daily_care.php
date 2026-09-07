@@ -51,6 +51,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'العناية اليومية والتشحيم'; $header_icon = 'fa fa-oil-can'; $header_actions = array();
     $header_back = array('href' => 'preventive_plans.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الخطط الوقائية');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر عناية</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $abn ?></div><div class="ems-stat-label">ملاحظات غير طبيعية</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $branched ?></div><div class="ems-stat-label">تفرع عنها بلاغ</div></div>
+    </div>
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w7_dc_r">النتيجة</label><select name="result" id="w7_dc_r" onchange="this.form.submit()">
+            <option value="">الكل</option>
+            <?php foreach (array_keys($choices) as $c): ?>
+                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا أسطر عناية يومية', 'المهمة تنفذ بقائمة النوع. والنتيجة غير الطبيعية تفتح بلاغا'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th><th>التاريخ</th><th>المعدة</th><th>قائمة النوع</th><th>المهمة</th><th>النتيجة</th><th>ملاحظة غير طبيعية</th><th>بلاغ متفرع</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
+        <tbody>
+        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
+            <tr>
+                <td><?= $i ?></td>
+                <td><?= htmlspecialchars((string) $r['care_date']) ?></td>
+                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
+                <td><?= htmlspecialchars((string) $r['checklist_ref']) ?></td>
+                <td><?= htmlspecialchars((string) $r['task_ar']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['result'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars(mb_substr((string) $r['abnormal_note'], 0, 120)) ?></small></td>
+                <td><?= ($r['breakdown_id'] === null || (int) $r['breakdown_id'] === 0) ? '—' : (int) $r['breakdown_id'] ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="10">لا أسطر عناية يومية.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -97,42 +134,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     )); ?>
 
     </div></div></div>
-    <?php  ?>
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر عناية</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $abn ?></div><div class="ems-stat-label">ملاحظات غير طبيعية</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $branched ?></div><div class="ems-stat-label">تفرع عنها بلاغ</div></div>
-    </div>
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w7_dc_r">النتيجة</label><select name="result" id="w7_dc_r" onchange="this.form.submit()">
-            <option value="">الكل</option>
-            <?php foreach (array_keys($choices) as $c): ?>
-                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا أسطر عناية يومية', 'المهمة تنفذ بقائمة النوع. والنتيجة غير الطبيعية تفتح بلاغا'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>التاريخ</th><th>المعدة</th><th>قائمة النوع</th><th>المهمة</th><th>النتيجة</th><th>ملاحظة غير طبيعية</th><th>بلاغ متفرع</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
-            <tr>
-                <td><?= $i ?></td>
-                <td><?= htmlspecialchars((string) $r['care_date']) ?></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $r['checklist_ref']) ?></td>
-                <td><?= htmlspecialchars((string) $r['task_ar']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['result'], $conn)) ?></td>
-                <td><small><?= htmlspecialchars(mb_substr((string) $r['abnormal_note'], 0, 120)) ?></small></td>
-                <td><?= ($r['breakdown_id'] === null || (int) $r['breakdown_id'] === 0) ? '—' : (int) $r['breakdown_id'] ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="10">لا أسطر عناية يومية.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
 </div>
 </body></html>

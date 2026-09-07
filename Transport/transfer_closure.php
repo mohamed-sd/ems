@@ -54,37 +54,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'إقفال أمر الترحيل'; $header_icon = 'fa fa-file-circle-check'; $header_actions = array();
     $header_back = array('href' => 'transfer_close_cost.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'بنود تكلفة الرحلة');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_closure
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإقفال' => 'g115',
-            'رقم الأمر' => 'g116',
-            'فحص محضر الاستلام' => 'g117',
-            'عدد بنود التكلفة' => 'g118',
-            'إجمالي التكلفة' => 'g119',
-            'التوزيع بالمتحمل' => 'g120',
-            'ترحيل قراءة العداد' => 'g121',
-            'الإحالة للمالية' => 'g122',
-            'ملاحظة الإقفال' => 'g123',
-            'حالة الإقفال' => 'g124',
-            'المنشئ' => 'g125',
-            'تاريخ الإنشاء' => 'g126',
-            'المراجع' => 'g127',
-            'المعتمد' => 'g128',
-            'تاريخ الاعتماد' => 'g129',
-            'حالة البيانات' => 'g130',
-            'مرجع المصدر' => 'g131',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_closure');
-        echo ems_w14_grid('emsList_trp_transfer_closure', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في إقفال أمر الترحيل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أوامر بإقفال</div></div>
@@ -123,5 +92,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tr><td colspan="11">لا أوامر ترحيل مقفلة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_closure
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الإقفال' => 'g115',
+            'رقم الأمر' => 'g116',
+            'فحص محضر الاستلام' => 'g117',
+            'عدد بنود التكلفة' => 'g118',
+            'إجمالي التكلفة' => 'g119',
+            'التوزيع بالمتحمل' => 'g120',
+            'ترحيل قراءة العداد' => 'g121',
+            'الإحالة للمالية' => 'g122',
+            'ملاحظة الإقفال' => 'g123',
+            'حالة الإقفال' => 'g124',
+            'المنشئ' => 'g125',
+            'تاريخ الإنشاء' => 'g126',
+            'المراجع' => 'g127',
+            'المعتمد' => 'g128',
+            'تاريخ الاعتماد' => 'g129',
+            'حالة البيانات' => 'g130',
+            'مرجع المصدر' => 'g131',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_closure');
+        echo ems_w14_grid('emsList_trp_transfer_closure', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في إقفال أمر الترحيل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body></html>

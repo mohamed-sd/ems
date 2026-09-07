@@ -36,30 +36,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title='سجل الأحداث التشغيلية المجمع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_worker_worklog
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الحدث' => 'g105',
-            'وقت الحدث' => 'g106',
-            'نوع الحدث' => 'g107',
-            'مصدره' => 'g108',
-            'المشروع' => 'g109',
-            'الموقع' => 'g110',
-            'المعدة' => 'g111',
-            'ملخص الحدث' => 'g112',
-            'مرجع السجل الأصلي' => 'g113',
-            'درجة الأهمية' => 'g114',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('ops_worker_worklog');
-        echo ems_w14_grid('emsList_ops_worker_worklog', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأحداث التشغيلية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
     <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا سجل أحداث تشغيلية مجمعة للعاملين بعد', 'سجل العاملين في «سجل العامل» وارصد عملياتهم لتظهر حصيلتهم هنا'); ?>
@@ -170,6 +146,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
         <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" class="wl-empty-cell">لا توجد بيانات بعد (طبق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_worker_worklog
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الحدث' => 'g105',
+            'وقت الحدث' => 'g106',
+            'نوع الحدث' => 'g107',
+            'مصدره' => 'g108',
+            'المشروع' => 'g109',
+            'الموقع' => 'g110',
+            'المعدة' => 'g111',
+            'ملخص الحدث' => 'g112',
+            'مرجع السجل الأصلي' => 'g113',
+            'درجة الأهمية' => 'g114',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('ops_worker_worklog');
+        echo ems_w14_grid('emsList_ops_worker_worklog', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأحداث التشغيلية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 </body></html>

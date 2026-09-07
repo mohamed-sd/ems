@@ -137,35 +137,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السجل' => 'g188',
-            'رقم الموظف' => 'g189',
-            'التاريخ' => 'g190',
-            'رمز الحالة' => 'g191',
-            'ساعات إضافية' => 'g192',
-            'مرجع المأمورية' => 'g193',
-            'مرجع الإجازة' => 'g194',
-            'مصدر التسجيل' => 'g195',
-            'ملاحظة' => 'g196',
-            'حالة السجل' => 'g197',
-            'المنشئ' => 'g198',
-            'تاريخ الإنشاء' => 'g199',
-            'حالة البيانات' => 'g200',
-            'مرجع المصدر' => 'g201',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('hr_attendance');
-        echo ems_w14_grid('emsList_hr_attendance', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الحضور والانصراف'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
-
     <?php
     $header_title = 'الحضور والانصراف';
     $header_icon = 'fa fa-fingerprint';
@@ -289,6 +260,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </table>
         </div>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السجل' => 'g188',
+            'رقم الموظف' => 'g189',
+            'التاريخ' => 'g190',
+            'رمز الحالة' => 'g191',
+            'ساعات إضافية' => 'g192',
+            'مرجع المأمورية' => 'g193',
+            'مرجع الإجازة' => 'g194',
+            'مصدر التسجيل' => 'g195',
+            'ملاحظة' => 'g196',
+            'حالة السجل' => 'g197',
+            'المنشئ' => 'g198',
+            'تاريخ الإنشاء' => 'g199',
+            'حالة البيانات' => 'g200',
+            'مرجع المصدر' => 'g201',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_attendance');
+        echo ems_w14_grid('emsList_hr_attendance', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الحضور والانصراف'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <script>

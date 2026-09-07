@@ -62,36 +62,6 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_back = array();
     $header_context = array('المعروض' => count($rows) . ' إجراء', 'متأخرة' => $overdueN, 'تنتظر قبول المتحقق' => $doneN);
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_treatments
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الإجراء' => 'g41',
-            'Risk_ID' => 'g42',
-            'مسار المعالجة' => 'g43',
-            'وصف الإجراء' => 'g44',
-            'المالك' => 'g45',
-            'الإدارة المنفذة' => 'g46',
-            'Due_Date' => 'g47',
-            'المستوى المستهدف بعد الإجراء' => 'g48',
-            'أيام التأخير' => 'g49',
-            'دليل الإنجاز' => 'g50',
-            'إعادة التقييم بعده' => 'g51',
-            'حالة الإجراء' => 'g52',
-            'المنشئ' => 'g53',
-            'تاريخ الإنشاء' => 'g54',
-            'حالة البيانات' => 'g55',
-            'مرجع المصدر' => 'g56',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('rsk_risk_treatments');
-        echo ems_w14_grid('emsList_rsk_risk_treatments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في خطط معالجة المخاطر'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا إجراءات معالجة مسندة إليك أو إلى نطاقك', 'أسند معالجة من ملف الخطر في «سجل المخاطر» ثم عد إلى هذه الشاشة');
@@ -135,6 +105,36 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; if (empty($rows)): ?><tr><td colspan="8" class="text-muted">لا إجراءات</td></tr><?php endif; ?></tbody>
         </table>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_treatments
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الإجراء' => 'g41',
+            'Risk_ID' => 'g42',
+            'مسار المعالجة' => 'g43',
+            'وصف الإجراء' => 'g44',
+            'المالك' => 'g45',
+            'الإدارة المنفذة' => 'g46',
+            'Due_Date' => 'g47',
+            'المستوى المستهدف بعد الإجراء' => 'g48',
+            'أيام التأخير' => 'g49',
+            'دليل الإنجاز' => 'g50',
+            'إعادة التقييم بعده' => 'g51',
+            'حالة الإجراء' => 'g52',
+            'المنشئ' => 'g53',
+            'تاريخ الإنشاء' => 'g54',
+            'حالة البيانات' => 'g55',
+            'مرجع المصدر' => 'g56',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('rsk_risk_treatments');
+        echo ems_w14_grid('emsList_rsk_risk_treatments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في خطط معالجة المخاطر'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <?php /* INJ-0576: موضعُ إدخالِ دليلِ الإنجاز — عنوانٌ وثلاثةُ حقولٍ وردٌّ في موضعِه */ ?>

@@ -55,6 +55,63 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تجميع الطلبات وخطة الشراء'; $header_icon = 'fa fa-layer-group'; $header_actions = array();
     $header_back = array('href' => 'requests_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'طلبات الشراء');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">حزم التجميع</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $totalMembers ?></div><div class="ems-stat-label">طلبات مضمومة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $totalLines ?></div><div class="ems-stat-label">بنود داخل الحزم</div></div>
+    </div>
+
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w9_pkg_st">حالة الحزمة</label><select name="state" id="w9_pkg_st" onchange="this.form.submit()">
+            <option value="">الكل</option>
+            <?php foreach (array_keys($choices) as $c): ?>
+                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا حزم تجميع', 'الحزمة تضم طلبات شراء لفترة واحدة بسبب مكتوب. والطلب لا يضم إلى حزمتين'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>رمز الحزمة</th><th>العنوان</th><th>من</th><th>إلى</th><th>سبب التجميع</th><th>الطلبات</th><th>البنود</th><th>الحالة</th><th>الأعضاء</th></tr></thead>
+        <tbody>
+        <?php if ($rows): foreach ($rows as $r): ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $r['code']) ?></td>
+                <td><?= htmlspecialchars((string) $r['title']) ?></td>
+                <td><?= htmlspecialchars((string) $r['period_from']) ?></td>
+                <td><?= htmlspecialchars((string) $r['period_to']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['strategy'], $conn)) ?></td>
+                <td><?= (int) $r['member_count'] ?></td>
+                <td><?= (int) $r['line_count'] ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
+                <td><a href="?pkg=<?= (int) $r['id'] ?>">عرض الأعضاء</a></td>
+            </tr>
+        <?php endforeach; endif; ?>
+        </tbody>
+    </table></div>
+
+    <?php if ($open > 0): ?>
+    <h3 class="ems-section-title">أعضاء الحزمة</h3>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>رمز الطلب</th><th>الجهة الطالبة</th><th>سبب الضم</th><th>تاريخ الضم</th></tr></thead>
+        <tbody>
+        <?php if ($members): foreach ($members as $m): $q = isset($reqs[(int) $m['request_id']]) ? $reqs[(int) $m['request_id']] : null; ?>
+            <tr>
+                <td><?= htmlspecialchars($q ? (string) $q['code'] : ('#' . (int) $m['request_id'])) ?></td>
+                <td><?= htmlspecialchars($q ? (string) $q['requesting_dept'] : '') ?></td>
+                <td><?= htmlspecialchars((string) $m['join_reason']) ?></td>
+                <td><?= htmlspecialchars((string) $m['joined_at']) ?></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="4">لا طلبات مضمومة في هذه الحزمة</td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table></div>
+    <?php endif; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -132,62 +189,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('prc_package_lines');
         echo ems_w14_grid('emsList_prc_package_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تجميع الطلبات وخطة الشراء'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php  ?>
-
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">حزم التجميع</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $totalMembers ?></div><div class="ems-stat-label">طلبات مضمومة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $totalLines ?></div><div class="ems-stat-label">بنود داخل الحزم</div></div>
-    </div>
-
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w9_pkg_st">حالة الحزمة</label><select name="state" id="w9_pkg_st" onchange="this.form.submit()">
-            <option value="">الكل</option>
-            <?php foreach (array_keys($choices) as $c): ?>
-                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا حزم تجميع', 'الحزمة تضم طلبات شراء لفترة واحدة بسبب مكتوب. والطلب لا يضم إلى حزمتين'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رمز الحزمة</th><th>العنوان</th><th>من</th><th>إلى</th><th>سبب التجميع</th><th>الطلبات</th><th>البنود</th><th>الحالة</th><th>الأعضاء</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                <td><?= htmlspecialchars((string) $r['code']) ?></td>
-                <td><?= htmlspecialchars((string) $r['title']) ?></td>
-                <td><?= htmlspecialchars((string) $r['period_from']) ?></td>
-                <td><?= htmlspecialchars((string) $r['period_to']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['strategy'], $conn)) ?></td>
-                <td><?= (int) $r['member_count'] ?></td>
-                <td><?= (int) $r['line_count'] ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-                <td><a href="?pkg=<?= (int) $r['id'] ?>">عرض الأعضاء</a></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
-
-    <?php if ($open > 0): ?>
-    <h3 class="ems-section-title">أعضاء الحزمة</h3>
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رمز الطلب</th><th>الجهة الطالبة</th><th>سبب الضم</th><th>تاريخ الضم</th></tr></thead>
-        <tbody>
-        <?php if ($members): foreach ($members as $m): $q = isset($reqs[(int) $m['request_id']]) ? $reqs[(int) $m['request_id']] : null; ?>
-            <tr>
-                <td><?= htmlspecialchars($q ? (string) $q['code'] : ('#' . (int) $m['request_id'])) ?></td>
-                <td><?= htmlspecialchars($q ? (string) $q['requesting_dept'] : '') ?></td>
-                <td><?= htmlspecialchars((string) $m['join_reason']) ?></td>
-                <td><?= htmlspecialchars((string) $m['joined_at']) ?></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="4">لا طلبات مضمومة في هذه الحزمة</td></tr>
-        <?php endif; ?>
-        </tbody>
-    </table></div>
-    <?php endif; ?>
 </div>
 </body></html>

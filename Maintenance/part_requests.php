@@ -51,41 +51,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'طلبات صرف القطع'; $header_icon = 'fa fa-boxes-stacked'; $header_actions = array();
     $header_back = array('href' => 'orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر العمل');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <table id="emsList_mnt_part_requests"></table>
-    </div></div></div>
-    <?php  ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_part_requests
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الطلب' => 'g140',
-            'رقم الأمر' => 'g141',
-            'تاريخ الطلب' => 'g142',
-            'المخزن' => 'g143',
-            'البنود المطلوبة' => 'g144',
-            'الأولوية' => 'g145',
-            'مستلم العهدة' => 'g146',
-            'رقم سند الصرف' => 'g147',
-            'مطابقة الاستلام' => 'g148',
-            'حالة الطلب' => 'g149',
-            'المنشئ' => 'g150',
-            'تاريخ الإنشاء' => 'g151',
-            'حالة البيانات' => 'g152',
-            'مرجع المصدر' => 'g153',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('mnt_part_requests');
-        echo ems_w14_grid('emsList_mnt_part_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلب صرف القطع لأمر العمل'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">طلبات صرف</div></div>
@@ -123,5 +88,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tr><td colspan="10">لا طلبات صرف قطع.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_part_requests"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_part_requests
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g140',
+            'رقم الأمر' => 'g141',
+            'تاريخ الطلب' => 'g142',
+            'المخزن' => 'g143',
+            'البنود المطلوبة' => 'g144',
+            'الأولوية' => 'g145',
+            'مستلم العهدة' => 'g146',
+            'رقم سند الصرف' => 'g147',
+            'مطابقة الاستلام' => 'g148',
+            'حالة الطلب' => 'g149',
+            'المنشئ' => 'g150',
+            'تاريخ الإنشاء' => 'g151',
+            'حالة البيانات' => 'g152',
+            'مرجع المصدر' => 'g153',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_part_requests');
+        echo ems_w14_grid('emsList_mnt_part_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلب صرف القطع لأمر العمل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body></html>

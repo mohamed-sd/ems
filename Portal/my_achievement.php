@@ -64,29 +64,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title = 'إنجازي بين تاريخين'; $header_icon = 'fa fa-chart-simple';
     $header_actions = array(array('href' => 'my_certificate.php', 'icon' => 'fa fa-certificate', 'label' => 'شهادة الإنجاز'));
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_my_achievement
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g11',
-            'الحساب' => 'g12',
-            'المدى' => 'g13',
-            'مؤشر الإنجاز' => 'g14',
-            'القيمة' => 'g15',
-            'الوحدة' => 'g16',
-            'بلغة الدور' => 'g17',
-            'مقارنة بالمدى السابق' => 'g18',
-            'آخر تحديث' => 'g19',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('my_achievement');
-        echo ems_w14_grid('emsList_my_achievement', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مؤشرات الإنجاز الشخصي'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
     echo ems_states_bundle('لا قياسات إنجاز لهذه الفترة', 'غير الفترة أو الصفة ثم اضغط «قس» لقياس إنجازي من مصادره');
@@ -188,6 +165,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         بل يخفى بنص <strong>لا ينطبق</strong> — فالمقارنة تبقى عادلة» (USR-01 §6).</p>
     </div></div>
     <?php endif; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_my_achievement
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g11',
+            'الحساب' => 'g12',
+            'المدى' => 'g13',
+            'مؤشر الإنجاز' => 'g14',
+            'القيمة' => 'g15',
+            'الوحدة' => 'g16',
+            'بلغة الدور' => 'g17',
+            'مقارنة بالمدى السابق' => 'g18',
+            'آخر تحديث' => 'g19',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('my_achievement');
+        echo ems_w14_grid('emsList_my_achievement', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مؤشرات الإنجاز الشخصي'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

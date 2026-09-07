@@ -104,6 +104,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../Maintenance/orders.php', 'class' => '', 'icon' => 'fas fa-screwdriver-wrench', 'label' => 'أوامر الصيانة');
     include('../includes/page_header.php'); ?>
+    <?php 
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشرات صيانة لهذا اليوم في نطاقك', 'افتح أوامر الصيانة أو الخطط الوقائية لتسجيل أول حركة تظهر هنا');
+    ?>
+    <p class="text-muted mnt-bd-intro"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدة متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقم لفتح مصدره. (<?php echo $today; ?>)</p>
+
+    <!-- ① مؤشرات اليوم -->
+    <div class="mnt-bd-kpis">
+        <?php foreach ($cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
+            $toneCls = $tone === 'ok' ? 'mnt-bd-num--ok' : ($tone === 'err' ? 'mnt-bd-num--err' : 'mnt-bd-num--or'); ?>
+        <a href="<?php echo $href; ?>" class="mnt-bd-kpi-link">
+            <div class="card mnt-bd-kpi-card"><div class="card-body mnt-bd-kpi-body">
+                <i class="fas <?php echo $icon; ?> mnt-bd-kpi-icon"></i>
+                <div class="mnt-bd-num <?php echo $toneCls; ?>"><?php echo htmlspecialchars((string)$val); ?></div>
+                <div class="text-muted mnt-bd-kpi-lbl"><?php echo htmlspecialchars($lbl); ?></div>
+            </div></div>
+        </a>
+        <?php endforeach; ?>
+    </div>
+
+    <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -132,27 +153,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('mnt_dashboard_kpi');
         echo ems_w14_grid('emsList_mnt_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة الصيانة والجاهزية'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php 
-    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشرات صيانة لهذا اليوم في نطاقك', 'افتح أوامر الصيانة أو الخطط الوقائية لتسجيل أول حركة تظهر هنا');
-    ?>
-    <p class="text-muted mnt-bd-intro"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدة متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقم لفتح مصدره. (<?php echo $today; ?>)</p>
-
-    <!-- ① مؤشرات اليوم -->
-    <div class="mnt-bd-kpis">
-        <?php foreach ($cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
-            $toneCls = $tone === 'ok' ? 'mnt-bd-num--ok' : ($tone === 'err' ? 'mnt-bd-num--err' : 'mnt-bd-num--or'); ?>
-        <a href="<?php echo $href; ?>" class="mnt-bd-kpi-link">
-            <div class="card mnt-bd-kpi-card"><div class="card-body mnt-bd-kpi-body">
-                <i class="fas <?php echo $icon; ?> mnt-bd-kpi-icon"></i>
-                <div class="mnt-bd-num <?php echo $toneCls; ?>"><?php echo htmlspecialchars((string)$val); ?></div>
-                <div class="text-muted mnt-bd-kpi-lbl"><?php echo htmlspecialchars($lbl); ?></div>
-            </div></div>
-        </a>
-        <?php endforeach; ?>
-    </div>
-
-    <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
 </div>
 <style>
     /* UXW-01 ①②: أنماطُ بطاقاتِ المؤشراتِ أصنافًا، وألوانُ النبرةِ برموزِ اللوحة */

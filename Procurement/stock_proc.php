@@ -48,29 +48,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_stock_proc
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g110',
-            'كود الصنف' => 'g111',
-            'المخزن' => 'g112',
-            'حالة الرصيد' => 'g113',
-            'الكمية' => 'g114',
-            'متوسط التكلفة' => 'g115',
-            'القيمة' => 'g116',
-            'آخر حركة' => 'g117',
-            'تحت الحد الأدنى؟' => 'g118',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('wh_stock_proc');
-        echo ems_w14_grid('emsList_wh_stock_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أرصدة المخزون بحالاتها'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // TKT-15 · زر الإبلاغ السياقي — المخزون والاستلام (§2-③)
     require_once __DIR__ . '/../includes/report_button.php';
@@ -266,6 +243,29 @@ try {
     <?php endif; ?>
     </tbody>
   </table></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_stock_proc
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g110',
+            'كود الصنف' => 'g111',
+            'المخزن' => 'g112',
+            'حالة الرصيد' => 'g113',
+            'الكمية' => 'g114',
+            'متوسط التكلفة' => 'g115',
+            'القيمة' => 'g116',
+            'آخر حركة' => 'g117',
+            'تحت الحد الأدنى؟' => 'g118',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_stock_proc');
+        echo ems_w14_grid('emsList_wh_stock_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أرصدة المخزون بحالاتها'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

@@ -83,6 +83,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'صندوق اعتمادات النائب الموحد: المحرك يحدد من يستلم والفعل عند فاعله'; $header_icon = 'fa fa-stamp'; $header_actions = array();
     $header_back = array('href' => 'vp_dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة قيادة النائب');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format(count($rows)) ?></div><div class="ems-stat-label">وارد الصندوق الموحد</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nPend) ?></div><div class="ems-stat-label">طلبات مالية منتظرة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nMine) ?></div><div class="ems-stat-label">ضمن نطاق نيابتك المسجل</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value">2</div><div class="ems-stat-label">رافدان مسميان</div></div>
+    </div>
+
+    <div class="table-container">
+        <table class="ems-data-table">
+            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة المصدر</th><th>البيان</th><th>النطاق</th><th>التاريخ</th><th>فعله عند فاعله</th></tr></thead>
+            <tbody>
+            <?php foreach ($rows as $x0): ?>
+                <tr>
+                    <td><?= htmlspecialchars($x0['kind']) ?></td>
+                    <td><?= htmlspecialchars($x0['ref']) ?></td>
+                    <td><?= htmlspecialchars($x0['src']) ?></td>
+                    <td><?= htmlspecialchars($x0['desc']) ?></td>
+                    <td><?= htmlspecialchars($x0['mine']) ?></td>
+                    <td><?= htmlspecialchars($x0['at']) ?></td>
+                    <td><a href="<?= htmlspecialchars($x0['link']) ?>"><?= htmlspecialchars($x0['label']) ?></a></td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if (!$rows): ?><tr><td colspan="7">لا وارد منتظرا في الرافدين</td></tr><?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ems-note-box">
+        شاشة واحدة والمحرك يحدد اي نائب يستلم اي طلب، نص الحبة نفسه: التوجيه لمستوى النائب
+        يحكمه محرك الاعتماد بمصفوفته، ونطاق نيابتك يعلم على الصف من سجل التكليفات والرؤية اوسع من الصلاحية.
+        الفعل في صندوق الاعتمادات وبوابة الطلبات ولا كتابة هنا.
+    </div>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
@@ -121,40 +155,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('exec_request_queue');
         echo ems_w14_grid('emsList_exec_request_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق اعتمادات النائب'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php  ?>
-
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format(count($rows)) ?></div><div class="ems-stat-label">وارد الصندوق الموحد</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nPend) ?></div><div class="ems-stat-label">طلبات مالية منتظرة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nMine) ?></div><div class="ems-stat-label">ضمن نطاق نيابتك المسجل</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value">2</div><div class="ems-stat-label">رافدان مسميان</div></div>
-    </div>
-
-    <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>النوع</th><th>المرجع</th><th>الجهة المصدر</th><th>البيان</th><th>النطاق</th><th>التاريخ</th><th>فعله عند فاعله</th></tr></thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['kind']) ?></td>
-                    <td><?= htmlspecialchars($x0['ref']) ?></td>
-                    <td><?= htmlspecialchars($x0['src']) ?></td>
-                    <td><?= htmlspecialchars($x0['desc']) ?></td>
-                    <td><?= htmlspecialchars($x0['mine']) ?></td>
-                    <td><?= htmlspecialchars($x0['at']) ?></td>
-                    <td><a href="<?= htmlspecialchars($x0['link']) ?>"><?= htmlspecialchars($x0['label']) ?></a></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="7">لا وارد منتظرا في الرافدين</td></tr><?php endif; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="ems-note-box">
-        شاشة واحدة والمحرك يحدد اي نائب يستلم اي طلب، نص الحبة نفسه: التوجيه لمستوى النائب
-        يحكمه محرك الاعتماد بمصفوفته، ونطاق نيابتك يعلم على الصف من سجل التكليفات والرؤية اوسع من الصلاحية.
-        الفعل في صندوق الاعتمادات وبوابة الطلبات ولا كتابة هنا.
-    </div>
 </div>
 </body>
 </html>

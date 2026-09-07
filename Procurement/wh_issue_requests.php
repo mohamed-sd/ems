@@ -63,6 +63,66 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'طلبات الصرف الواردة'; $header_icon = 'fa fa-inbox'; $header_actions = array();
     $header_back = array('href' => 'issue_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سند الصرف');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">طلبات صرف واردة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $pending ?></div><div class="ems-stat-label">تنتظر الاعتماد</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $partial ?></div><div class="ems-stat-label">اعتمدت ولم تصرف</div></div>
+    </div>
+
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w9_ir_st">حالة الطلب</label><select name="state" id="w9_ir_st" onchange="this.form.submit()">
+            <option value="">الكل</option>
+            <?php foreach (array_keys($choices) as $c): ?>
+                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا طلبات صرف واردة', 'الطلب من الجهة والسند من المخزن. وخفض المعتمد عن المطلوب بسبب مكتوب'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>رمز الطلب</th><th>المخزن</th><th>الجهة الطالبة</th><th>الغرض</th><th>تاريخ الحاجة</th><th>الأولوية</th><th>سند الصرف</th><th>الحالة</th><th>سبب الرفض</th><th>البنود</th></tr></thead>
+        <tbody>
+        <?php if ($rows): foreach ($rows as $r): ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $r['code']) ?></td>
+                <td><?= htmlspecialchars(isset($whs[(int) $r['warehouse_id']]) ? $whs[(int) $r['warehouse_id']] : '') ?></td>
+                <td><?= htmlspecialchars((string) $r['requesting_dept']) ?></td>
+                <td><?= htmlspecialchars((string) $r['purpose']) ?></td>
+                <td><?= htmlspecialchars((string) $r['need_date']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['priority'], $conn)) ?></td>
+                <td><?= ((int) $r['issue_id'] > 0 ? (int) $r['issue_id'] : '') ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
+                <td><a href="?req=<?= (int) $r['id'] ?>">عرض البنود</a></td>
+            </tr>
+        <?php endforeach; endif; ?>
+        </tbody>
+    </table></div>
+
+    <?php if ($open > 0): ?>
+    <h3 class="ems-section-title">بنود طلب الصرف</h3>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>الصنف</th><th>المطلوب</th><th>المعتمد</th><th>المصروف</th><th>المتبقي</th><th>سبب خفض المعتمد</th></tr></thead>
+        <tbody>
+        <?php if ($lines): foreach ($lines as $l): $rem = (float) $l['qty_approved'] - (float) $l['qty_issued']; ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $l['item_name']) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['qty_requested'], 3)) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['qty_approved'], 3)) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['qty_issued'], 3)) ?></td>
+                <td><?= htmlspecialchars(number_format($rem, 3)) ?></td>
+                <td><?= htmlspecialchars((string) $l['cut_reason']) ?></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="6">لا بنود لهذا الطلب</td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table></div>
+    <?php endif; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -130,65 +190,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('wh_issue_requests');
         echo ems_w14_grid('emsList_wh_issue_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php  ?>
-
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">طلبات صرف واردة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $pending ?></div><div class="ems-stat-label">تنتظر الاعتماد</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $partial ?></div><div class="ems-stat-label">اعتمدت ولم تصرف</div></div>
-    </div>
-
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w9_ir_st">حالة الطلب</label><select name="state" id="w9_ir_st" onchange="this.form.submit()">
-            <option value="">الكل</option>
-            <?php foreach (array_keys($choices) as $c): ?>
-                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا طلبات صرف واردة', 'الطلب من الجهة والسند من المخزن. وخفض المعتمد عن المطلوب بسبب مكتوب'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>رمز الطلب</th><th>المخزن</th><th>الجهة الطالبة</th><th>الغرض</th><th>تاريخ الحاجة</th><th>الأولوية</th><th>سند الصرف</th><th>الحالة</th><th>سبب الرفض</th><th>البنود</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                <td><?= htmlspecialchars((string) $r['code']) ?></td>
-                <td><?= htmlspecialchars(isset($whs[(int) $r['warehouse_id']]) ? $whs[(int) $r['warehouse_id']] : '') ?></td>
-                <td><?= htmlspecialchars((string) $r['requesting_dept']) ?></td>
-                <td><?= htmlspecialchars((string) $r['purpose']) ?></td>
-                <td><?= htmlspecialchars((string) $r['need_date']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['priority'], $conn)) ?></td>
-                <td><?= ((int) $r['issue_id'] > 0 ? (int) $r['issue_id'] : '') ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-                <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
-                <td><a href="?req=<?= (int) $r['id'] ?>">عرض البنود</a></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
-
-    <?php if ($open > 0): ?>
-    <h3 class="ems-section-title">بنود طلب الصرف</h3>
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>الصنف</th><th>المطلوب</th><th>المعتمد</th><th>المصروف</th><th>المتبقي</th><th>سبب خفض المعتمد</th></tr></thead>
-        <tbody>
-        <?php if ($lines): foreach ($lines as $l): $rem = (float) $l['qty_approved'] - (float) $l['qty_issued']; ?>
-            <tr>
-                <td><?= htmlspecialchars((string) $l['item_name']) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['qty_requested'], 3)) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['qty_approved'], 3)) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['qty_issued'], 3)) ?></td>
-                <td><?= htmlspecialchars(number_format($rem, 3)) ?></td>
-                <td><?= htmlspecialchars((string) $l['cut_reason']) ?></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="6">لا بنود لهذا الطلب</td></tr>
-        <?php endif; ?>
-        </tbody>
-    </table></div>
-    <?php endif; ?>
 </div>
 </body></html>

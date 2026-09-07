@@ -126,50 +126,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php'; ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_tre_beneficiary')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المستفيد' => 'g202',
-            'اسم المستفيد' => 'g203',
-            'نوع المستفيد' => 'g204',
-            'رقم الحساب/IBAN' => 'g205',
-            'البنك' => 'g206',
-            'وثيقة التحقق' => 'g207',
-            'تاريخ التحقق' => 'g208',
-            'محقق مستقل' => 'g209',
-            'تغيير حساب معلق؟' => 'g210',
-            'حالة التحقق' => 'g211',
-            'المنشئ' => 'g212',
-            'تاريخ الإنشاء' => 'g213',
-            'حالة البيانات' => 'g214',
-            'مرجع المصدر' => 'g215',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('tre_beneficiary');
-        echo ems_w14_grid('emsList_tre_beneficiary', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المستفيدين والتحقق'); /* /GUIDE_COLS */ ?>
-    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
-         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
-         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
-    require_once __DIR__ . '/../includes/w14_guide_form.php';
-    ems_w14_guide_form(array(
-        'surfaces' => array('سجل المستفيدين والتحقق', 'سجل المستفيدين والتحقق'),
-        'table'    => 'tre_beneficiary',
-        'cols'     => $GUIDE_COLS,
-        'screen'   => 'finance/tre_beneficiary.php',
-    )); ?>
-
-    </div></div></div>
     <?php 
   echo ems_states_bundle('لا مستفيد مسجل بعد',
       'الحساب يسجل ثم يتحقق منه غير منشئه — ولا صرف إلى حساب غير متحقق');
@@ -237,4 +193,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endforeach; ?>
     </tbody>
   </table>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
+         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
+         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tre_beneficiary')); ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المستفيد' => 'g202',
+            'اسم المستفيد' => 'g203',
+            'نوع المستفيد' => 'g204',
+            'رقم الحساب/IBAN' => 'g205',
+            'البنك' => 'g206',
+            'وثيقة التحقق' => 'g207',
+            'تاريخ التحقق' => 'g208',
+            'محقق مستقل' => 'g209',
+            'تغيير حساب معلق؟' => 'g210',
+            'حالة التحقق' => 'g211',
+            'المنشئ' => 'g212',
+            'تاريخ الإنشاء' => 'g213',
+            'حالة البيانات' => 'g214',
+            'مرجع المصدر' => 'g215',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tre_beneficiary');
+        echo ems_w14_grid('emsList_tre_beneficiary', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المستفيدين والتحقق'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('سجل المستفيدين والتحقق', 'سجل المستفيدين والتحقق'),
+        'table'    => 'tre_beneficiary',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'finance/tre_beneficiary.php',
+    )); ?>
+
+    </div></div></div>
 </div>

@@ -52,6 +52,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الإصلاح الخارجي ومطالبات الضمان'; $header_icon = 'fa fa-screwdriver-wrench'; $header_actions = array();
     $header_back = array('href' => 'orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر العمل');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر خارجية</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $warranty ?></div><div class="ems-stat-label">مطالبات ضمان</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $cost ?></div><div class="ems-stat-label">التكلفة الفعلية</div></div>
+    </div>
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w7_er_k">نوع السطر</label><select name="line_kind" id="w7_er_k" onchange="this.form.submit()">
+            <option value="">الكل</option>
+            <?php foreach (array_keys($choices) as $c): ?>
+                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا إحالات خارجية ولا مطالبات ضمان', 'الإحالة تفتح من أمر عمل. ومطالبة الضمان بمرجع عقد المورد'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th><th>أمر العمل</th><th>النوع</th><th>مرجع العقد</th><th>نطاق العمل</th><th>التكلفة المقدرة</th><th>التكلفة الفعلية</th><th>نتيجة المطالبة</th><th>محضر الاستلام</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
+        <tbody>
+        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
+            <tr>
+                <td><?= $i ?></td>
+                <td><?= htmlspecialchars(isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : ('#' . (int) $r['order_id'])) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['line_kind'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $r['contract_ref']) ?></td>
+                <td><small><?= htmlspecialchars(mb_substr((string) $r['scope_ar'], 0, 120)) ?></small></td>
+                <td><?= htmlspecialchars((string) $r['estimated_cost']) ?></td>
+                <td><?= htmlspecialchars((string) $r['actual_cost']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['claim_result'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $r['receipt_ref']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="11">لا إحالات خارجية ولا مطالبات ضمان.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -99,43 +137,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     )); ?>
 
     </div></div></div>
-    <?php  ?>
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر خارجية</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $warranty ?></div><div class="ems-stat-label">مطالبات ضمان</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $cost ?></div><div class="ems-stat-label">التكلفة الفعلية</div></div>
-    </div>
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w7_er_k">نوع السطر</label><select name="line_kind" id="w7_er_k" onchange="this.form.submit()">
-            <option value="">الكل</option>
-            <?php foreach (array_keys($choices) as $c): ?>
-                <option value="<?= htmlspecialchars($c) ?>" <?= $pick === $c ? 'selected' : '' ?>><?= htmlspecialchars(ems_w7_ar($c, $conn)) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا إحالات خارجية ولا مطالبات ضمان', 'الإحالة تفتح من أمر عمل. ومطالبة الضمان بمرجع عقد المورد'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>أمر العمل</th><th>النوع</th><th>مرجع العقد</th><th>نطاق العمل</th><th>التكلفة المقدرة</th><th>التكلفة الفعلية</th><th>نتيجة المطالبة</th><th>محضر الاستلام</th><th>حالة السطر</th><th>قاعدة الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
-            <tr>
-                <td><?= $i ?></td>
-                <td><?= htmlspecialchars(isset($orders[(int) $r['order_id']]) ? $orders[(int) $r['order_id']] : ('#' . (int) $r['order_id'])) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['line_kind'], $conn)) ?></td>
-                <td><?= htmlspecialchars((string) $r['contract_ref']) ?></td>
-                <td><small><?= htmlspecialchars(mb_substr((string) $r['scope_ar'], 0, 120)) ?></small></td>
-                <td><?= htmlspecialchars((string) $r['estimated_cost']) ?></td>
-                <td><?= htmlspecialchars((string) $r['actual_cost']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['claim_result'], $conn)) ?></td>
-                <td><?= htmlspecialchars((string) $r['receipt_ref']) ?></td>
-                <td><?= htmlspecialchars(ems_w7_ar((string) $r['state'], $conn)) ?></td>
-                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="11">لا إحالات خارجية ولا مطالبات ضمان.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
 </div>
 </body></html>

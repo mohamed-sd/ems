@@ -59,6 +59,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => '../Tickets/tickets_list.php', 'class' => 'ems-btn', 'icon' => 'fa fa-plus', 'label' => 'مركز البلاغات'));
     $header_back = array('href' => 'orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر العمل');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $n ?></div><div class="ems-stat-label">بلاغات مستلمة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $stopped ?></div><div class="ems-stat-label">أوقفت المعدة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $noOrder ?></div><div class="ems-stat-label">بلا أمر عمل بعد</div></div>
+    </div>
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w7_bi_st">حالة البلاغ</label><select name="state" id="w7_bi_st" onchange="this.form.submit()">
+            <option value="">كل الحالات</option>
+            <?php foreach (array_keys($states) as $s): ?>
+                <option value="<?= htmlspecialchars($s) ?>" <?= $state === $s ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا بلاغات محالة إلى الصيانة', 'البلاغ ينشأ في مركز البلاغات ويصل هنا محالا. ولا ينشأ من هذه الشاشة'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th><th>كود البلاغ</th><th>المعدة</th><th>وقت البلاغ</th><th>الجهة المبلغة</th>
+            <th>أوقفت المعدة</th><th>الوصف</th><th>حالة البلاغ</th><th>أمر العمل</th></tr></thead>
+        <tbody>
+        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; $bid = (int) $r['id']; ?>
+            <tr><td><?= $i ?></td>
+                <td><?= htmlspecialchars((string) $r['code']) ?></td>
+                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
+                <td><?= htmlspecialchars((string) $r['report_datetime']) ?></td>
+                <td><?= htmlspecialchars((string) $r['reporter_dept']) ?></td>
+                <td><?= ((int) $r['is_stopped'] === 1 ? 'نعم' : 'لا') ?></td>
+                <td><small><?= htmlspecialchars(mb_substr((string) $r['description'], 0, 120)) ?></small></td>
+                <td><?= htmlspecialchars((string) $r['state']) ?></td>
+                <td><?= isset($ordered[$bid]) ? htmlspecialchars($ordered[$bid]) : 'لم يفتح بعد' ?></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="9">لا بلاغات محالة إلى الصيانة.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -122,41 +158,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('mnt_breakdown_intake');
         echo ems_w14_grid('emsList_mnt_breakdown_intake', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البلاغ الفني واستقبال العطل'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php  ?>
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $n ?></div><div class="ems-stat-label">بلاغات مستلمة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $stopped ?></div><div class="ems-stat-label">أوقفت المعدة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $noOrder ?></div><div class="ems-stat-label">بلا أمر عمل بعد</div></div>
-    </div>
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w7_bi_st">حالة البلاغ</label><select name="state" id="w7_bi_st" onchange="this.form.submit()">
-            <option value="">كل الحالات</option>
-            <?php foreach (array_keys($states) as $s): ?>
-                <option value="<?= htmlspecialchars($s) ?>" <?= $state === $s ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا بلاغات محالة إلى الصيانة', 'البلاغ ينشأ في مركز البلاغات ويصل هنا محالا. ولا ينشأ من هذه الشاشة'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>كود البلاغ</th><th>المعدة</th><th>وقت البلاغ</th><th>الجهة المبلغة</th>
-            <th>أوقفت المعدة</th><th>الوصف</th><th>حالة البلاغ</th><th>أمر العمل</th></tr></thead>
-        <tbody>
-        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; $bid = (int) $r['id']; ?>
-            <tr><td><?= $i ?></td>
-                <td><?= htmlspecialchars((string) $r['code']) ?></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $r['report_datetime']) ?></td>
-                <td><?= htmlspecialchars((string) $r['reporter_dept']) ?></td>
-                <td><?= ((int) $r['is_stopped'] === 1 ? 'نعم' : 'لا') ?></td>
-                <td><small><?= htmlspecialchars(mb_substr((string) $r['description'], 0, 120)) ?></small></td>
-                <td><?= htmlspecialchars((string) $r['state']) ?></td>
-                <td><?= isset($ordered[$bid]) ? htmlspecialchars($ordered[$bid]) : 'لم يفتح بعد' ?></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="9">لا بلاغات محالة إلى الصيانة.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
 </div>
 </body></html>

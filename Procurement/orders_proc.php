@@ -317,41 +317,6 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_orders_proc
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم الأمر' => 'g91',
-            'تاريخ الأمر' => 'g92',
-            'رقم المحضر' => 'g93',
-            'رقم المورد' => 'g94',
-            'عقد إطاري مرجعي' => 'g95',
-            'عدد البنود تفصيلها ش07-2' => 'g96',
-            'القيمة الإجمالية' => 'g97',
-            'العملة' => 'g98',
-            'وقت الدفع' => 'g99',
-            'نوع الاستلام' => 'g100',
-            'مكان التسليم' => 'g101',
-            'تاريخ التوريد المتفق' => 'g102',
-            'غرامة التأخير' => 'g103',
-            'حالة الأمر' => 'g104',
-            'المنشئ' => 'g105',
-            'تاريخ الإنشاء' => 'g106',
-            'المراجع' => 'g107',
-            'المعتمد' => 'g108',
-            'تاريخ الاعتماد' => 'g109',
-            'حالة البيانات' => 'g110',
-            'مرجع المصدر' => 'g111',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_orders_proc');
-        echo ems_w14_grid('emsList_prc_orders_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أوامر الشراء'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا أوامر شراء مطابقة للفلاتر الحالية',
@@ -703,6 +668,41 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             </table>
         </div>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_orders_proc
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الأمر' => 'g91',
+            'تاريخ الأمر' => 'g92',
+            'رقم المحضر' => 'g93',
+            'رقم المورد' => 'g94',
+            'عقد إطاري مرجعي' => 'g95',
+            'عدد البنود تفصيلها ش07-2' => 'g96',
+            'القيمة الإجمالية' => 'g97',
+            'العملة' => 'g98',
+            'وقت الدفع' => 'g99',
+            'نوع الاستلام' => 'g100',
+            'مكان التسليم' => 'g101',
+            'تاريخ التوريد المتفق' => 'g102',
+            'غرامة التأخير' => 'g103',
+            'حالة الأمر' => 'g104',
+            'المنشئ' => 'g105',
+            'تاريخ الإنشاء' => 'g106',
+            'المراجع' => 'g107',
+            'المعتمد' => 'g108',
+            'تاريخ الاعتماد' => 'g109',
+            'حالة البيانات' => 'g110',
+            'مرجع المصدر' => 'g111',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_orders_proc');
+        echo ems_w14_grid('emsList_prc_orders_proc', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أوامر الشراء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

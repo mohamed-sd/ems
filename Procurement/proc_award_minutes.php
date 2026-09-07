@@ -62,37 +62,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'محضر المقارنة والترسية'; $header_icon = 'fa fa-gavel'; $header_actions = array();
     $header_back = array('href' => 'proc_offers.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'عروض الموردين');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_award_minutes
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'رقم المحضر' => 'g36',
-            'رقم طلب العروض' => 'g37',
-            'العروض المقارنة' => 'g38',
-            'جدول المقارنة' => 'g39',
-            'العرض المرسى عليه' => 'g40',
-            'قيمة الترسية' => 'g41',
-            'مبرر الاختيار' => 'g42',
-            'تفصيل المبرر' => 'g43',
-            'أعضاء اللجنة' => 'g44',
-            'حالة الترسية' => 'g45',
-            'المنشئ' => 'g46',
-            'تاريخ الإنشاء' => 'g47',
-            'المراجع' => 'g48',
-            'المعتمد' => 'g49',
-            'تاريخ الاعتماد' => 'g50',
-            'حالة البيانات' => 'g51',
-            'مرجع المصدر' => 'g52',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('prc_proc_award_minutes');
-        echo ems_w14_grid('emsList_prc_proc_award_minutes', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في محضر المقارنة والترسية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php  ?>
 
     <div class="ems-stat-cards">
@@ -133,5 +102,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endforeach; endif; ?>
         </tbody>
     </table></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_award_minutes
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المحضر' => 'g36',
+            'رقم طلب العروض' => 'g37',
+            'العروض المقارنة' => 'g38',
+            'جدول المقارنة' => 'g39',
+            'العرض المرسى عليه' => 'g40',
+            'قيمة الترسية' => 'g41',
+            'مبرر الاختيار' => 'g42',
+            'تفصيل المبرر' => 'g43',
+            'أعضاء اللجنة' => 'g44',
+            'حالة الترسية' => 'g45',
+            'المنشئ' => 'g46',
+            'تاريخ الإنشاء' => 'g47',
+            'المراجع' => 'g48',
+            'المعتمد' => 'g49',
+            'تاريخ الاعتماد' => 'g50',
+            'حالة البيانات' => 'g51',
+            'مرجع المصدر' => 'g52',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_award_minutes');
+        echo ems_w14_grid('emsList_prc_proc_award_minutes', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في محضر المقارنة والترسية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body></html>

@@ -60,6 +60,70 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'عروض الموردين المستلمة'; $header_icon = 'fa fa-file-invoice'; $header_actions = array();
     $header_back = array('href' => 'proc_rfq.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'طلب العروض');
     include('../includes/page_header.php'); ?>
+    <?php  ?>
+
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عروض مستلمة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $lateN ?></div><div class="ems-stat-label">وردت بعد الموعد</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $altN ?></div><div class="ems-stat-label">بنود بديلة معلنة</div></div>
+    </div>
+
+    <form method="get" action="" class="ems-filters">
+        <div class="field"><label for="w9_off_rfq">طلب العروض</label><select name="rfq" id="w9_off_rfq" onchange="this.form.submit()">
+            <option value="0">الكل</option>
+            <?php foreach ($rfqs as $id => $q): ?>
+                <option value="<?= (int) $id ?>" <?= $rfqPick === (int) $id ? 'selected' : '' ?>><?= htmlspecialchars((string) $q['code']) ?></option>
+            <?php endforeach; ?>
+        </select></div>
+    </form>
+
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا عروض مستلمة', 'العرض من مورد مدعو وحده. والوارد بعد الموعد يوسم ولا يحذف'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>مرجع العرض</th><th>طلب العروض</th><th>المورد</th><th>تاريخ التقديم</th><th>سار حتى</th><th>العملة</th><th>الإجمالي</th><th>بالأساس</th><th>البنود</th><th>مدة التوريد</th><th>ورد بعد الموعد</th><th>البنود</th></tr></thead>
+        <tbody>
+        <?php if ($rows): foreach ($rows as $r): $q = isset($rfqs[(int) $r['rfq_id']]) ? $rfqs[(int) $r['rfq_id']] : null; ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $r['offer_ref']) ?></td>
+                <td><?= htmlspecialchars($q ? (string) $q['code'] : ('#' . (int) $r['rfq_id'])) ?></td>
+                <td><?= htmlspecialchars(isset($sups[(int) $r['supplier_id']]) ? $sups[(int) $r['supplier_id']] : ('#' . (int) $r['supplier_id'])) ?></td>
+                <td><?= htmlspecialchars((string) $r['submitted_at']) ?></td>
+                <td><?= htmlspecialchars((string) $r['valid_until']) ?></td>
+                <td><?= htmlspecialchars((string) $r['currency']) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $r['total_amount'], 2)) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $r['base_amount'], 2)) ?></td>
+                <td><?= (int) $r['line_count'] ?></td>
+                <td><?= (int) $r['delivery_days'] ?></td>
+                <td><?= ((int) $r['late'] === 1 ? 'نعم' : 'لا') ?></td>
+                <td><a href="?offer=<?= (int) $r['id'] ?>">عرض البنود</a></td>
+            </tr>
+        <?php endforeach; endif; ?>
+        </tbody>
+    </table></div>
+
+    <?php if ($open > 0): ?>
+    <h3 class="ems-section-title">بنود العرض</h3>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>الصنف</th><th>بند الطلب</th><th>الكمية المعروضة</th><th>سعر الوحدة</th><th>الإجمالي</th><th>العلامة التجارية</th><th>بديل</th><th>سبب البديل</th></tr></thead>
+        <tbody>
+        <?php if ($lines): foreach ($lines as $l): ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $l['item_name']) ?></td>
+                <td><?= (int) $l['request_line_id'] ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['qty_offered'], 3)) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['unit_price'], 4)) ?></td>
+                <td><?= htmlspecialchars(number_format((float) $l['subtotal'], 2)) ?></td>
+                <td><?= htmlspecialchars((string) $l['brand']) ?></td>
+                <td><?= ((int) $l['is_alternative'] === 1 ? 'نعم' : 'لا') ?></td>
+                <td><?= htmlspecialchars((string) $l['alt_why']) ?></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="8">لا بنود لهذا العرض</td></tr>
+        <?php endif; ?>
+        </tbody>
+    </table></div>
+    <?php endif; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -146,69 +210,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $__gridRows = ems_w14_guide_rows('prc_offer_compare');
         echo ems_w14_grid('emsList_prc_offer_compare', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عروض الموردين المستلمة'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php  ?>
-
-    <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عروض مستلمة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $lateN ?></div><div class="ems-stat-label">وردت بعد الموعد</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $altN ?></div><div class="ems-stat-label">بنود بديلة معلنة</div></div>
-    </div>
-
-    <form method="get" action="" class="ems-filters">
-        <div class="field"><label for="w9_off_rfq">طلب العروض</label><select name="rfq" id="w9_off_rfq" onchange="this.form.submit()">
-            <option value="0">الكل</option>
-            <?php foreach ($rfqs as $id => $q): ?>
-                <option value="<?= (int) $id ?>" <?= $rfqPick === (int) $id ? 'selected' : '' ?>><?= htmlspecialchars((string) $q['code']) ?></option>
-            <?php endforeach; ?>
-        </select></div>
-    </form>
-
-    <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا عروض مستلمة', 'العرض من مورد مدعو وحده. والوارد بعد الموعد يوسم ولا يحذف'); ?>
-
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>مرجع العرض</th><th>طلب العروض</th><th>المورد</th><th>تاريخ التقديم</th><th>سار حتى</th><th>العملة</th><th>الإجمالي</th><th>بالأساس</th><th>البنود</th><th>مدة التوريد</th><th>ورد بعد الموعد</th><th>البنود</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): $q = isset($rfqs[(int) $r['rfq_id']]) ? $rfqs[(int) $r['rfq_id']] : null; ?>
-            <tr>
-                <td><?= htmlspecialchars((string) $r['offer_ref']) ?></td>
-                <td><?= htmlspecialchars($q ? (string) $q['code'] : ('#' . (int) $r['rfq_id'])) ?></td>
-                <td><?= htmlspecialchars(isset($sups[(int) $r['supplier_id']]) ? $sups[(int) $r['supplier_id']] : ('#' . (int) $r['supplier_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $r['submitted_at']) ?></td>
-                <td><?= htmlspecialchars((string) $r['valid_until']) ?></td>
-                <td><?= htmlspecialchars((string) $r['currency']) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $r['total_amount'], 2)) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $r['base_amount'], 2)) ?></td>
-                <td><?= (int) $r['line_count'] ?></td>
-                <td><?= (int) $r['delivery_days'] ?></td>
-                <td><?= ((int) $r['late'] === 1 ? 'نعم' : 'لا') ?></td>
-                <td><a href="?offer=<?= (int) $r['id'] ?>">عرض البنود</a></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
-
-    <?php if ($open > 0): ?>
-    <h3 class="ems-section-title">بنود العرض</h3>
-    <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>الصنف</th><th>بند الطلب</th><th>الكمية المعروضة</th><th>سعر الوحدة</th><th>الإجمالي</th><th>العلامة التجارية</th><th>بديل</th><th>سبب البديل</th></tr></thead>
-        <tbody>
-        <?php if ($lines): foreach ($lines as $l): ?>
-            <tr>
-                <td><?= htmlspecialchars((string) $l['item_name']) ?></td>
-                <td><?= (int) $l['request_line_id'] ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['qty_offered'], 3)) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['unit_price'], 4)) ?></td>
-                <td><?= htmlspecialchars(number_format((float) $l['subtotal'], 2)) ?></td>
-                <td><?= htmlspecialchars((string) $l['brand']) ?></td>
-                <td><?= ((int) $l['is_alternative'] === 1 ? 'نعم' : 'لا') ?></td>
-                <td><?= htmlspecialchars((string) $l['alt_why']) ?></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="8">لا بنود لهذا العرض</td></tr>
-        <?php endif; ?>
-        </tbody>
-    </table></div>
-    <?php endif; ?>
 </div>
 </body></html>

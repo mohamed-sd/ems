@@ -67,6 +67,24 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = array();
     $header_back    = array('href' => 'clients.php', 'class' => '', 'label' => 'سجل العملاء');
     include __DIR__ . '/../includes/page_header.php'; ?>
+    <?php 
+    if (isset($_GET['msg'])) {
+        echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
+    }
+
+    if ($client === null) {
+        /* ◆ **ولا يُصيَّر نموذجٌ بلا طرف**: صفٌّ بلا عميلٍ مرجعيٍّ يُكتَب ثم لا
+             يُعرَف صاحبُه — فيُمنع الإدخالُ ويُشرَح السبب. */
+        echo '<div class="card"><div class="card-body"><p class="pc-note">'
+           . '<strong>افتح هذا التبويب من ملف عميل بعينه</strong> — '
+           . 'جهة الاتصال تابعة لعميل، ولا تسجل بلا طرف مرجعي.'
+           . ' <a href="clients.php">سجل العملاء</a></p></div></div>';
+    } else {
+        $label = (string) (isset($client['legal_name']) && $client['legal_name'] !== ''
+            ? $client['legal_name'] : (isset($client['client_name']) ? $client['client_name'] : ('#' . $CID)));
+        echo ems_pc_render(ems_pc_rows($conn, 'client', $CID), $label, $canEdit);
+    }
+    ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
@@ -93,24 +111,6 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         $__gridRows = ems_w14_guide_rows('sal_client_contacts');
         echo ems_w14_grid('emsList_sal_client_contacts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في جهات اتصال العملاء'); /* /GUIDE_COLS */ ?>
     </div></div></div>
-    <?php 
-    if (isset($_GET['msg'])) {
-        echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
-    }
-
-    if ($client === null) {
-        /* ◆ **ولا يُصيَّر نموذجٌ بلا طرف**: صفٌّ بلا عميلٍ مرجعيٍّ يُكتَب ثم لا
-             يُعرَف صاحبُه — فيُمنع الإدخالُ ويُشرَح السبب. */
-        echo '<div class="card"><div class="card-body"><p class="pc-note">'
-           . '<strong>افتح هذا التبويب من ملف عميل بعينه</strong> — '
-           . 'جهة الاتصال تابعة لعميل، ولا تسجل بلا طرف مرجعي.'
-           . ' <a href="clients.php">سجل العملاء</a></p></div></div>';
-    } else {
-        $label = (string) (isset($client['legal_name']) && $client['legal_name'] !== ''
-            ? $client['legal_name'] : (isset($client['client_name']) ? $client['client_name'] : ('#' . $CID)));
-        echo ems_pc_render(ems_pc_rows($conn, 'client', $CID), $label, $canEdit);
-    }
-    ?>
 </div>
 </body>
 </html>

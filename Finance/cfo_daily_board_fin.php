@@ -140,27 +140,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف المؤشر' => 'g153',
-            'المؤشر KPI Catalog' => 'g154',
-            'القيمة' => 'g155',
-            'الوحدة' => 'g156',
-            'العملة' => 'g157',
-            'الحالة' => 'g158',
-            'آخر تحديث' => 'g159',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_dashboard_kpi');
-        echo ems_w14_grid('emsList_exec_board_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المالية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
     echo ems_states_bundle('لا أرقام يوم لهذا التاريخ بعد', 'افتح سجل المصدر من أي بطاقة — والأرقام تظهر متى سجلت حركات اليوم');
@@ -206,6 +185,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table></div>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المؤشر' => 'g153',
+            'المؤشر KPI Catalog' => 'g154',
+            'القيمة' => 'g155',
+            'الوحدة' => 'g156',
+            'العملة' => 'g157',
+            'الحالة' => 'g158',
+            'آخر تحديث' => 'g159',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_dashboard_kpi');
+        echo ems_w14_grid('emsList_exec_board_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المالية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 </body>

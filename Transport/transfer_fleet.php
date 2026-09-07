@@ -131,38 +131,6 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_fleet
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'كود الناقلة' => 'g26',
-            'النوع' => 'g27',
-            'رقم اللوحة' => 'g28',
-            'المالك' => 'g29',
-            'مرجع المورد عند التأجير' => 'g30',
-            'السعة الوزنية (طن)' => 'g31',
-            'الطول والعرض المسموحان' => 'g32',
-            'عدد المحاور' => 'g33',
-            'رخصة السير وانتهاؤها' => 'g34',
-            'تأمين البضاعة وانتهاؤه' => 'g35',
-            'تصاريح المسار السارية' => 'g36',
-            'فحص المطابقة مع الحمولة' => 'g37',
-            'حالة الناقلة' => 'g38',
-            'المنشئ' => 'g39',
-            'تاريخ الإنشاء' => 'g40',
-            'حالة البيانات' => 'g41',
-            'مرجع المصدر' => 'g42',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('trp_transfer_fleet');
-        echo ems_w14_grid('emsList_trp_transfer_fleet', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في اللوابد والمركبات الناقلة'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
-
     <?php
     $header_title = 'اللوابد والمركبات الناقلة';
     $header_icon = 'fa fa-trailer';
@@ -280,6 +248,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </table>
         </div>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_fleet
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود الناقلة' => 'g26',
+            'النوع' => 'g27',
+            'رقم اللوحة' => 'g28',
+            'المالك' => 'g29',
+            'مرجع المورد عند التأجير' => 'g30',
+            'السعة الوزنية (طن)' => 'g31',
+            'الطول والعرض المسموحان' => 'g32',
+            'عدد المحاور' => 'g33',
+            'رخصة السير وانتهاؤها' => 'g34',
+            'تأمين البضاعة وانتهاؤه' => 'g35',
+            'تصاريح المسار السارية' => 'g36',
+            'فحص المطابقة مع الحمولة' => 'g37',
+            'حالة الناقلة' => 'g38',
+            'المنشئ' => 'g39',
+            'تاريخ الإنشاء' => 'g40',
+            'حالة البيانات' => 'g41',
+            'مرجع المصدر' => 'g42',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_fleet');
+        echo ems_w14_grid('emsList_trp_transfer_fleet', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في اللوابد والمركبات الناقلة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <script>

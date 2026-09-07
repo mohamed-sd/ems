@@ -101,33 +101,6 @@ function fin_stmt_rows($rows, $type_lbl)
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_fina_financial_statements_fin')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف السطر' => 'g212',
-            'الفترة' => 'g213',
-            'القائمة' => 'g214',
-            'البند' => 'g215',
-            'القيمة' => 'g216',
-            'فترة المقارنة' => 'g217',
-            'التغير' => 'g218',
-            'ملاحظة إفصاح' => 'g219',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_financial_statements_fin');
-        echo ems_w14_grid('emsList_fina_financial_statements_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القوائم المالية'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا قيود مرحلة تشتق منها القوائم بعد', 'رحل قيدا واحدا على الأقل من دفتر اليومية لتظهر القوائم الثلاث');
@@ -213,6 +186,33 @@ function fin_stmt_rows($rows, $type_lbl)
                 <th class="fin-stmt-num"><span class="badge badge-<?php echo $net_cash >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_cash, 2); ?></span></th></tr></tfoot>
         </table></div>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
+         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
+         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fina_financial_statements_fin')); ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g212',
+            'الفترة' => 'g213',
+            'القائمة' => 'g214',
+            'البند' => 'g215',
+            'القيمة' => 'g216',
+            'فترة المقارنة' => 'g217',
+            'التغير' => 'g218',
+            'ملاحظة إفصاح' => 'g219',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_financial_statements_fin');
+        echo ems_w14_grid('emsList_fina_financial_statements_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القوائم المالية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 </body>
 </html>

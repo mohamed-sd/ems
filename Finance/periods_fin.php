@@ -192,43 +192,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء فترة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php'); ?>
-    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
-         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
-    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
-         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
-         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
-    require_once __DIR__ . '/../includes/ems_filter_box.php';
-    ems_filter_box(array('for' => '#emsList_fina_periods_fin')); ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
-    <div class="card-body"><div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
-             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
-             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
-             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
-        $GUIDE_COLS = array(
-            'معرف الفترة' => 'g35',
-            'الشهر' => 'g36',
-            'قيود الفترة' => 'g37',
-            'قيود معلقة' => 'g38',
-            'مطابقة المخازن' => 'g39',
-            'مطابقة الخزينة' => 'g40',
-            'الإقفالات التشغيلية الواردة' => 'g41',
-            'فروق معالجة' => 'g42',
-            'قرار الإقفال' => 'g43',
-            'قرار إعادة الفتح' => 'g44',
-            'حالة الفترة' => 'g45',
-            'المنشئ' => 'g46',
-            'تاريخ الإنشاء' => 'g47',
-            'المراجع' => 'g48',
-            'المعتمد' => 'g49',
-            'تاريخ الاعتماد' => 'g50',
-            'حالة البيانات' => 'g51',
-            'مرجع المصدر' => 'g52',
-        );
-        $D = array();
-        $__gridRows = ems_w14_guide_rows('fina_periods_fin');
-        echo ems_w14_grid('emsList_fina_periods_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التقويم المحاسبي للفترات'); /* /GUIDE_COLS */ ?>
-    </div></div></div>
     <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
     echo ems_states_bundle('لا فترات مالية منشأة بعد', 'أنشئ فترة بزر «إنشاء فترة» في رأس الشاشة ثم استوف قائمة إقفالها');
@@ -369,6 +332,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
     </div></div>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
+         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
+         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fina_periods_fin')); ?>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الفترة' => 'g35',
+            'الشهر' => 'g36',
+            'قيود الفترة' => 'g37',
+            'قيود معلقة' => 'g38',
+            'مطابقة المخازن' => 'g39',
+            'مطابقة الخزينة' => 'g40',
+            'الإقفالات التشغيلية الواردة' => 'g41',
+            'فروق معالجة' => 'g42',
+            'قرار الإقفال' => 'g43',
+            'قرار إعادة الفتح' => 'g44',
+            'حالة الفترة' => 'g45',
+            'المنشئ' => 'g46',
+            'تاريخ الإنشاء' => 'g47',
+            'المراجع' => 'g48',
+            'المعتمد' => 'g49',
+            'تاريخ الاعتماد' => 'g50',
+            'حالة البيانات' => 'g51',
+            'مرجع المصدر' => 'g52',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_periods_fin');
+        echo ems_w14_grid('emsList_fina_periods_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التقويم المحاسبي للفترات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
