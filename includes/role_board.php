@@ -599,19 +599,40 @@ function roleBoardQuickActions($conn, $roleId, $userId, $limit = 3)
     $out = array();
     $rid = intval($roleId); $uid = intval($userId);
     try {
+        /* ⛔ **والترشيحُ بالحارسِ لا بجملةِ SQL** — وهو فرقٌ مقيسٌ لا تجميل:
+             `perm_nav_view_exists_sql` تقرأ `role_permissions` **وحدَها**، بينما
+             يُحكَم الوصولُ بطبقةِ القوالب. فبلاطةٌ تمرُّ بالجملةِ ويردُّها الحارسُ
+             عند النقرِ = **بلاطةٌ ميتة**: قِيس **15 بلاطةً في خمسِ جلساتٍ حيّة**
+             (ثلاثٌ لكلِّ واحدةٍ — أي كلُّ إنشائه السريع).
+           ◆ **والمعيارُ واحدٌ في كلِّ سطحٍ يُظهِر رابطًا**: ما يفتحه الحارسُ
+             يُعرَض وما يردُّه لا يُعرَض — تُسأل `check_page_permissions` نفسُها
+             التي تحرس الوجهة. وهو عينُ ما تفعله `getUnifiedQuickItems`.
+           ◆ **ويُجلَب فائضٌ ثمَّ يُقتطع**: الترشيحُ بعدَ الجلبِ، فلو بقي
+             `LIMIT $limit` في الجملةِ لعادت بلاطتانِ حيث تُرجى ثلاث. */
+        if (!function_exists('check_page_permissions')) {
+            require_once __DIR__ . '/permissions_helper.php';
+        }
         $rows = array();
         $q = $conn->prepare(
-            "SELECT n.label_ar, n.route, n.icon,
+            "SELECT n.label_ar, n.route, n.icon, n.permission_code,
                     (SELECT COUNT(*) FROM activity_logs a
                       WHERE a.user_id = ? AND a.url LIKE CONCAT('%', n.route, '%')) AS uses
                FROM nav_items n
               WHERE n.role_id = ? AND n.active = 1 AND n.door = 'DAILY'
-                AND (n.permission_code IS NULL OR " . perm_nav_view_exists_sql('n') . ")
-              ORDER BY uses DESC, n.sort_order ASC LIMIT " . intval($limit));
+              ORDER BY uses DESC, n.sort_order ASC LIMIT " . (intval($limit) * 8));
         $q->bind_param('ii', $uid, $rid);
         $q->execute();
         $res = $q->get_result();
-        while ($r = $res->fetch_assoc()) { $rows[] = $r; }
+        while ($r = $res->fetch_assoc()) {
+            $pc = trim((string) ($r['permission_code'] ?? ''));
+            if ($pc !== '') {                      /* بلا رمزٍ: حارسُه في وجهتِه */
+                $p = check_page_permissions($conn, $pc);
+                if (empty($p['can_view'])) { continue; }
+            }
+            unset($r['permission_code']);
+            $rows[] = $r;
+            if (count($rows) >= intval($limit)) { break; }
+        }
         $q->close();
         $out = $rows;
     } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'role_board quick'); error_log('role_board quick: ' . $t->getMessage()); }

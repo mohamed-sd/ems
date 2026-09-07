@@ -828,6 +828,9 @@ class TenantRegistry
         'stop_reason_codes' => array('type' => self::T_GLOBAL, 'soft' => false), // N-12: أسباب التعطل الستة — قاموس محكوم
         'roles' => array('type' => self::T_GLOBAL, 'soft' => false),
         'modules' => array('type' => self::T_GLOBAL, 'soft' => false),
+        /* أثرُ دمجِ هويّاتِ الشاشاتِ المكرَّرة (2028_06_06) — تابعٌ لـ`modules`
+           فيأخذ تصنيفَه: مرجعُ نظامٍ عامٌّ لا يخصُّ شركةً. */
+        'modules_identity_merge' => array('type' => self::T_GLOBAL, 'soft' => false),
         'link_groups' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_items' => array('type' => self::T_GLOBAL, 'soft' => false),
         // UXUI-01: سجلُّ التنقلِ المعياريُّ (مصفوفةُ الـ359) — تعريفُ نظامٍ لا بياناتُ شركة

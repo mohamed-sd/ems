@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-07 06:33:45
--- الجداول: 1249 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-08 03:12:13
+-- الجداول: 1250 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -15069,12 +15069,25 @@ CREATE TABLE `modules` (
   `display_order` int(11) DEFAULT 0 COMMENT 'ترتيب العرض في القوائم',
   `owner_dept_note` varchar(120) DEFAULT NULL COMMENT 'الإدارةُ المالكةُ نصًّا (nav09_file_map.owner_dept) — للوحداتِ المشترَكةِ بين أدوارٍ كثيرة',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_modules_code` (`code`),
   KEY `owner_role_id` (`owner_role_id`),
   KEY `idx_display_order` (`display_order`),
   KEY `ix_modules_group` (`group_id`),
   CONSTRAINT `modules_group_fk` FOREIGN KEY (`group_id`) REFERENCES `link_groups` (`id`) ON DELETE SET NULL,
   CONSTRAINT `modules_ibfk_1` FOREIGN KEY (`owner_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: modules_identity_merge ──
+CREATE TABLE `modules_identity_merge` (
+  `code` varchar(190) NOT NULL,
+  `kept_id` int(11) NOT NULL,
+  `dropped_ids` varchar(255) NOT NULL,
+  `owners_lost` varchar(255) NOT NULL DEFAULT '',
+  `rp_removed` int(11) NOT NULL DEFAULT 0,
+  `nav_moved` int(11) NOT NULL DEFAULT 0,
+  `merged_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: monthly_performance ──
 CREATE TABLE `monthly_performance` (

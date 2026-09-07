@@ -40,9 +40,32 @@ function head($m) { echo "\n── {$m}\n"; }
 $teardown = function () use ($conn) {
     $conn->query("DELETE FROM ownership_access_grants WHERE person_id IN (999301, 999302)");
     $conn->query("DELETE FROM sensitive_read_log WHERE person_id IN (999301, 999302)");
+    $conn->query("DELETE FROM gov_authority_grants WHERE user_id IN (999301, 999302)");
 };
 register_shutdown_function($teardown);
 $teardown();
+
+/* ── تغطيةُ المسبارِ بقالبٍ — شرطُ قياسٍ لا حاشية ─────────────────────────
+   ⛔ **العطبُ المقيس**: المسبارُ جلسةٌ بمعرِّفٍ صناعيٍّ (999301/999302) **لا
+     وجودَ له في `users`** ومن ثمَّ بلا قالبٍ نافذ. ومنذ صار السايدبارُ يُرشَّح
+     بحكمِ الحارسِ لغيرِ المغطَّى أيضًا (`unified_nav.php` §RPR-03)، صارت قائمةُ
+     هذا المسبارِ **فارغةً كلَّها** — فيمرُّ شرطُ «بابُ FIN غيرُ مُصيَّر» **لأنَّ
+     لا بابَ أصلًا**: أخضرُ كاذبٌ على صفرٍ مقيس.
+   ⚠ **والتغطيةُ لا تُصطنع اليوم**: `gov_policy_freeze.scope_code='grants'`
+     نافذٌ، فإصدارُ منحةٍ يُردُّ بـ«PERM-01: تجميد». ولا يُلتفُّ على تجميدِ
+     المالكِ من اختبار.
+   ⛔ **ولا يُستعار مستخدمٌ حقيقيٌّ مسبارًا**: تنظيفُ هذا الملفِّ يحذف
+     `ownership_access_grants` بمعرِّفِ المسبار — ولمستخدمِ الدورِ 26 الحيِّ
+     (#859) **منحتانِ حقيقيّتانِ نافذتان**، فاستعارتُه تمحوهما.
+   ⇒ **فالبنودُ التي تشترط التغطيةَ تُعلَّق بسببٍ مسمًّى**، لا تُمرَّر ولا تُرسَّب:
+     تعليقٌ يُقرأ خيرٌ من أخضرَ لا يقيس أو أحمرَ لا يدلّ. */
+$FREEZE_GRANTS = false;
+if ($__fz = $conn->query("SELECT active FROM gov_policy_freeze WHERE scope_code = 'grants' LIMIT 1")) {
+    $__fr = $__fz->fetch_assoc();
+    $FREEZE_GRANTS = $__fr && intval($__fr['active']) === 1;
+}
+$SKIP = 0;
+function skip($m, $why) { global $SKIP; $SKIP++; echo "  ⏸ معلَّق: {$m}\n       السبب: {$why}\n"; }
 
 head('① الدور 26 وحارس الثوابت');
 $r = $conn->query("SELECT name, status FROM roles WHERE id = 26")->fetch_assoc();
@@ -95,20 +118,59 @@ foreach (array(206, 207, 208, 212) as $m) {
         && $perm[$m]['can_edit'] == 0 && $perm[$m]['can_delete'] == 0, "الشاشة {$m}: عرضًا فقط (can_view وحدها)");
 }
 
+/* ── مسبارا ④/⑤ **مستخدمانِ حقيقيّانِ** لا معرِّفانِ مصطنعان ────────────────
+   ◆ **ولماذا**: منذ صار السايدبارُ يُرشَّح بحكمِ الحارسِ لغيرِ المغطَّى أيضًا،
+     صارت جلسةُ معرِّفٍ صناعيٍّ تُصيَّر **فارغةً** — فيمرُّ شرطُ «بابُ FIN غائب»
+     لأنَّ لا بابَ أصلًا: أخضرُ كاذبٌ على صفرٍ مقيس. ولا تُصطنع تغطيةٌ اليوم
+     (‏تجميدُ `grants` نافذٌ)، ولا يُلتفُّ على تجميدِ المالكِ من اختبار.
+   ◆ **والطبيعةُ وفَّرت المسبارَين**: في الدورِ 26 مستخدمانِ حيّانِ **كلاهما
+     مغطًّى بقالبٍ** ويفترقانِ في **منحةِ المجالِ وحدَها** — وهي عينُ المتغيِّرِ
+     المفحوص. فالقياسُ **قراءةٌ محضةٌ بلا كتابةٍ ولا تنظيفٍ ولا خطر**. */
+$probe = function ($withGrant) use ($conn) {
+    $sql = "SELECT u.id, u.username FROM users u
+             WHERE u.role = 26 AND u.status = 'active'
+               AND EXISTS (SELECT 1 FROM gov_authority_grants g
+                             JOIN gov_role_profiles p ON p.profile_id = g.profile_id AND p.state = 'active'
+                            WHERE g.user_id = u.id AND g.revoked_at IS NULL
+                              AND (g.valid_to IS NULL OR g.valid_to > NOW()))
+               AND " . ($withGrant ? '' : 'NOT ') . "EXISTS (
+                     SELECT 1 FROM ownership_access_grants o
+                      WHERE o.person_id = u.id AND o.state = 'active'
+                        AND o.permission_code = 'ownership.owner_view')
+             LIMIT 1";
+    $r = $conn->query($sql);
+    return $r ? $r->fetch_assoc() : null;
+};
+
 head('④ بلا منحة لا يُصيَّر باب FIN — fail-closed');
-$_SESSION['user'] = array('id' => $U_NOGRANT, 'role' => '26', 'company_id' => $CO, 'name' => 'FIN26 Probe');
-$items = getUnifiedNavItems($conn, 26);
-$doors = array_unique(array_map(function ($i) { return $i['door']; }, $items));
-check(!in_array('FIN', $doors, true), 'مستخدم الدور 26 بلا منحة: باب FIN غير مُصيَّر أصلًا');
-check(in_array('HOME', $doors, true) && in_array('GOV', $doors, true), 'وسائر أبوابه (HOME · GOV) ظاهرة — الحجب على FIN وحده');
+$p4 = $probe(false);
+if (!$p4) {
+    skip('مستخدم الدور 26 بلا منحة: باب FIN غير مُصيَّر أصلًا',
+         'لا مستخدمَ حيًّا في الدورِ 26 مغطًّى بقالبٍ وبلا منحةِ مجال');
+    skip('وسائر أبوابه (HOME · GOV) ظاهرة — الحجب على FIN وحده', 'كسابقه');
+} else {
+    $_SESSION['user'] = array('id' => intval($p4['id']), 'role' => '26', 'company_id' => $CO, 'name' => $p4['username']);
+    $items = getUnifiedNavItems($conn, 26);
+    $doors = array_unique(array_map(function ($i) { return $i['door']; }, $items));
+    /* ⛔ **حارسُ المفردةِ قبلَ الحكم**: قائمةٌ فارغةٌ تُمرِّر شرطَ الغيابِ بلا قياس. */
+    check(count($items) > 0, "مسبارُ «{$p4['username']}» يُصيَّر (" . count($items) . ' بندًا) — فالغيابُ حكمٌ لا صفر');
+    check(!in_array('FIN', $doors, true), 'مستخدم الدور 26 بلا منحة: باب FIN غير مُصيَّر أصلًا');
+    check(in_array('HOME', $doors, true) && in_array('GOV', $doors, true), 'وسائر أبوابه (HOME · GOV) ظاهرة — الحجب على FIN وحده');
+}
 
 head('⑤ وبمنحة فردية نافذة يراه');
 $g = ODG::grant($conn, $CO, $U_GRANTED, ODG::PERM_OWNER, 1, 'حزمة fin26 — منحة مسبار');
-check($g['ok'], 'مُنح المسبار ownership.owner_view');
-$_SESSION['user'] = array('id' => $U_GRANTED, 'role' => '26', 'company_id' => $CO, 'name' => 'FIN26 Probe G');
-$items = getUnifiedNavItems($conn, 26);
-$fin = array_values(array_filter($items, function ($i) { return $i['door'] === 'FIN'; }));
-check(count($fin) === 2, 'بالمنحة: باب FIN يُصيَّر بشاشتيه (210 · 211)');
+check($g['ok'], 'مُنح المسبار ownership.owner_view');   /* يفحص الخدمةَ — ومعرِّفٌ صناعيٌّ يُنظَّف */
+$p5 = $probe(true);
+if (!$p5) {
+    skip('بالمنحة: باب FIN يُصيَّر بشاشتيه (210 · 211)',
+         'لا مستخدمَ حيًّا في الدورِ 26 مغطًّى بقالبٍ وله منحةُ مجال');
+} else {
+    $_SESSION['user'] = array('id' => intval($p5['id']), 'role' => '26', 'company_id' => $CO, 'name' => $p5['username']);
+    $items = getUnifiedNavItems($conn, 26);
+    $fin = array_values(array_filter($items, function ($i) { return $i['door'] === 'FIN'; }));
+    check(count($fin) === 2, "بالمنحة («{$p5['username']}»): باب FIN يُصيَّر بشاشتيه (210 · 211)");
+}
 unset($_SESSION['user']);
 
 head('⑥ العلمان واللوحة');
@@ -131,5 +193,6 @@ check(strpos($src, 'OwnershipDomainGuard') !== false && strpos($src, 'AuthorityG
 check(strpos($src, "state = 'revoked'") !== false && strpos($src, 'DELETE FROM ownership_access_grants') === false,
     'والإلغاء تعليم حالة لا حذف صف — السجل باقٍ للتدقيق');
 
-echo PHP_EOL . "══ النتيجة: {$PASS} ناجحة · {$FAIL} فاشلة ══" . PHP_EOL;
+echo PHP_EOL . "══ النتيجة: {$PASS} ناجحة · {$FAIL} فاشلة"
+   . ($SKIP > 0 ? " · {$SKIP} معلَّقة" : '') . " ══" . PHP_EOL;
 exit($FAIL === 0 ? 0 : 1);

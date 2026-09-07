@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-07 06:33:45
+-- المصدر: equipation_manage · التوليد: 2026-09-08 03:12:13
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -60,7 +60,6 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (3,'الصلاحيات','main/users.php',1,3,1,1,'fa fa-users-cog',30,NULL),
 (4,'مركز التقارير','Reports/reports.php',1,NULL,1,1,'fa fa-chart-pie',90,NULL),
 (5,'أنواع المعدات','Equipments/equipments_types.php',1,2,1,1,'fa fa-tractor',50,NULL),
-(6,'مركز التقارير','Reports/reports.php',2,NULL,1,0,'fa fa-chart-pie',60,NULL),
 (7,'سجل الموظفين','Employees/employees.php',4,NULL,1,1,'fa fa-id-card',10,NULL),
 (8,'المعدات','Equipments/equipments_fleet.php',3,NULL,1,1,'fa fa-tractor',10,NULL),
 (9,'شاشة التشغيل','Oprators/oprators.php',6,NULL,0,1,'fa fa-truck-moving',90,NULL),
@@ -68,27 +67,16 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (11,'الإعدادات','Settings/settings.php',1,NULL,1,1,'fa fa-gear',110,NULL),
 (12,'سجل النشاط','ActivityLogs/activity_logs.php',1,3,1,1,'fa fa-chart-line',60,NULL),
 (14,'مشرفو الموردين','main/project_users.php',2,NULL,1,0,'fa fa-users-cog',20,NULL),
-(15,'المشرفين','main/project_users.php',3,NULL,1,1,'fa fa-users-cog',30,NULL),
-(16,'المشرفين','main/project_users.php',4,NULL,1,1,'fa fa-users-cog',30,NULL),
-(17,'إدارة المعاونين','main/project_users.php',5,NULL,1,1,'fa fa-users-cog',170,NULL),
-(18,'المشرفين','main/project_users.php',6,NULL,1,1,'fa fa-users-cog',180,NULL),
 (20,'سجل عقود المشاريع','Contracts/contracts.php',1,1,1,1,'fa-file-signature fa',200,NULL),
 (21,'ملف عقد المشروع','Contracts/contracts_details.php',1,NULL,0,0,'fa fa-link',210,NULL),
 (22,'سجل الموردين','Suppliers/suppliers.php',2,NULL,1,1,'fa fa-truck-loading',10,NULL),
 (23,'التشغيل','Oprators/select_project.php',3,NULL,1,1,'fa fa-cogs',20,NULL),
-(24,'الإعدادات','Settings/settings.php',2,NULL,0,0,'fa fa-gear',240,NULL),
 (25,'سجل عقود الموردين','Suppliers/supplierscontracts.php',2,NULL,1,1,'fa-file-signature fa',250,NULL),
 (26,'ملف عقد المورد','Suppliers/supplierscontracts_details.php',2,NULL,0,0,'fa fa-link',260,NULL),
 (27,'المعدات','Equipments/equipments_drivers.php',4,NULL,0,1,'fa fa-tractor',20,NULL),
-(28,'مركز التقارير','Reports/reports.php',5,NULL,1,1,'fa fa-link',280,NULL),
 (29,'توزيع المشغّلين','movement/project_drivers.php',6,NULL,0,1,'fa fa-id-card',80,NULL),
 (30,'الورديات','movement/movement_operations.php',6,NULL,1,1,'fa fa-tractor',30,NULL),
-(31,'مركز التقارير','Reports/reports.php',4,NULL,1,1,'fa fa-chart-pie',300,NULL),
-(32,'مركز التقارير','Reports/reports.php',3,NULL,1,1,'fa fa-chart-pie',50,NULL),
 (34,'متابعة المشروع','movement/map_page.php',6,NULL,1,1,'fas fa-map-marked-alt',20,NULL),
-(35,'العملاء','Clients/clients.php',12,NULL,1,1,'fa fa-users',1,NULL),
-(36,'المشاريع','Projects/projects.php',12,NULL,1,1,'fa fa-folder-open',2,NULL),
-(37,'العقود','Contracts/contracts.php',12,NULL,1,1,'fa-file-signature fa',3,NULL),
 (38,'تصنيفات الأعطال','Equipments/manage_failure_codes.php',13,NULL,1,1,'fa fa-screwdriver-wrench',60,NULL),
 (40,'الأنواع والموديلات','Equipments/fleet_models.php',3,NULL,1,1,'fa fa-clipboard-list',12,NULL),
 (41,'إعداد الإهلاك','Equipments/fleet_depreciation_profiles.php',3,NULL,1,1,'fa fa-coins',13,NULL),
@@ -109,7 +97,6 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (57,'الهيكل الوظيفي والمناصب','Employees/job_titles.php',4,NULL,1,1,'fa fa-user-tag',11,NULL),
 (58,'الأدوار الوظيفية','Employees/employee_roles.php',4,NULL,1,1,'fa fa-people-arrows',12,NULL),
 (59,'المشغّلون والسائقون','Employees/equipment_operators.php',4,NULL,1,1,'fa fa-id-card-clip',13,NULL),
-(60,'إدارة المستخدمين','main/users.php',15,NULL,1,1,'fa fa-users-cog',10,NULL),
 (61,'المعاونون','main/all_assistants.php',15,NULL,1,1,'fa fa-users-cog',20,NULL),
 (62,'عقود الموظفين','Employees/employee_contracts.php',4,NULL,0,1,'fa fa-file-contract',0,NULL),
 (63,'ملف عقد الموظف','Employees/employee_contracts_details.php',4,NULL,0,1,'fa fa-file-alt',0,NULL),
@@ -156,7 +143,6 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (104,'لوحة المالية','Finance/cfo_daily_board_fin.php',17,4,1,1,'fa fa-gauge-high',4,NULL),
 (105,'وحدات الأطراف','Finance/unit_records_fin.php',17,5,1,0,'fa fa-cubes',22,NULL),
 (106,'ذمم الموردين وأعمارها','Finance/supplier_statement_fin.php',17,6,1,1,'fa fa-file-contract',55,NULL),
-(107,'المعاونين','main/project_users.php',17,NULL,1,1,'fa fa-users-cog',20,NULL),
 (108,'إعدادات الترحيل','Transport/transfer_types_config.php',23,NULL,1,0,'fa fa-layer-group',80,NULL),
 (109,'قواعد تحميل تكلفة الترحيل','Transport/transfer_cost_rules_config.php',23,NULL,1,0,'fa fa-scale-balanced',85,NULL),
 (110,'المواقع','Transport/trs_locations_config.php',23,NULL,1,0,'fa fa-location-dot',90,NULL),
@@ -254,8 +240,7 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (203,'تقرير الاستثناءات','Reports/exceptions_report.php',1,NULL,0,1,'fa fa-shield-halved',0,NULL),
 (204,'تقرير المنع','Reports/guard_denials_report.php',1,NULL,0,1,'fa fa-ban',0,NULL),
 (205,'تصنيف الحمايات','Settings/guard_classification.php',1,NULL,0,1,'fa fa-shield',0,NULL),
-(206,'سجل الشركات والكيانات','Governance/entities_registry.php',1,NULL,0,1,'fa fa-building-columns',0,NULL);
-INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
+(206,'سجل الشركات والكيانات','Governance/entities_registry.php',1,NULL,0,1,'fa fa-building-columns',0,NULL),
 (207,'التفويض بالتوقيع','Governance/signing_authority.php',1,NULL,0,1,'fa fa-file-signature',0,NULL),
 (208,'التراخيص والكفالات','Governance/licenses_guarantees.php',1,NULL,0,1,'fa fa-certificate',0,NULL),
 (209,'أنماط تفعيل المزايا','Governance/activation_patterns.php',1,NULL,0,1,'fa fa-toggle-on',0,NULL),
@@ -269,7 +254,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (217,'قرارات الهيكل التنظيمي','admin/org_structure.php',NULL,NULL,0,0,'fa fa-sitemap',302,'الحوكمة والالتزام'),
 (218,'أذونات المواقع','admin/org_permits.php',NULL,NULL,0,0,'fa fa-key',303,'إدارة الموقع'),
 (222,'مركز حوكمة الصلاحيات','admin/sec_governance.php',15,NULL,0,0,'fa fa-shield-alt',310,NULL),
-(223,'معالج إعداد الموظف','admin/sec_employee_wizard.php',NULL,NULL,0,0,'fa fa-user-plus',311,NULL),
+(223,'معالج إعداد الموظف','admin/sec_employee_wizard.php',NULL,NULL,0,0,'fa fa-user-plus',311,NULL);
+INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
 (225,'لوحة مسارات البلاغات','Tickets/ticket_workstreams_board.php',NULL,NULL,0,0,'fa fa-code-branch',320,NULL),
 (226,'برج المراقبة','Tickets/watchtower.php',24,NULL,0,0,'fa fa-broadcast-tower',321,NULL),
 (227,'الإبلاغ السياقي من داخل الشاشة','Tickets/ticket_contextual_open.php',NULL,NULL,0,0,'fa fa-bullhorn',322,NULL),
@@ -442,10 +428,6 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (395,'الأدوار الثمانية داخل وحدة الخزينة','Finance/tre_unit_roles.php',21,NULL,1,0,'fa fa-user-group',1029,NULL),
 (396,'سجل بنود الوثائق وتغطيتها','Finance/ctrl_doc_registry.php',31,NULL,1,0,'fa fa-list-check',1030,NULL),
 (397,'الأحكام المنتشرة على الإدارات الست عشرة','Finance/ctrl_dept_propagation.php',31,NULL,1,0,'fa fa-share-nodes',1031,NULL),
-(398,'إدارة المعاونين','main/project_users.php',27,3915,1,0,'fa fa-users-gear',9800,NULL),
-(399,'إدارة المعاونين','main/project_users.php',28,3916,1,0,'fa fa-users-gear',9800,NULL),
-(400,'إدارة المعاونين','main/project_users.php',32,3917,1,0,'fa fa-users-gear',9800,NULL),
-(401,'إدارة المعاونين','main/project_users.php',33,3918,1,0,'fa fa-users-gear',9800,NULL),
 (402,'إيكوبيشن | صندوق موافقاتي','Approvals/requests.php',13,NULL,0,0,'fa fa-file-lines',900,NULL),
 (403,'إيكوبيشن | بطاقة العميل','Clients/client_profile.php',1,NULL,0,0,'fa fa-file-lines',900,NULL),
 (404,'إيكوبيشن | سجل قيادة السائق','Employees/employee_equipment_history.php',4,NULL,0,0,'fa fa-file-lines',900,NULL),
@@ -455,8 +437,7 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (408,'عمليات التمويل','Financing/operation_profile.php',26,NULL,0,0,'fa fa-file-lines',900,NULL),
 (409,'ساعاتُ المعدة والوقائية','Maintenance/equipment_hours_preventive.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (410,'العودة للخدمة','Maintenance/return_to_service.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
-(411,'لوحة المواقع','Operations/sites_board.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL);
-INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
+(411,'لوحة المواقع','Operations/sites_board.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (412,'طلب تبديل','Operations/swap_request.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (413,'المرتجعات','Procurement/wh_returns.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (414,'إيكوبيشن | بطاقة المشروع','Projects/project_profile.php',1,NULL,0,0,'fa fa-file-lines',900,NULL),
@@ -474,7 +455,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (426,'إيكوبيشن | بطاقة المورد','Suppliers/supplier_profile.php',1,NULL,0,0,'fa fa-file-lines',900,NULL),
 (427,'suppliers_details','Suppliers/suppliers_details.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (428,'الاستفسار عن بلاغ','Tickets/inquiry.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
-(429,'الاستقبال والتصنيف','Tickets/intake_classify.php',24,NULL,0,0,'fa fa-file-lines',900,NULL),
+(429,'الاستقبال والتصنيف','Tickets/intake_classify.php',24,NULL,0,0,'fa fa-file-lines',900,NULL);
+INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
 (430,'إيكوبيشن | $typetext','Timesheet/aprovment.php',NULL,NULL,0,0,'fa fa-file-lines',900,NULL),
 (431,'تفاصيل الوحدة','Timesheet/timesheet_details.php',1,NULL,0,0,'fa fa-file-lines',900,NULL),
 (432,'إيكوبيشن | سجل الوحدات اليومية','Timesheet/view_timesheet.php',6,NULL,0,0,'fa fa-file-lines',900,NULL),
@@ -656,8 +638,7 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (829,'تقويم الامتثال','Governance/compliance_calendar.php',1,NULL,0,0,'fa fa-calendar-check',4,'DEP-08'),
 (830,'التقديمات النظامية','Governance/regulatory_filings.php',1,NULL,0,0,'fa fa-file-arrow-up',7,'DEP-08'),
 (831,'فصل الواجبات المتعارضة','Governance/sod_conflicts.php',15,NULL,0,0,'fa fa-code-branch',13,'DEP-08'),
-(832,'تضارب المصالح','Governance/conflict_disclosures.php',15,NULL,0,0,'fa fa-user-shield',14,'DEP-08');
-INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
+(832,'تضارب المصالح','Governance/conflict_disclosures.php',15,NULL,0,0,'fa fa-user-shield',14,'DEP-08'),
 (833,'الأطراف ذات العلاقة','Governance/related_parties.php',15,NULL,0,0,'fa fa-handshake',15,'DEP-08'),
 (834,'الهدايا والضيافة','Governance/gifts_hospitality.php',15,NULL,0,0,'fa fa-gift',16,'DEP-08'),
 (835,'إقرارات مدونة السلوك','Governance/conduct_acknowledgements.php',15,NULL,0,0,'fa fa-file-signature',17,'DEP-08'),
@@ -675,7 +656,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (847,'لوحة المراجعة الداخلية','Audit/iaf_overview.php',33,NULL,0,0,'fa fa-clipboard-check',60,'IAF'),
 (848,'برامج المراجعة','Audit/iaf_audit_programs.php',33,NULL,0,0,'fa fa-diagram-project',66,'IAF'),
 (849,'طلبات الأدلة','Audit/iaf_evidence_requests.php',33,NULL,0,0,'fa fa-inbox',67,'IAF'),
-(850,'العينات ونتائج الاختبارات','Audit/iaf_test_samples.php',33,NULL,0,0,'fa fa-vials',68,'IAF'),
+(850,'العينات ونتائج الاختبارات','Audit/iaf_test_samples.php',33,NULL,0,0,'fa fa-vials',68,'IAF');
+INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_link`, `is_quick`, `icon`, `display_order`, `owner_dept_note`) VALUES
 (851,'مخاطر وظيفة المراجعة','Audit/iaf_function_risks.php',33,NULL,0,0,'fa fa-user-secret',76,'IAF'),
 (852,'التقرير اليومي التنفيذي','Portal/exec_daily_report.php',9,NULL,0,0,'fa fa-calendar-day',11,'EX-CEO'),
 (853,'تفصيل توقفات اليوم','Portal/exec_daily_stops.php',9,NULL,0,0,'fa fa-hourglass-half',12,'EX-CEO'),
@@ -858,16 +840,11 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (26,1,12,1,1,1,1),
 (28,1,20,1,0,0,0),
 (29,1,21,1,0,0,0),
-(30,1,6,1,1,1,1),
 (31,1,14,1,1,1,1),
 (32,1,8,1,1,1,1),
-(33,1,15,1,1,1,1),
 (34,1,7,1,1,1,1),
-(35,1,16,1,1,1,1),
 (36,1,10,1,1,1,1),
-(37,1,17,1,1,1,1),
 (38,1,9,1,0,0,0),
-(39,1,18,1,1,1,1),
 (40,7,21,1,0,0,0),
 (42,7,20,1,0,0,0),
 (49,2,1,1,0,0,0),
@@ -878,17 +855,12 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (55,2,12,1,0,0,0),
 (57,2,20,1,1,1,1),
 (58,2,21,1,1,1,1),
-(59,2,6,1,1,1,1),
-(60,2,14,1,1,0,1),
+(60,2,14,1,1,1,1),
 (61,2,22,1,1,1,1),
 (62,2,8,1,0,0,0),
-(63,2,15,1,1,1,1),
 (64,2,7,1,0,0,0),
-(65,2,16,1,1,1,1),
 (66,2,10,1,1,1,1),
-(67,2,17,1,1,1,1),
 (68,2,9,1,0,0,0),
-(69,2,18,1,1,1,1),
 (70,8,1,1,0,0,0),
 (71,8,2,1,0,0,0),
 (73,8,4,1,1,1,1),
@@ -897,17 +869,12 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (76,8,12,1,0,0,0),
 (78,8,20,1,0,0,0),
 (79,8,21,1,0,0,0),
-(80,8,6,1,0,1,1),
-(81,8,14,0,0,0,0),
+(81,8,14,1,1,1,1),
 (82,8,22,1,0,1,0),
 (83,8,8,1,0,0,0),
-(84,8,15,1,1,1,1),
 (85,8,7,1,0,0,0),
-(86,8,16,1,1,1,1),
 (87,8,10,1,1,1,1),
-(88,8,17,1,1,1,1),
 (89,8,9,1,0,0,0),
-(90,8,18,1,1,1,1),
 (114,3,1,1,0,0,0),
 (115,3,2,1,0,0,0),
 (117,3,4,1,1,1,1),
@@ -916,18 +883,12 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (120,3,12,1,0,0,0),
 (122,3,20,1,0,0,0),
 (123,3,21,1,0,0,0),
-(124,3,6,1,1,1,1),
 (125,3,14,1,1,1,1),
 (126,3,22,1,0,0,0),
 (127,3,8,1,1,1,1),
-(128,3,15,1,1,0,1),
 (129,3,7,1,0,0,0),
-(130,3,16,1,1,1,1),
 (131,3,10,1,1,1,1),
-(132,3,17,1,1,1,1),
 (133,3,9,1,0,0,0),
-(134,3,18,1,1,1,1),
-(135,10,15,1,0,1,1),
 (136,10,8,1,0,0,0),
 (137,3,23,1,1,1,0),
 (141,11,1,1,0,0,0),
@@ -938,20 +899,13 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (147,11,12,1,0,0,0),
 (149,11,20,1,0,0,0),
 (150,11,21,1,0,0,0),
-(151,11,6,1,1,1,1),
 (152,11,14,1,1,1,1),
 (153,11,22,1,1,1,1),
 (154,11,8,1,1,1,0),
-(155,11,15,1,1,1,1),
 (156,11,23,1,1,1,1),
 (157,11,7,1,0,0,0),
-(158,11,16,1,1,1,1),
 (159,11,10,1,0,0,0),
-(160,11,17,1,1,1,1),
 (161,11,9,1,0,0,0),
-(162,11,18,1,1,1,1),
-(163,2,24,1,1,1,0),
-(164,8,24,1,0,0,0),
 (165,2,25,1,1,1,1),
 (166,8,25,1,1,1,0),
 (167,2,26,1,1,1,1),
@@ -964,21 +918,15 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (175,6,12,1,0,0,0),
 (177,6,20,1,1,1,1),
 (178,6,21,1,1,1,1),
-(179,6,6,1,1,1,1),
 (180,6,14,1,1,1,1),
 (181,6,22,1,0,0,0),
-(182,6,24,1,1,1,1),
 (183,6,25,1,0,0,0),
 (184,6,26,1,0,0,0),
 (185,6,8,1,1,1,1),
-(186,6,15,1,1,1,1),
 (187,6,23,1,0,0,0),
 (188,6,7,1,0,0,0),
-(189,6,16,1,1,1,1),
 (190,6,10,1,1,1,1),
-(191,6,17,1,1,1,1),
 (192,6,9,1,1,1,1),
-(193,6,18,1,1,1,1),
 (194,4,1,1,0,0,0),
 (195,4,2,1,0,0,0),
 (197,4,4,1,1,1,1),
@@ -987,21 +935,15 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (200,4,12,1,0,0,0),
 (202,4,20,1,0,0,0),
 (203,4,21,1,0,0,0),
-(204,4,6,1,1,1,1),
 (205,4,14,1,1,1,1),
 (206,4,22,1,0,0,0),
-(207,4,24,1,1,1,1),
 (208,4,25,1,0,0,0),
 (209,4,26,1,0,0,0),
 (210,4,8,1,1,1,1),
-(211,4,15,1,1,1,1),
 (212,4,23,1,0,0,0),
 (213,4,7,1,1,1,1),
-(214,4,16,1,1,1,1),
 (215,4,10,1,1,1,1),
-(216,4,17,1,1,1,1),
 (217,4,9,1,0,0,0),
-(218,4,18,1,1,1,1),
 (219,4,27,1,1,1,1),
 (221,5,1,1,0,0,0),
 (222,5,2,1,0,0,0),
@@ -1011,23 +953,16 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (227,5,12,1,0,0,0),
 (229,5,20,1,0,0,0),
 (230,5,21,1,0,0,0),
-(231,5,6,1,0,0,0),
 (232,5,14,1,0,0,0),
 (233,5,22,1,0,0,0),
-(234,5,24,1,0,0,0),
 (235,5,25,1,0,0,0),
 (236,5,26,1,0,0,0),
 (237,5,8,1,0,0,0),
-(238,5,15,1,0,0,0),
 (239,5,23,1,0,0,0),
 (240,5,7,1,0,0,0),
-(241,5,16,1,0,0,0),
 (242,5,27,1,0,0,0),
 (243,5,10,1,0,0,0),
-(244,5,17,1,0,0,0),
-(245,5,28,1,0,0,0),
 (246,5,9,1,0,0,0),
-(247,5,18,1,0,0,0),
 (248,6,30,1,0,1,1),
 (249,6,29,1,1,1,1),
 (250,6,34,1,1,1,1),
@@ -1039,32 +974,19 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (257,12,12,1,0,0,0),
 (259,12,20,1,1,1,1),
 (260,12,21,1,1,1,1),
-(261,12,6,1,1,1,1),
 (262,12,14,1,0,0,0),
 (263,12,22,1,0,0,0),
-(264,12,24,1,1,1,1);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (265,12,25,1,0,0,0),
 (266,12,26,1,0,0,0),
 (267,12,8,1,0,0,0),
-(268,12,15,1,0,0,0),
 (269,12,23,1,0,0,0),
-(270,12,32,1,1,1,1),
 (271,12,7,1,0,0,0),
-(272,12,16,1,0,0,0),
 (273,12,27,1,0,0,0),
-(274,12,31,1,1,1,1),
 (275,12,10,1,1,1,1),
-(276,12,17,1,0,0,0),
-(277,12,28,1,1,1,1),
 (278,12,9,1,0,0,0),
-(279,12,18,1,0,0,0),
 (280,12,29,1,0,0,0),
 (281,12,30,1,0,0,0),
 (282,12,34,1,0,0,0),
-(283,12,35,1,1,1,1),
-(284,12,36,1,1,1,1),
-(285,12,37,1,1,1,1),
 (286,3,38,1,1,1,1),
 (287,1,40,1,1,1,1),
 (288,2,40,1,0,0,0),
@@ -1102,7 +1024,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (331,4,48,1,1,1,1),
 (334,4,50,1,1,1,1),
 (335,4,51,1,1,1,1),
-(336,4,52,1,1,1,1),
+(336,4,52,1,1,1,1);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (337,4,53,1,1,1,1),
 (338,4,54,1,0,0,0),
 (339,4,55,1,1,1,1),
@@ -1110,7 +1033,6 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (341,4,57,1,1,1,1),
 (342,4,58,1,1,1,1),
 (343,4,59,1,1,1,1),
-(344,15,60,1,1,1,1),
 (345,15,61,1,1,1,1),
 (347,15,3,1,1,1,1),
 (354,4,62,1,1,1,1),
@@ -1243,8 +1165,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (500,20,86,1,0,0,0),
 (501,21,103,1,1,1,0),
 (502,21,102,1,1,1,0),
-(503,21,101,1,1,1,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(503,21,101,1,1,1,0),
 (504,21,100,1,1,1,0),
 (505,21,99,1,1,1,0),
 (506,21,98,1,1,1,0),
@@ -1296,7 +1217,6 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (610,22,106,1,0,0,0),
 (611,22,105,1,0,0,0),
 (612,22,104,1,0,0,0),
-(613,17,107,1,1,1,1),
 (614,17,14,1,1,1,1),
 (615,23,108,1,1,1,1),
 (616,23,109,1,1,1,1),
@@ -1305,7 +1225,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (619,23,112,1,1,1,1),
 (620,23,113,1,0,0,0),
 (624,13,114,1,1,1,0),
-(625,14,114,1,1,1,0),
+(625,14,114,1,1,1,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (628,13,116,1,0,1,0),
 (629,14,116,1,0,1,0),
 (630,17,117,1,0,1,0),
@@ -1444,8 +1365,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (784,14,138,1,0,0,0),
 (785,11,139,1,0,0,0),
 (786,10,139,1,0,0,0),
-(787,8,139,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(787,8,139,1,0,0,0),
 (788,7,139,1,0,0,0),
 (789,24,139,1,0,0,0),
 (790,15,139,1,0,0,0),
@@ -1506,7 +1426,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (867,17,147,1,0,0,0),
 (868,18,147,1,0,0,0),
 (869,1,147,1,0,0,0),
-(872,4,148,1,1,0,0),
+(872,4,148,1,1,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (873,19,148,1,0,1,0),
 (874,17,148,1,0,0,0),
 (875,18,148,1,0,0,0),
@@ -1645,8 +1566,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1053,3,189,1,1,0,0),
 (1054,3,188,1,0,0,0),
 (1055,3,187,1,0,0,0),
-(1056,4,190,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(1056,4,190,1,0,0,0),
 (1057,4,189,1,1,0,0),
 (1058,4,188,1,0,0,0),
 (1059,4,187,1,0,0,0),
@@ -1707,7 +1627,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1114,14,188,1,0,0,0),
 (1115,14,187,1,0,0,0),
 (1116,18,190,1,0,0,0),
-(1117,18,189,1,1,0,0),
+(1117,18,189,1,1,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (1118,18,188,1,0,0,0),
 (1119,18,187,1,0,0,0),
 (1120,19,190,1,0,0,0),
@@ -1790,11 +1711,6 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1255,12,202,1,0,0,0),
 (1256,22,202,1,0,0,0),
 (1260,15,14,1,1,1,0),
-(1261,15,15,1,1,1,0),
-(1262,15,16,1,1,1,0),
-(1263,15,17,1,1,1,0),
-(1264,15,18,1,1,1,0),
-(1265,15,107,1,1,1,0),
 (1266,1,203,1,0,0,0),
 (1267,19,203,1,0,0,0),
 (1268,17,203,1,0,0,0),
@@ -1846,8 +1762,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1324,5,227,1,0,0,0),
 (1325,6,227,1,1,0,0),
 (1326,12,227,1,1,0,0),
-(1327,13,227,1,1,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(1327,13,227,1,1,0,0),
 (1328,15,227,1,1,0,0),
 (1329,16,227,1,1,0,0),
 (1330,17,227,1,1,0,0),
@@ -1913,7 +1828,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1403,15,242,1,1,1,0),
 (1404,15,243,1,1,1,0),
 (1405,15,244,1,1,1,0),
-(1406,9,245,1,1,1,0),
+(1406,9,245,1,1,1,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (1407,15,245,1,0,0,0),
 (1408,9,246,1,0,0,0),
 (1409,6,246,1,0,0,0),
@@ -2047,8 +1963,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1553,7,252,1,0,0,0),
 (1554,8,252,1,0,0,0),
 (1555,10,252,1,0,0,0),
-(1556,11,252,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(1556,11,252,1,0,0,0),
 (1557,14,252,1,0,0,0),
 (1558,18,252,1,0,0,0),
 (1559,19,252,1,0,0,0),
@@ -2114,7 +2029,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1627,9,137,1,0,0,0),
 (1628,9,187,1,0,0,0),
 (1630,12,258,1,1,1,0),
-(1631,12,259,1,1,1,0),
+(1631,12,259,1,1,1,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (1632,12,260,1,1,1,0),
 (1633,15,261,1,1,1,0),
 (1634,9,262,1,0,0,0),
@@ -2248,8 +2164,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1762,24,279,1,0,0,0),
 (1763,25,279,1,0,0,0),
 (1764,26,279,1,0,0,0),
-(1765,27,279,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(1765,27,279,1,0,0,0),
 (1766,7,279,1,0,0,0),
 (1767,8,279,1,0,0,0),
 (1768,10,279,1,0,0,0),
@@ -2315,7 +2230,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1828,13,295,1,0,0,0),
 (1829,14,295,1,0,0,0),
 (1830,23,295,1,0,0,0),
-(1831,16,295,1,0,0,0),
+(1831,16,295,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (1832,25,295,1,0,0,0),
 (1833,12,295,1,0,0,0),
 (1834,2,295,1,0,0,0),
@@ -2449,8 +2365,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (1962,29,321,1,1,1,0),
 (1963,28,322,1,1,1,0),
 (1964,29,322,1,1,1,0),
-(1965,28,323,1,1,1,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(1965,28,323,1,1,1,0),
 (1966,29,323,1,1,1,0),
 (1967,28,324,1,1,1,0),
 (1968,29,324,1,1,1,0),
@@ -2516,7 +2431,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2028,30,336,1,0,0,0),
 (2029,28,337,1,1,1,0),
 (2030,29,337,1,1,1,0),
-(2031,30,337,1,0,0,0),
+(2031,30,337,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (2032,28,338,1,1,1,0),
 (2033,29,338,1,1,1,0),
 (2034,30,338,1,0,0,0),
@@ -2650,8 +2566,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2162,9,355,1,0,0,0),
 (2163,28,355,1,0,0,0),
 (2164,15,355,1,0,0,0),
-(2165,17,356,1,0,1,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(2165,17,356,1,0,1,0),
 (2166,18,356,1,0,0,0),
 (2167,19,356,1,0,0,0),
 (2168,20,356,1,0,0,0),
@@ -2717,7 +2632,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2228,33,369,1,0,0,0),
 (2229,31,369,1,0,0,0),
 (2230,18,370,1,0,0,0),
-(2231,15,370,1,0,0,0),
+(2231,15,370,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (2232,33,370,1,0,0,0),
 (2233,31,370,1,0,0,0),
 (2234,31,371,1,0,0,0),
@@ -2815,12 +2731,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2326,28,14,1,1,1,1),
 (2327,32,14,1,1,1,1),
 (2328,33,14,1,0,0,0),
-(2329,27,398,1,1,1,1),
-(2330,28,399,1,1,1,1),
 (2331,29,14,1,0,0,0),
 (2332,30,14,1,0,0,0),
-(2333,32,400,1,1,1,1),
-(2334,33,401,1,0,0,0),
 (2335,1,402,1,0,1,0),
 (2336,2,402,1,0,1,0),
 (2337,3,402,1,0,1,0),
@@ -2851,8 +2763,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2362,7,403,1,0,0,0),
 (2363,1,403,1,0,0,0),
 (2364,2,403,1,0,0,0),
-(2365,8,403,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(2365,8,403,1,0,0,0),
 (2366,3,403,1,0,0,0),
 (2367,11,403,1,0,0,0),
 (2368,6,403,1,0,0,0),
@@ -2922,7 +2833,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2432,2,416,1,0,0,0),
 (2433,8,416,1,0,0,0),
 (2434,3,416,1,0,0,0),
-(2435,11,416,1,0,0,0),
+(2435,11,416,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (2436,6,416,1,0,0,0),
 (2437,4,416,1,0,0,0),
 (2438,5,416,1,0,0,0),
@@ -3052,8 +2964,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2562,15,437,1,0,0,0),
 (2563,33,437,1,0,0,0),
 (2564,31,437,1,0,0,0),
-(2565,1,438,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(2565,1,438,1,0,0,0),
 (2566,15,438,1,0,0,0),
 (2567,6,439,1,0,0,0),
 (2568,7,439,1,0,0,0),
@@ -3123,7 +3034,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2636,4,438,1,0,0,0),
 (2637,5,438,1,0,0,0),
 (2638,6,438,1,0,0,0),
-(2639,9,438,1,0,0,0),
+(2639,9,438,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (2640,12,438,1,0,0,0),
 (2641,13,438,1,0,0,0),
 (2642,16,438,1,0,0,0),
@@ -3253,8 +3165,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2766,19,430,1,0,0,0),
 (2767,20,430,1,0,0,0),
 (2768,21,430,1,0,0,0),
-(2769,22,430,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(2769,22,430,1,0,0,0),
 (2770,3,442,1,0,0,0),
 (2771,1,443,1,0,0,0),
 (2772,2,443,1,0,0,0),
@@ -3324,7 +3235,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2836,30,451,1,0,0,0),
 (2837,9,452,1,0,0,0),
 (2838,16,452,1,0,0,0),
-(2839,28,452,1,0,0,0),
+(2839,28,452,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (2840,29,452,1,0,0,0),
 (2841,30,452,1,0,0,0),
 (2842,5,453,1,0,0,0),
@@ -3454,8 +3366,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2967,15,477,1,0,0,0),
 (2968,17,20,1,0,0,0),
 (2969,17,43,1,0,0,0),
-(2970,17,73,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(2970,17,73,1,0,0,0),
 (2971,17,72,1,0,0,0),
 (2972,16,22,1,0,0,0),
 (2973,16,192,1,0,0,0),
@@ -3525,7 +3436,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3037,13,196,1,0,0,0),
 (3038,13,225,1,0,0,0),
 (3039,13,40,1,0,0,0),
-(3040,13,73,1,0,0,0),
+(3040,13,73,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (3041,13,72,1,0,0,0),
 (3042,13,71,1,0,0,0),
 (3043,13,69,1,0,0,0),
@@ -3655,8 +3567,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3172,18,120,1,0,0,0),
 (3174,19,166,1,0,0,0),
 (3175,19,20,1,0,0,0),
-(3176,19,156,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(3176,19,156,1,0,0,0),
 (3177,19,43,1,0,0,0),
 (3178,19,73,1,0,0,0),
 (3179,19,72,1,0,0,0),
@@ -3726,7 +3637,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3246,2,486,1,0,0,0),
 (3247,8,486,1,0,0,0),
 (3248,15,486,1,0,0,0),
-(3249,2,487,1,1,1,0),
+(3249,2,487,1,1,1,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (3250,8,487,1,0,0,0),
 (3251,15,487,1,0,0,0),
 (3252,15,488,1,1,1,0),
@@ -3856,8 +3768,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3435,34,187,1,0,0,0),
 (3436,34,227,1,0,0,0),
 (3437,34,4,1,0,0,0),
-(3439,35,187,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(3439,35,187,1,0,0,0),
 (3440,35,227,1,0,0,0),
 (3441,35,4,1,0,0,0),
 (3442,9,505,1,1,1,0),
@@ -3927,7 +3838,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3635,2,511,1,0,0,0),
 (3636,4,511,1,0,0,0),
 (3637,8,511,1,0,0,0),
-(3638,16,511,1,0,0,0),
+(3638,16,511,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (3639,18,511,1,0,0,0),
 (3640,20,511,1,0,0,0),
 (3641,21,511,1,0,0,0),
@@ -4057,8 +3969,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (4225,10,567,1,0,0,0),
 (4226,11,567,1,0,0,0),
 (4227,18,567,1,0,0,0),
-(4228,19,567,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(4228,19,567,1,0,0,0),
 (4229,20,567,1,0,0,0),
 (4230,21,567,1,0,0,0),
 (4231,22,567,1,0,0,0),
@@ -4128,7 +4039,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (4358,23,575,1,1,1,1),
 (4359,23,576,1,1,1,1),
 (4360,17,576,1,0,0,0),
-(4361,18,576,1,0,0,0),
+(4361,18,576,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (4362,19,576,1,0,0,0),
 (4363,20,576,1,0,0,0),
 (4364,21,576,1,0,0,0),
@@ -4258,8 +4170,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (5088,4,602,1,0,0,0),
 (5089,8,602,1,0,0,0),
 (5090,16,602,1,0,0,0),
-(5091,18,602,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(5091,18,602,1,0,0,0),
 (5092,20,602,1,0,0,0),
 (5093,21,602,1,1,1,1),
 (5094,22,602,1,0,0,0),
@@ -4329,7 +4240,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (5167,1,608,1,0,0,0),
 (5168,23,608,1,0,0,0),
 (5169,4,608,1,0,0,0),
-(5170,26,608,1,0,0,0),
+(5170,26,608,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (5173,17,609,1,0,0,0),
 (5174,18,609,1,0,0,0),
 (5175,19,609,1,0,0,0),
@@ -4459,8 +4371,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (5945,21,711,1,0,0,0),
 (5946,22,711,1,0,0,0),
 (5947,1,712,1,0,0,0),
-(5948,2,712,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(5948,2,712,1,0,0,0),
 (5949,8,712,1,0,0,0),
 (5950,3,712,1,0,0,0),
 (5951,11,712,1,0,0,0),
@@ -4530,7 +4441,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (6674,20,835,1,0,0,0),
 (6675,33,835,1,0,0,0),
 (6679,9,836,1,0,0,0),
-(6680,15,836,1,0,0,0),
+(6680,15,836,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (6682,15,837,1,0,0,0),
 (6683,15,838,1,0,0,0),
 (6684,15,839,1,0,0,0),
@@ -4660,8 +4572,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9510,20,874,1,0,0,0),
 (9511,21,874,1,0,0,0),
 (9512,22,874,1,0,0,0),
-(9513,9,875,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(9513,9,875,1,0,0,0),
 (9514,1,876,1,0,0,0),
 (9515,2,876,1,0,0,0),
 (9516,3,876,1,0,0,0),
@@ -4731,7 +4642,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9580,21,885,1,0,0,0),
 (9581,22,885,1,0,0,0),
 (9582,2,886,1,0,0,0),
-(9583,19,886,1,0,0,0),
+(9583,19,886,1,0,0,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (9584,17,886,1,0,0,0),
 (9585,18,886,1,0,0,0),
 (9586,8,886,1,0,0,0),
@@ -4861,8 +4773,7 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9710,7,899,1,0,0,0),
 (9711,13,899,1,0,0,0),
 (9712,14,899,1,0,0,0),
-(9713,2,899,1,0,0,0);
-INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
+(9713,2,899,1,0,0,0),
 (9714,8,899,1,0,0,0),
 (9715,10,899,1,0,0,0),
 (9716,11,899,1,0,0,0),
@@ -4932,7 +4843,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9786,27,951,1,1,1,0),
 (9787,27,952,1,1,1,0),
 (9788,27,953,1,1,1,0),
-(9789,27,954,1,1,1,0),
+(9789,27,954,1,1,1,0);
+INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (9790,27,955,1,1,1,0),
 (9791,27,956,1,1,1,0),
 (9792,2,957,1,1,1,0),
@@ -5003,7 +4915,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9858,12,1011,1,0,1,0),
 (9864,15,1012,1,1,1,0),
 (9865,15,1013,1,0,0,0),
-(9866,15,1014,1,1,1,1);
+(9866,15,1014,1,1,1,1),
+(9869,10,14,1,0,1,1);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -8607,7 +8520,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6942,27,'REC',6270,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',10,NULL,'main/project_users.php',1,1,'2026-08-09 18:14:57','2026-09-06 21:48:05'),
 (6943,28,'REC',6298,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',10,NULL,'main/project_users.php',1,1,'2026-08-09 18:14:57','2026-09-06 21:48:05'),
 (6944,32,'HOME',3926,14,'مشرفو الموردين','main/project_users.php','fa fa-users-gear',3,NULL,'main/project_users.php',0,0,'2026-08-09 18:14:57','2026-08-12 04:45:04'),
-(6945,33,'HOME',3928,401,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',3,NULL,'main/project_users.php',0,0,'2026-08-09 18:14:57','2026-08-12 04:45:04'),
+(6945,33,'HOME',3928,14,'إدارة المعاونين','main/project_users.php','fa fa-users-gear',3,NULL,'main/project_users.php',0,0,'2026-08-09 18:14:57','2026-09-08 02:26:29'),
 (6946,28,'REC',6299,323,'ملف الخطر','Risk/risk_card.php','fa fa-file-shield',2,NULL,'Risk/risk_card.php',1,0,'2026-08-09 19:30:01','2026-08-30 11:54:28'),
 (6947,29,'REC',6313,323,'ملف الخطر','Risk/risk_card.php','fa fa-file-shield',2,NULL,'Risk/risk_card.php',1,0,'2026-08-09 19:30:01','2026-08-30 11:54:28'),
 (6948,30,'REC',6323,323,'ملف الخطر','Risk/risk_card.php','fa fa-file-shield',4,NULL,'Risk/risk_card.php',1,0,'2026-08-09 19:30:01','2026-08-30 11:54:28'),
