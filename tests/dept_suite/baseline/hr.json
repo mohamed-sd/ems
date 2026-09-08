@@ -1,0 +1,1103 @@
+{
+    "dept": "hr",
+    "dept_ar": "ادارة الموارد البشرية",
+    "at": "2026-09-08 15:53:22",
+    "mode": "full",
+    "screens": {
+        "Employees\/employee_card.php": {
+            "label": "بطاقة الموظف",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 72 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/employee_contracts_details.php": {
+            "label": "ملف عقد الموظف",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 91 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/employee_contracts.php": {
+            "label": "عقود الموظفين",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى employees.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Employees\/employee_equipment_history.php": {
+            "label": "سجل قيادة السائق",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى employees.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Employees\/employee_profile.php": {
+            "label": "بطاقة الموظف",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى employees.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Employees\/employee_roles.php": {
+            "label": "الأدوار الوظيفية",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 102 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/employees.php": {
+            "label": "سجل الموظفين",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 1,307 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/equipment_operators.php": {
+            "label": "سجل المشغلين",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 488 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_benefits.php": {
+            "label": "المزايا والتأمينات",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_board.php": {
+            "label": "لوحة الموارد البشرية",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_disciplinary.php": {
+            "label": "القضايا التأديبية والتحقيق",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_employee_documents.php": {
+            "label": "مستندات الموظف",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 82 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "employees\/hr_headcount_plan.php": {
+            "label": "خطة القوى العاملة",
+            "group": "employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_job_movements.php": {
+            "label": "الحركات الوظيفية",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_onboarding.php": {
+            "label": "التهيئة والمباشرة",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_performance.php": {
+            "label": "تقييم الأداء الوظيفي",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/hr_training.php": {
+            "label": "التدريب والكفاءة",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 82 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/job_titles.php": {
+            "label": "الهيكل الوظيفي والمناصب",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 115 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Employees\/showcontractemployee.php": {
+            "label": "عرض عقد الموظف",
+            "group": "Employees",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 71 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Equipments\/equipment_profile.php": {
+            "label": "بطاقة المعدة",
+            "group": "Equipments",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى equipments.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Equipments\/equipments.php": {
+            "label": "سجل المعدات",
+            "group": "Equipments",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 396 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "movement\/add_drivers.php": {
+            "label": "مشغّلو المعدة",
+            "group": "movement",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى equipments.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Operations\/attendance.php": {
+            "label": "الحضور والانصراف",
+            "group": "Operations",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 121 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_dept_hrm.php": {
+            "label": "مخاطر الموارد البشرية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/deductions.php": {
+            "label": "خصومات المسيّر",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 188 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/final_settlement.php": {
+            "label": "التصفية النهائية",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 247 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/gov_dept_hrm.php": {
+            "label": "حوكمة الموارد البشرية",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 85 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/hr_workforce_report.php": {
+            "label": "تقرير القوى العاملة",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/op_monthly.php": {
+            "label": "الأداء الشهري للمشغل",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 116 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/op_qual.php": {
+            "label": "تأهيل المشغلين على أنواع المعدات",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 111 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/payroll_lines.php": {
+            "label": "أسطر مسيّر الرواتب",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/project_contracts.php": {
+            "label": "عقود المشاريع المؤقتة",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 127 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/rec_applications.php": {
+            "label": "طلبات الترشح",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/rec_stages.php": {
+            "label": "مراحل التوظيف",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Workforce\/worker_evaluation.php": {
+            "label": "تقييم أداء العاملين",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 155 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4606,
+        "PROJECT": 993011,
+        "OPPORTUNITY": 1537,
+        "QUOTATION": 216,
+        "CONTRACT": 7311,
+        "SITE": 1185,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

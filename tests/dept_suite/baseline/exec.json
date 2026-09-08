@@ -1,0 +1,1258 @@
+{
+    "dept": "exec",
+    "dept_ar": "الإدارة التنفيذية",
+    "at": "2026-09-08 15:53:34",
+    "mode": "full",
+    "screens": {
+        "Clients\/commercial_risks.php": {
+            "label": "المخاطر التجارية",
+            "group": "Clients",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 167 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_approvals.php": {
+            "label": "اعتمادات الرئيس التنفيذي",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 140 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_assurance_box.php": {
+            "label": "صندوق التأكيد المستقل — تقارير المراجعة الداخلية",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_board.php": {
+            "label": "لوحة الرئيس التنفيذي",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 110 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_contracts.php": {
+            "label": "العقود والالتزامات المحجوزة أو المصعدة",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 151 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/ceo_org_decisions.php": {
+            "label": "قرارات الهيكل التنظيمي",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_risk.php": {
+            "label": "المخاطر والقرارات العليا",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 128 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/ceo_unified_queue.php": {
+            "label": "جميع الطلبات المرفوعة إليّ",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 114 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/contract_review.php": {
+            "label": "مراجعة العقود وملاحظاتها",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 112 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/dept_achievement.php": {
+            "label": "إنجاز الإدارة",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 72 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_actions_followup.php": {
+            "label": "متابعة القرارات التنفيذية",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 91 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_command_board.php": {
+            "label": "لوحة القيادة التنفيذية",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 90 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_contract_registry.php": {
+            "label": "سجل العقود الموحَّد",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_crisis_command.php": {
+            "label": "قيادة الأزمات والطوارئ",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_critical_exceptions.php": {
+            "label": "الاستثناءات الحرجة",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_daily_deviations.php": {
+            "label": "انحرافات وقرارات اليوم",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_daily_report.php": {
+            "label": "التقرير اليومي التنفيذي",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_daily_stops.php": {
+            "label": "تفصيل توقفات اليوم",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 207 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/exec_doc_review_notes.php": {
+            "label": "ملاحظات مراجعة الوثيقة قبل التوقيع",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 83 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/exec_document_approvals.php": {
+            "label": "اعتمادات العقود والوثائق",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 162 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_escalations.php": {
+            "label": "التصعيدات العليا",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/exec_financial_approvals.php": {
+            "label": "الاعتمادات المالية",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 165 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_leadership_appointments.php": {
+            "label": "موافقات التعيين في المسميات القيادية",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 82 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/exec_leadership_meetings.php": {
+            "label": "اجتماعات الإدارة العليا",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_meeting_decisions.php": {
+            "label": "قرارات الاجتماعات",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_monthly_pack.php": {
+            "label": "التقرير الشهري التنفيذي",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_org_projects.php": {
+            "label": "الإدارات والمشروعات",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 178 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_raised_requests.php": {
+            "label": "الطلبات المرفوعة إلى القيادة",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_redline_breaches.php": {
+            "label": "تجاوزات الخطوط الحمراء",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_reserved_matters.php": {
+            "label": "المسائل المحجوزة والسلطة المحجوزة",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_strategic_decisions.php": {
+            "label": "القرارات الاستراتيجية",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "portal\/exec_temp_assignments.php": {
+            "label": "التكليفات والإنابات المؤقتة",
+            "group": "portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 143 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/exec_weekly_report.php": {
+            "label": "التقرير الأسبوعي التنفيذي",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/founding_mode.php": {
+            "label": "وضع التأسيس وإغلاقه",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 101 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/gov_dept_ceo.php": {
+            "label": "حوكمة مكتبُ الرئيس التنفيذي والنواب",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/project_charter.php": {
+            "label": "قرار فتح مشروع — ميثاق المشروع",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 207 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Portal\/release_stamp.php": {
+            "label": "بصمة الإصدار وتقرير النشر",
+            "group": "Portal",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 136 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Reports\/exceptions_report.php": {
+            "label": "تقرير الاستثناءات",
+            "group": "Reports",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى dashboard.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Reports\/reports.php": {
+            "label": "مركز التقارير التنفيذية",
+            "group": "Reports",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى dashboard.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Workforce\/contract_registry.php": {
+            "label": "سجل العقود",
+            "group": "Workforce",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 398 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4610,
+        "PROJECT": 993015,
+        "OPPORTUNITY": 1541,
+        "QUOTATION": 220,
+        "CONTRACT": 7315,
+        "SITE": 1189,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

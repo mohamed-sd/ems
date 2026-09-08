@@ -22,7 +22,7 @@ $FA_SCREEN = array(
 function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
     $eqs = array();
-    $r = $conn->query("SELECT DISTINCT l.equipment_id, e.equipment_code, e.equipment_name
+    $r = $conn->query("SELECT DISTINCT l.equipment_id, e.code AS equipment_code, e.name AS equipment_name
                          FROM fin_journal_lines l
                          LEFT JOIN equipments e ON e.id = l.equipment_id
                         WHERE l.company_id = {$company_id} AND l.equipment_id IS NOT NULL

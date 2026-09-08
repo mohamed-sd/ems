@@ -20,7 +20,7 @@ $TARGET = 20;
 
 /** جداولُ لا تُملأ: الأدوارُ والصفحاتُ والصلاحياتُ + النظاميةُ + المهجورة. */
 $SKIP = array_merge(UAT_FORBIDDEN, [
-    'super_admins', 'super_admin_password_resets', 'company_user_password_resets', 'ems_sessions',
+    'super_admins', 'ems_sessions',
     'ems_event_dead_letter', 'capacity_shadow_diffs', 'worker_backup', 'api_tokens', 'tenants',
     'drivercontracts', 'drivercontractequipments', 'driver_contract_notes', 'workspace_prefs',
     'schema_migrations', 'admin_companies', 'admin_subscription_plans', 'admin_subscription_requests',

@@ -18,7 +18,9 @@
    ◆ **والظهورُ ليس صلاحيّةً** (NAV-ARCH-02 §36): رفعُ الرايةِ أو خفضُها لا
      يفتح بابًا ولا يغلقه — حارسُ الوجهةِ باقٍ كما هو. */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
-session_start();
+// تُبلَغ هذه الشاشةُ أحيانًا وجلستُها نشطةٌ سلفًا (مسار مضمَّن) — فحارسُ الحالةِ
+// يمنع تنبيه «الجلسة نشطة» دون أن يفتح جلسةً ثانية.
+if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();

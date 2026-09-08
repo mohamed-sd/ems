@@ -1,0 +1,886 @@
+{
+    "dept": "tickets",
+    "dept_ar": "إدارة البلاغات",
+    "at": "2026-09-08 15:53:38",
+    "mode": "full",
+    "screens": {
+        "Risk\/risk_dept_crp.php": {
+            "label": "مخاطر البلاغات والوقائع",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 72 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/admin_close.php": {
+            "label": "إغلاق البلاغ وتأكيده",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 129 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/gov_dept_crp.php": {
+            "label": "لوحة مركز البلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 83 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/inquiry.php": {
+            "label": "الاستفسار عن بلاغ متعثر",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 68 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/intake_classify.php": {
+            "label": "الاستقبال والتصنيف لتوجيه البلاغات الجديدة",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 276 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/my_tickets.php": {
+            "label": "بلاغاتي من سجل البلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 76 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_categories_config.php": {
+            "label": "تصنيفات الأعطال والبلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 83 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_close.php": {
+            "label": "إغلاق البلاغ وتأكيده",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 71 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_contextual_open.php": {
+            "label": "الإبلاغ السياقي من داخل الشاشة",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 73 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_dashboard.php": {
+            "label": "مؤشرات البلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 103 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_escalation_config.php": {
+            "label": "مهل البلاغات وتصعيدها",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 86 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_form.php": {
+            "label": "تسجيل البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 94 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_kpi.php": {
+            "label": "مؤشرات البلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 84 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_recurrence.php": {
+            "label": "البلاغات المتكررة وسببها الجذري",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 102 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_sla_config.php": {
+            "label": "مصفوفة مهل المعالجة للبلاغات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 94 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_types_config.php": {
+            "label": "إعدادات البلاغات للأنواع والمهل والتصعيد",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 86 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/ticket_workstreams_board.php": {
+            "label": "تحويل البلاغ وتفريعه لمسارات",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 245 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tickets_list.php": {
+            "label": "صندوق بلاغات الإدارة",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 166 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_assignment.php": {
+            "label": "تاريخ إسناد البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_communications.php": {
+            "label": "مراسلات البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_escalation.php": {
+            "label": "تصعيد البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_parties.php": {
+            "label": "أطراف البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_reopen.php": {
+            "label": "إعادة فتح البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_resolution_actions.php": {
+            "label": "إجراءات معالجة البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_routing.php": {
+            "label": "تاريخ توجيه البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_subject_types.php": {
+            "label": "أنواع محل البلاغ المعتمدة",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/tkt_verification.php": {
+            "label": "التحقق من المعالجة وإغلاق البلاغ",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Tickets\/watchtower.php": {
+            "label": "تقرير من يتأخر ومن لا يستجيب",
+            "group": "Tickets",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 71 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4611,
+        "PROJECT": 993016,
+        "OPPORTUNITY": 1542,
+        "QUOTATION": 221,
+        "CONTRACT": 7316,
+        "SITE": 1190,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

@@ -1,0 +1,1041 @@
+{
+    "dept": "financing",
+    "dept_ar": "إدارة التمويل",
+    "at": "2026-09-08 15:53:41",
+    "mode": "full",
+    "screens": {
+        "Equipments\/fin_assets.php": {
+            "label": "الأصول الممولة",
+            "group": "Equipments",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 117 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/asset_disposal.php": {
+            "label": "انتقال الملكية والخروج",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/cost_allocation.php": {
+            "label": "توزيع السداد",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/deviations.php": {
+            "label": "الانحرافات والمتأخرات",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 185 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_capital_balance.php": {
+            "label": "رصيد رأس المال والعائد",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_changes.php": {
+            "label": "تعديلات التمويل وإعادة الجدولة",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 118 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_close_audit.php": {
+            "label": "تقرير المراجعة والإغلاق",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_contract_close.php": {
+            "label": "الإقفالات التعاقدية",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_contract_terms.php": {
+            "label": "بنود وشروط التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_contracts.php": {
+            "label": "سجل عقود التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_covenants.php": {
+            "label": "مصفوفة الالتزامات التمويلية",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_due_diligence.php": {
+            "label": "وثائق التأهيل والعناية",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_final_close.php": {
+            "label": "إقفال التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_financier_contacts.php": {
+            "label": "جهات اتصال الممولين والمفوض",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_financier_dues.php": {
+            "label": "استحقاقات الممول",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_migration_map.php": {
+            "label": "خريطة الترحيل ومصفوفة التسوية",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_models.php": {
+            "label": "نماذج التمويل ومعالجتها",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 85 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_monthly_close.php": {
+            "label": "الإقفالات الشهرية وكشف الحس",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_needs.php": {
+            "label": "فرص واحتياجات التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_offers.php": {
+            "label": "عروض التمويل والتفاوض",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_payment_allocation.php": {
+            "label": "تخصيص السداد على الأقساط",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_payment_orders.php": {
+            "label": "أوامر الدفع والسداد الفعلي",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_portfolio_board.php": {
+            "label": "التقارير ولوحة المحفظة",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 73 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_precontract_review.php": {
+            "label": "مراجعة ما قبل التعاقد",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/fin_ref_dictionary.php": {
+            "label": "القوائم وقاموس البيانات",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/financiers_registry.php": {
+            "label": "سجل الممولين",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/financing_board.php": {
+            "label": "لوحة إدارة التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 78 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/financing_operation_new.php": {
+            "label": "إنشاء عملية تمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 80 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/gov_dept_cap.php": {
+            "label": "حوكمة التمويل والملكية",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/installments.php": {
+            "label": "جدول الأقساط والاستحقاقات",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 280 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/operation_profile.php": {
+            "label": "عمليات التمويل",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 73 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Financing\/owners_registry.php": {
+            "label": "حصص الملكية وحق الانتفاع",
+            "group": "Financing",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 140 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_dept_cap.php": {
+            "label": "مخاطر التمويل والملكية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4612,
+        "PROJECT": 993017,
+        "OPPORTUNITY": 1543,
+        "QUOTATION": 222,
+        "CONTRACT": 7317,
+        "SITE": 1191,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

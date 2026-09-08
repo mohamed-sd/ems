@@ -1,0 +1,793 @@
+{
+    "dept": "risk",
+    "dept_ar": "إدارة المخاطر · محلل المخاطر · مشرف المخاطر",
+    "at": "2026-09-08 15:53:30",
+    "mode": "full",
+    "screens": {
+        "risk\/dept_risk_space.php": {
+            "label": "مساحة مخاطر الإدارة",
+            "group": "risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 71 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/gov_dept_rsk.php": {
+            "label": "حوكمة إدارة المخاطر المؤسسية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_acceptance.php": {
+            "label": "قبول المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 97 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_appetite.php": {
+            "label": "الشهية وحدود التحمل",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 74 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_assessment.php": {
+            "label": "تقييم المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 76 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_board.php": {
+            "label": "لوحة المخاطر المؤسسية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_card.php": {
+            "label": "ملف الخطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 66 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_closure.php": {
+            "label": "سجل الإغلاق والأدلة",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_committee.php": {
+            "label": "لجنة المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 88 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_control_verify.php": {
+            "label": "التحقق من الضوابط الحرجة",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 103 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_controls.php": {
+            "label": "الضوابط الرقابية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 94 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_dept_ceo.php": {
+            "label": "المخاطر المؤسسية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 72 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_escalations.php": {
+            "label": "تصعيدات المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_events.php": {
+            "label": "أحداث المخاطر والخسائر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_field.php": {
+            "label": "مخاطر الميدان",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 83 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_incidents.php": {
+            "label": "الحوادث والوقائع",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 89 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_kris.php": {
+            "label": "مؤشرات المخاطر الرئيسة",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 124 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_register.php": {
+            "label": "سجل المخاطر المؤسسي",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 100 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_reports.php": {
+            "label": "تقارير المخاطر الدورية",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 94 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_reviews.php": {
+            "label": "المراجعة الدورية وإعادة التقييم",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 76 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_settings.php": {
+            "label": "إعدادات المخاطر والتصنيف",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 90 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_signals.php": {
+            "label": "إشارات المخاطر والفرز",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 511 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_taxonomy.php": {
+            "label": "تصنيف المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_treatments.php": {
+            "label": "خطط معالجة المخاطر",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 96 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_units.php": {
+            "label": "وحدات المخاطر والتصنيف",
+            "group": "Risk",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 85 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4608,
+        "PROJECT": 993013,
+        "OPPORTUNITY": 1539,
+        "QUOTATION": 218,
+        "CONTRACT": 7313,
+        "SITE": 1187,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

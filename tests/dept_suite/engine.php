@@ -308,8 +308,14 @@ function ds_fixtures_borrow(array &$ctx)
         'SITE'        => $one("SELECT id FROM sites         WHERE company_id={$co} ORDER BY id DESC LIMIT 1"),
     );
     $f['PROJECT'] = $one("SELECT project_id FROM contracts WHERE id={$f['CONTRACT']}");
-    $f['LINE']    = $one("SELECT id FROM client_contract_lines WHERE contract_id={$f['CONTRACT']} ORDER BY id DESC LIMIT 1");
-    if ($f['LINE'] === 0) { $f['LINE'] = $one("SELECT id FROM client_contract_lines ORDER BY id DESC LIMIT 1"); }
+    /* ⛔ **والرمزُ يُحَلُّ بما تراه الشاشةُ لا بأحدثِ صفٍّ في الجدول**: الشاشاتُ
+         تُصفّي `is_deleted` و`state='active'` وتُحصَر بالمستأجر، فرمزٌ يقع على
+         **بندٍ محذوف** يُصيَّر 200 بلا نموذجٍ فتُقرأ الشاشةُ راسبةً وهي سليمة.
+         (‏وقع مقيسًا: `{LINE}` وقعت على #3756 المحذوف فرسبت شاشتا الجدولِ
+         الشهريِّ وخطةِ الموارد بغيابِ علامتَيهما.) */
+    $LQ = "COALESCE(is_deleted,0)=0 AND state='active'";
+    $f['LINE']    = $one("SELECT id FROM client_contract_lines WHERE company_id={$co} AND contract_id={$f['CONTRACT']} AND {$LQ} ORDER BY id DESC LIMIT 1");
+    if ($f['LINE'] === 0) { $f['LINE'] = $one("SELECT id FROM client_contract_lines WHERE company_id={$co} AND {$LQ} ORDER BY id DESC LIMIT 1"); }
     $ctx['fix'] = $f;
     return $f;
 }

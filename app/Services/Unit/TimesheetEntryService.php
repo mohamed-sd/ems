@@ -144,8 +144,10 @@ class TimesheetEntryService
             if (in_array($health, array('معطلة', 'خارج الخدمة', 'out_of_service', 'broken'), true)) {
                 $quadWarn[] = 'readiness: المعدة بحالة «' . $health . '» يوم الإدخال';
             }
-            $rq = $conn->query("SELECT COUNT(*) c FROM contractequipments ce
-                                 WHERE ce.equipment_id = " . intval($equipmentId));
+            // «تكليفٌ تعاقديٌّ قائم» = تشغيلةٌ نشطةٌ للمعدة — فسطرُ العقدِ في
+            // `contractequipments` بالنوعِ لا بالمعدةِ (لا عمودَ equipment_id فيه)
+            $rq = $conn->query("SELECT COUNT(*) c FROM operations o
+                                 WHERE o.equipment = " . intval($equipmentId) . " AND o.status = 1");
             $asg = $rq ? $rq->fetch_assoc() : null;
             if (!$asg || intval($asg['c']) === 0) {
                 $quadWarn[] = 'assignment: المعدة بلا تكليف تعاقدي قائم';

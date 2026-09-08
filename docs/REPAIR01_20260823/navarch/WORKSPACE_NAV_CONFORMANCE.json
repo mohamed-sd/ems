@@ -145,9 +145,9 @@
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-05": {
-            "TARGET_NAV_RECALL": 100,
+            "TARGET_NAV_RECALL": 95.5,
             "TARGET_FOUND": 21,
-            "TARGET_TOTAL": 21,
+            "TARGET_TOTAL": 22,
             "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
@@ -172,15 +172,17 @@
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 113,
             "NEW_LIFECYCLE": 21,
-            "MISSING_TARGETS": [],
+            "MISSING_TARGETS": [
+                "finance\/acc_approval_record"
+            ],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
         },
         "DEP-06": {
             "TARGET_NAV_RECALL": 100,
-            "TARGET_FOUND": 16,
-            "TARGET_TOTAL": 16,
+            "TARGET_FOUND": 17,
+            "TARGET_TOTAL": 17,
             "PLACEMENT_PRECISION": 99.1,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
@@ -204,7 +206,7 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 109,
-            "NEW_LIFECYCLE": 16,
+            "NEW_LIFECYCLE": 17,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
@@ -245,16 +247,16 @@
         },
         "DEP-08": {
             "TARGET_NAV_RECALL": 100,
-            "TARGET_FOUND": 31,
-            "TARGET_TOTAL": 31,
+            "TARGET_FOUND": 46,
+            "TARGET_TOTAL": 46,
             "PLACEMENT_PRECISION": 100,
-            "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
+            "UNEXPLAINED_EXTRA_MENU_ITEM": 2,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 0,
+            "WRONG_ORDER": 41,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -270,11 +272,14 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 83,
-            "NEW_LIFECYCLE": 31,
+            "NEW_LIFECYCLE": 48,
             "MISSING_TARGETS": [],
-            "EXTRA_ITEMS": [],
+            "EXTRA_ITEMS": [
+                "settings\/db_backup",
+                "governance\/bus_monitor"
+            ],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
         },
         "DEP-09": {
             "TARGET_NAV_RECALL": 100,
@@ -375,17 +380,17 @@
             "ADDITIONS_OUTSIDE_GUIDE": [
                 "operations\/operations_room",
                 "operations\/distribution_space",
-                "timesheet\/view_timesheet",
-                "operations\/stops_unattributed"
+                "operations\/stops_unattributed",
+                "timesheet\/view_timesheet"
             ],
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-12": {
             "TARGET_NAV_RECALL": 100,
-            "TARGET_FOUND": 19,
-            "TARGET_TOTAL": 19,
+            "TARGET_FOUND": 21,
+            "TARGET_TOTAL": 21,
             "PLACEMENT_PRECISION": 100,
-            "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
+            "UNEXPLAINED_EXTRA_MENU_ITEM": 1,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
@@ -407,11 +412,13 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 75,
-            "NEW_LIFECYCLE": 19,
+            "NEW_LIFECYCLE": 22,
             "MISSING_TARGETS": [],
-            "EXTRA_ITEMS": [],
+            "EXTRA_ITEMS": [
+                "timesheet\/timesheet_type"
+            ],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
         },
         "DEP-13": {
             "TARGET_NAV_RECALL": 100,
@@ -589,7 +596,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 0,
+            "WRONG_ORDER": 1,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -609,7 +616,7 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
         },
         "IAF": {
             "TARGET_NAV_RECALL": 100,

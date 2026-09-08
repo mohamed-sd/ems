@@ -314,7 +314,7 @@ class SettlementService
         try {
             $issues = $gate->scopedQuery(
                 array('scope' => array('i' => 'proc_issue')),
-                "SELECT i.id, i.total_cost, i.currency, DATE(i.created_at) AS d_date
+                "SELECT i.id, i.total_cost, DATE(i.created_at) AS d_date
                    FROM proc_issue i
                   WHERE {TENANT_SCOPE}
                     AND i.charge_supplier_id = ?
@@ -339,8 +339,7 @@ class SettlementService
                     'description' => 'قطع غيار — صرف #' . $x['id'] . ' · ' . $priced['note'],
                     'work_date'   => (string) $x['d_date'],
                     'amount'      => (float) $priced['amount'],
-                    'currency'    => ($x['currency'] !== null && $x['currency'] !== '')
-                                     ? (string) $x['currency'] : 'SDG',
+                    'currency'    => 'SDG',   // صرفُ المخزونِ بلا عمودِ عملةٍ — عملةُ التشغيل (كأمرِ الصيانة)
                 );
             }
         } catch (\Throwable $t) {

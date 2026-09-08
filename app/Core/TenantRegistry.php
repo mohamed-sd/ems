@@ -878,8 +878,6 @@ class TenantRegistry
         'admin_audit_log' => array('type' => self::T_PLATFORM, 'soft' => false),
         'admin_subscription_requests' => array('type' => self::T_PLATFORM, 'soft' => false),
         'super_admins' => array('type' => self::T_PLATFORM, 'soft' => false),
-        'super_admin_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
-        'company_user_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
         'api_tokens' => array('type' => self::T_PLATFORM, 'soft' => false),
         /* الإداراتُ — هجرة 2028_04_20: مرجعٌ يخدم المستأجرين جميعًا
            بلا `company_id`، تُؤلَّف من لوحةِ الإدارةِ العليا وحدَها

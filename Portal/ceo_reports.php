@@ -122,7 +122,7 @@ $openRisk = cr_rows($conn,
 /* ⑧ خريطة السقوف: ملكية التوجيه المالي + عناوين الموازنات */
 $routing = cr_rows($conn, "SELECT request_kind, owner_dept, COUNT(*) c FROM fin_request_routing
                             GROUP BY request_kind, owner_dept ORDER BY request_kind LIMIT 20");
-$budgets = cr_rows($conn, "SELECT b.budget_no, b.status, COUNT(l.id) lines_c
+$budgets = cr_rows($conn, "SELECT b.budget_no, b.state AS status, COUNT(l.id) lines_c
                             FROM fin_budgets b LEFT JOIN fin_budget_lines l ON l.budget_id = b.id
                             WHERE 1=1 " . str_replace('company_id', 'b.company_id', $coW) . "
                             GROUP BY b.id ORDER BY b.id DESC LIMIT 10");

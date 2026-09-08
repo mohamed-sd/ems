@@ -118,6 +118,16 @@ if ($errors -eq 0) {
             Write-Host "INJ-FIX-01 GAP-29: new file with a raw query on a tenant table" -ForegroundColor Red
             exit 1
         }
+        # NAV-ARCH-02: a display surface must derive visibility from the guard,
+        # not decide it from the parallel register (role_permissions). That exact
+        # pattern produced 547 links that were shown and then refused at the door,
+        # across five separate places - two found by grepping known function names,
+        # four only by luck. The ratchet replaces luck with a count.
+        & C:\wamp64\bin\php\php8.2.30\php.exe tests/nav_parallel_register_ratchet.php
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "NAV-ARCH-02: a new surface decides visibility from the parallel register" -ForegroundColor Red
+            exit 1
+        }
         # INJ-FRD-REM-01: the 26 proofs of that round were outside the sweep
         # (the filter was injfix0*). Evidence that is never re-run rots in
         # silence. Three-way verdict: a closed requirement whose proof turns

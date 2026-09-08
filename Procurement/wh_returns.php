@@ -67,7 +67,7 @@ if ($__pc['run'] && $__pc['ok']) {
    المحاولةِ لا بعدَ الرفض. والقيمةُ ‎سند:صنف‎ لأن السندَ قد يحمل الصنفَ في
    أكثرَ من سطر (وكانت القائمةُ تُكرِّر السندَ بقيمةٍ واحدةٍ فتُخلَط السطور). */
 $issues = array();
-$r = mysqli_query($conn, "SELECT i.id, i.issue_no, il.item_id, it.name item,
+$r = mysqli_query($conn, "SELECT i.id, i.code AS issue_no, il.item_id, it.name item,
                                  SUM(il.qty) issued,
                                  COALESCE((SELECT SUM(m.qty) FROM proc_stock_move m
                                             WHERE m.company_id = i.company_id AND m.move_type='مرتجع'
@@ -77,7 +77,7 @@ $r = mysqli_query($conn, "SELECT i.id, i.issue_no, il.item_id, it.name item,
                           JOIN proc_issue_line il ON il.issue_id = i.id
                           JOIN proc_item it ON it.id = il.item_id
                           WHERE i.company_id = $company_id
-                          GROUP BY i.id, i.issue_no, il.item_id, it.name
+                          GROUP BY i.id, i.code, il.item_id, it.name
                           ORDER BY i.id DESC LIMIT 40");
 if ($r) while ($x = mysqli_fetch_assoc($r)) { $x['available'] = floatval($x['issued']) - floatval($x['returned']); $issues[] = $x; }
 $recent = array();

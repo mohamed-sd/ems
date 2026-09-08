@@ -63,9 +63,9 @@ if ($deptCode === 'flt') {
         array(
             'title' => 'تسجيل عطل المعدة وإغلاقه بيد واحدة',
             'sql' => "SELECT CONCAT('FLT-', f.id) doc, u.name person
-                        FROM fleet_failures f LEFT JOIN users u ON u.id = f.closed_by
-                       WHERE f.company_id = {$company_id} AND f.closed_by IS NOT NULL
-                         AND f.closed_by = f.created_by LIMIT 20",
+                        FROM mnt_breakdown f LEFT JOIN users u ON u.id = f.approved_by
+                       WHERE f.company_id = {$company_id} AND f.approved_by IS NOT NULL
+                         AND f.approved_by = f.created_by LIMIT 20",
         ),
     );
 } elseif ($deptCode === 'trp') {

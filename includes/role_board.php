@@ -268,8 +268,9 @@ function roleBoardAlerts($conn, $gate, $roleId)
              AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<?", array($today));
 
         // الحالات المفتوحة بأسمائها الفعلية في ENUM الجدول (لا اجتهاد)
+        // — و`fin_requests` بلا عمودِ حذفٍ أصلًا: حياتُه بـ`state` وحدَها
         $counts['req_sla'] = (int) roleBoardScalar($gate, array('scope' => array('q' => 'fin_requests')),
-            "SELECT COUNT(*) FROM fin_requests q WHERE {TENANT_SCOPE} AND COALESCE(q.is_deleted,0)=0
+            "SELECT COUNT(*) FROM fin_requests q WHERE {TENANT_SCOPE}
              AND q.state IN('draft','under_review','pending_approval','returned')
              AND q.created_at < DATE_SUB(NOW(), INTERVAL 3 DAY)");
 
@@ -310,11 +311,13 @@ function roleBoardAlerts($conn, $gate, $roleId)
         $counts = array();
         // الرصيد محسوبٌ من الحركات (صيغة stock_proc: استلام + إرجاع − صرف) مقارنًا
         // بنقطة الطلب — الاستعلام الفرعي بجدوله المعلَن (عقد scopedQuery)
+        // ◆ الارتباطُ بالصنفِ وحدَه: صفُّ الصنفِ لشركةٍ واحدةٍ فحركاتُه كذلك —
+        //   والبوابةُ ترفض `company_id` اليدويَّ حرفًا (نمطُ ⑤-655 نفسُه)
         $counts['reorder_hit'] = (int) roleBoardScalar($gate,
             array('scope' => array('op' => 'proc_orderpoint'), 'enrich' => array('m' => 'proc_stock_move')),
             "SELECT COUNT(*) FROM proc_orderpoint op WHERE {TENANT_SCOPE} AND COALESCE(op.is_deleted,0)=0
              AND (SELECT COALESCE(SUM(CASE WHEN m.move_type IN('استلام','إرجاع') THEN m.qty ELSE -m.qty END),0)
-                    FROM proc_stock_move m WHERE m.item_id = op.item_id AND m.company_id = op.company_id) <= op.min_qty");
+                    FROM proc_stock_move m WHERE m.item_id = op.item_id) <= op.min_qty");
         // لا عمودَ موعدِ توريدٍ على الأمر — «متأخر» = مؤكَّدٌ بلا استلامٍ فوق 7 أيام (تقريبٌ موثَّق)
         $counts['po_late'] = (int) roleBoardScalar($gate, array('scope' => array('o' => 'proc_order')),
             "SELECT COUNT(*) FROM proc_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0
@@ -477,9 +480,11 @@ function roleBoardAlerts($conn, $gate, $roleId)
                 // الواحدة**. الوردية جزءٌ من التجميع لا زينة: معدةٌ لها مشغّلٌ
                 // نهاريٌّ وآخرُ ليليٌّ تشغيلٌ طبيعيٌّ لا تعارض — وإسقاطُ shift_type
                 // كان يعدّها تعارضًا (قِيس على البيانات الحية: 9 بلا الوردية · 6 بها).
-                "SELECT COUNT(*) FROM (SELECT ed.equipment_id FROM equipment_drivers ed
+                // ◆ بلا جدولٍ مشتقٍّ: البوابةُ تشترط WHERE عليا واحدةً فيُجمَّع
+                //   بـGROUP/HAVING وتُعَدُّ الصفوفُ (نمطُ roleBoardRowCount الموثَّق أعلاه)
+                "SELECT ed.equipment_id FROM equipment_drivers ed
                  WHERE {TENANT_SCOPE} AND ed.status = 1
-                 GROUP BY ed.equipment_id, ed.shift_type HAVING COUNT(*) > 1) d"),
+                 GROUP BY ed.equipment_id, ed.shift_type HAVING COUNT(*) > 1", 'rows'),
             'move_waiting' => array(array('t' => 'worker_movement', 'a' => 'wm'),
                 "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state = 'مسودة'"),
         ),

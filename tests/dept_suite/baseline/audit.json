@@ -1,0 +1,669 @@
+{
+    "dept": "audit",
+    "dept_ar": "المراجع الداخلي المستقل",
+    "at": "2026-09-08 15:53:33",
+    "mode": "full",
+    "screens": {
+        "Audit\/iaf_access_log.php": {
+            "label": "سجل الاطلاع الحساس للمراجعين",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 91 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_action_plans.php": {
+            "label": "خطط المعالجة والمتابعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى iaf_findings.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Audit\/iaf_audit_programs.php": {
+            "label": "برامج المراجعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_authorities.php": {
+            "label": "صلاحيات المراجع داخل النظام",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 87 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_charter.php": {
+            "label": "ميثاق المراجعة الداخلية",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 99 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_closure.php": {
+            "label": "محاضر الإغلاق",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى iaf_findings.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Audit\/iaf_competencies.php": {
+            "label": "اختصاصات المراجعة العشرون",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 84 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_engagements.php": {
+            "label": "مهام المراجعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 130 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_escalations.php": {
+            "label": "الملاحظات المتأخرة والتصعيد",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى iaf_findings.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Audit\/iaf_evidence_requests.php": {
+            "label": "طلبات الأدلة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_findings.php": {
+            "label": "الملاحظات",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 178 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_function_risks.php": {
+            "label": "مخاطر وظيفة المراجعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_independence.php": {
+            "label": "سجل الاستقلال وتعارض المصالح",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 110 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_overview.php": {
+            "label": "لوحة المراجعة الداخلية",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_plan.php": {
+            "label": "الخطة السنوية للمراجعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 120 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_quality.php": {
+            "label": "تقييم الجودة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 113 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_reports.php": {
+            "label": "تقارير المراجعة",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى ceo_audit_reports.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Audit\/iaf_responses.php": {
+            "label": "ردود الإدارات على الملاحظات",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى iaf_findings.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Audit\/iaf_test_samples.php": {
+            "label": "العينات ونتائج الاختبارات",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 75 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_universe.php": {
+            "label": "سجل الكون الرقابي",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 109 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Audit\/iaf_workpapers.php": {
+            "label": "أوراق العمل",
+            "group": "Audit",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 118 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4609,
+        "PROJECT": 993014,
+        "OPPORTUNITY": 1540,
+        "QUOTATION": 219,
+        "CONTRACT": 7314,
+        "SITE": 1188,
+        "LINE": 0
+    },
+    "residue_after": 0
+}

@@ -125,9 +125,9 @@ class FinanceM10Service
             $st->close();
             if (!$quotaOk && !empty($unit['equipment_id'])) {
                 $eq = (int) $unit['equipment_id'];
-                $r = $db->query("SHOW TABLES LIKE 'contract_seats'");
+                $r = $db->query("SHOW TABLES LIKE 'seat_assignments'");
                 if ($r && $r->num_rows) {
-                    $st = $db->prepare("SELECT 1 FROM contract_seats
+                    $st = $db->prepare("SELECT 1 FROM seat_assignments
                                          WHERE company_id = ? AND equipment_id = ? LIMIT 1");
                     $st->bind_param('ii', $companyId, $eq);
                     $st->execute();

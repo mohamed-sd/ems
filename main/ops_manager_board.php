@@ -56,7 +56,7 @@ $mnt = $q1("SELECT SUM(state NOT IN ('إغلاق','ملغى')) open_orders,
 
 // ④ القوى التشغيلية
 $ops4 = $q1("SELECT COUNT(*) c FROM equipment_drivers ed
-              JOIN operations o ON o.id = ed.operation_id AND o.status = 1
+              JOIN operations o ON o.equipment = ed.equipment_id AND o.status = 1
               JOIN project p ON p.id = o.project_id
              WHERE p.company_id = {$company_id} AND ed.status = 1");
 $ops4 = $ops4 ?: $q1("SELECT COUNT(*) c FROM equipment_drivers WHERE status = 1");

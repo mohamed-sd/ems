@@ -1,20 +1,14 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-08 03:12:13
--- الجداول: 1250 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-08 20:08:24
+-- الجداول: 1248 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
 -- ═══════════════════════════════════════════════════════════════════════════
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ── Table: _trg_probe ──
-CREATE TABLE `_trg_probe` (
-  `id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: acc_account_recon ──
 CREATE TABLE `acc_account_recon` (
@@ -502,6 +496,8 @@ CREATE TABLE `activity_logs` (
   KEY `idx_record_id` (`record_id`),
   KEY `idx_employee_created` (`employee_id`,`created_at`),
   KEY `ix_impersonation` (`impersonation_id`),
+  KEY `ix_hot_e38cc8e81d` (`project_id`),
+  KEY `ix_hot_5f03387ce2` (`contract_id`),
   CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -1897,20 +1893,6 @@ CREATE TABLE `commercial_risks` (
   KEY `idx_risk_scope` (`company_id`,`is_deleted`),
   KEY `idx_risk_entity` (`entity_type`,`entity_id`),
   KEY `idx_risk_state` (`state`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ── Table: company_user_password_resets ──
-CREATE TABLE `company_user_password_resets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `token_hash` char(64) NOT NULL,
-  `expires_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `used_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_company_user_password_resets_token_hash` (`token_hash`),
-  KEY `idx_company_user_password_resets_user_id` (`user_id`),
-  CONSTRAINT `fk_company_user_password_resets_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: container_consumption ──
@@ -3781,6 +3763,10 @@ CREATE TABLE `ems_business_events` (
   KEY `ix_pub` (`created_at`),
   KEY `ix_code` (`event_key`,`created_at`),
   KEY `ix_ebe_training` (`is_training`),
+  KEY `ix_hot_6c06fc7399` (`project_id`),
+  KEY `ix_hot_038b2345b4` (`contract_id`),
+  KEY `ix_hot_952490960d` (`equipment_id`),
+  KEY `ix_rng_21efaed455` (`occurred_at`),
   CONSTRAINT `fk_be_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON UPDATE CASCADE,
   CONSTRAINT `chk_consumers` CHECK (`consumers_declared` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ADR-15: الجذر المحايد — سجل الحقائق المؤسسي append-only؛ القناة: EventPublisher حصرًا؛ الدفتر المالي إسقاطه الأول';
@@ -3862,6 +3848,10 @@ CREATE TABLE `ems_event_deliveries` (
   KEY `ix_state` (`state`,`next_attempt_at`),
   KEY `ix_outbox` (`outbox_id`),
   KEY `fk_evdeliv_event` (`event_id`),
+  KEY `ix_hot_788a9352b3` (`company_id`),
+  KEY `ix_rng_b27a816fac` (`claimed_at`),
+  KEY `ix_rng_dc15ef7b1c` (`next_attempt_at`),
+  KEY `ix_rng_3b6ec7abd2` (`next_retry_at`),
   CONSTRAINT `fk_evdeliv_event` FOREIGN KEY (`event_id`) REFERENCES `ems_business_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
   CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null),
@@ -3933,6 +3923,11 @@ CREATE TABLE `ems_job_queue` (
   KEY `idx_jq_claim` (`state`,`next_attempt_at`),
   KEY `idx_jq_company` (`company_id`,`state`,`created_at`),
   KEY `ix_type` (`job_type`,`state`),
+  KEY `ix_hot_2d9b280226` (`created_at`),
+  KEY `ix_rng_79870fbd6d` (`started_at`),
+  KEY `ix_rng_63003dab51` (`claimed_at`),
+  KEY `ix_rng_c324995d32` (`next_attempt_at`),
+  KEY `ix_rng_d137857d08` (`lock_expires_at`),
   CONSTRAINT `chk_lock` CHECK (`state` <> 'claimed' or `worker_id` is not null and `lock_expires_at` is not null),
   CONSTRAINT `chk_job_type` CHECK (`job_type` in ('fin_posting','capacity_rollup','depreciation_run','statement_build','alert_dispatch','event_retry','settlement_recalc','pilot_monitor'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-24: «قيد المعالجة» ثم إشعار الاكتمال — والصفحة لا تتجمد أبدًا';
@@ -4005,7 +4000,8 @@ CREATE TABLE `ems_saved_views` (
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_view` (`company_id`,`screen`,`owner_kind`,`owner_id`,`view_name`),
-  KEY `ix_screen` (`company_id`,`screen`,`active`)
+  KEY `ix_screen` (`company_id`,`screen`,`active`),
+  KEY `ix_hot_ad148eeef8` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ems_sequences ──
@@ -6844,6 +6840,8 @@ CREATE TABLE `fin_event_effects` (
   UNIQUE KEY `uq_effect` (`event_id`,`effect_type`,`party_type`,`party_id`,`contract_line_id`),
   KEY `ix_eff_company_party` (`company_id`,`party_type`,`party_id`),
   KEY `ix_eff_type` (`company_id`,`effect_type`),
+  KEY `ix_hot_ad06c870ad` (`created_at`),
+  KEY `ix_hot_721d65f6f3` (`status`),
   CONSTRAINT `fk_eff_event` FOREIGN KEY (`event_id`) REFERENCES `fin_financial_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='H-12 (FES §3.2): آثارُ الحدث — الحدثُ الواحد قد يولّد آثارًا لعدة أطراف';
 
@@ -6891,6 +6889,8 @@ CREATE TABLE `fin_event_links` (
   KEY `ix_parent` (`company_id`,`parent_kind`,`parent_ref`),
   KEY `ix_target` (`company_id`,`target_table`,`target_id`),
   KEY `ix_event` (`event_id`),
+  KEY `ix_hot_60113c648d` (`created_at`),
+  KEY `ix_rng_a52bf5b132` (`entry_date`),
   CONSTRAINT `fk_fel_event` FOREIGN KEY (`event_id`) REFERENCES `fin_financial_events` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -7091,6 +7091,14 @@ CREATE TABLE `fin_financial_events` (
   KEY `ix_ffe_source_line` (`company_id`,`entity_type`,`entity_id`,`source_line_id`,`source_doc_version`),
   KEY `fk_ffe_period` (`fiscal_period_id`),
   KEY `ix_ffe_training` (`is_training`),
+  KEY `ix_hot_777f3db349` (`created_at`),
+  KEY `ix_hot_b4f5751509` (`state`),
+  KEY `ix_hot_b4e16fd37f` (`project_id`),
+  KEY `ix_hot_f1450ccf2c` (`contract_id`),
+  KEY `ix_hot_a8e7397fff` (`equipment_id`),
+  KEY `ix_rng_03155b3971` (`due_date`),
+  KEY `ix_rng_43d0324d4f` (`occurred_at`),
+  KEY `ix_rng_e800375e98` (`approved_at`),
   CONSTRAINT `fk_ffe_period` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fin_financial_periods` (`id`),
   CONSTRAINT `fk_ffe_root` FOREIGN KEY (`root_event_id`) REFERENCES `ems_business_events` (`id`),
   CONSTRAINT `ck_ffe_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2))
@@ -7547,6 +7555,10 @@ CREATE TABLE `fin_journal_entries` (
   KEY `ix_fin_entry_deleted` (`is_deleted`),
   KEY `ix_je_txn_date` (`company_id`,`txn_date`),
   KEY `ix_je_request_no` (`company_id`,`request_no`),
+  KEY `ix_hot_03f337d48e` (`created_at`),
+  KEY `ix_hot_00d422151c` (`state`),
+  KEY `ix_rng_40fae17f44` (`posting_date`),
+  KEY `ix_rng_5c7a4bf92e` (`txn_date`),
   CONSTRAINT `ck_je_balanced` CHECK (round(`total_debit`,2) = round(`total_credit`,2)),
   CONSTRAINT `ck_je_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`total_debit` * `fx_rate`,2)),
   CONSTRAINT `chk_manual_journal_governed` CHECK (`event_id` is not null and `event_id` > 0 or `manual_gov_state` = 'PRE_GOVERNANCE' or trim(`manual_kind`) <> '' and trim(`source_doc_ref`) <> '' and trim(coalesce(`memo`,'')) <> '' and trim(`period_code`) <> '' and `created_by` > 0 and (`state` <> 'posted' or trim(`approval_ref`) <> '' and coalesce(`posted_by`,0) > 0))
@@ -7584,6 +7596,10 @@ CREATE TABLE `fin_journal_lines` (
   KEY `ix_jl_dims` (`company_id`,`contract_id`,`business_model`),
   KEY `ix_jl_party` (`company_id`,`counterparty_type`,`counterparty_id`),
   KEY `ix_jl_legacy` (`legacy_account_id`),
+  KEY `ix_hot_03c57904ae` (`created_at`),
+  KEY `ix_hot_e5499e9303` (`project_id`),
+  KEY `ix_hot_31fa6cd28f` (`contract_id`),
+  KEY `ix_hot_20f809a0bb` (`equipment_id`),
   CONSTRAINT `fk_fin_jl_acc` FOREIGN KEY (`account_id`) REFERENCES `fin_chart_of_accounts` (`id`),
   CONSTRAINT `fk_fin_jl_cc` FOREIGN KEY (`cost_center_id`) REFERENCES `fin_cost_centers` (`id`),
   CONSTRAINT `fk_fin_jl_entry` FOREIGN KEY (`entry_id`) REFERENCES `fin_journal_entries` (`id`) ON DELETE CASCADE
@@ -7809,7 +7825,8 @@ CREATE TABLE `fin_notifications` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_fin_ntf_target` (`company_id`,`target_level`,`is_read`),
-  KEY `ix_fin_ntf_created` (`company_id`,`created_at`)
+  KEY `ix_fin_ntf_created` (`company_id`,`created_at`),
+  KEY `ix_hot_b97db7c470` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_obl_alert_log ──
@@ -8202,6 +8219,9 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_dir` (`company_id`,`direction`),
   KEY `ix_fin_pay_state` (`company_id`,`state`),
   KEY `ix_fin_pay_deleted` (`is_deleted`),
+  KEY `ix_hot_9dbcd64cc4` (`created_at`),
+  KEY `ix_hot_8b3386b713` (`state`),
+  KEY `ix_hot_620d538faf` (`event_id`),
   CONSTRAINT `ck_pay_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2)),
   CONSTRAINT `ck_fp_allocated` CHECK (`allocated_amount` >= 0 and `allocated_amount` <= `amount`),
   CONSTRAINT `ck_collection_bank_ref` CHECK (`direction` <> 'collection' or `bank_ref` is not null and `bank_ref` <> ''),
@@ -9365,6 +9385,9 @@ CREATE TABLE `financing_installments` (
   UNIQUE KEY `uq_fi_seq` (`op_id`,`seq_no`) COMMENT 'يمنع تكرار القسط — وحدث الاستحقاق بمفتاح (العملية×القسط)',
   KEY `ix_fi_due` (`due_date`,`state`),
   KEY `ix_fininst_co` (`company_id`),
+  KEY `ix_hot_f29f8bbe67` (`created_at`),
+  KEY `ix_hot_a673cea4c5` (`state`),
+  KEY `ix_rng_019892cd45` (`paid_date`),
   CONSTRAINT `fk_fi_op` FOREIGN KEY (`op_id`) REFERENCES `financing_operations` (`op_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-01 §6: الأقساط تولَّد من العملية ولا تُدخل يدويًّا';
 
@@ -11004,7 +11027,8 @@ CREATE TABLE `gov_field_class` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_field` (`company_id`,`screen_code`,`field_key`),
   KEY `ix_dc` (`dc_code`,`active`),
-  KEY `ix_screen` (`screen_code`,`active`)
+  KEY `ix_screen` (`screen_code`,`active`),
+  KEY `ix_hot_34b28d5936` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PROP-01 §7-2 ⑤ — صفرُ حقلٍ في شاشةٍ حاكمةٍ بلا صنف';
 
 -- ── Table: gov_field_inheritance ──
@@ -11160,7 +11184,8 @@ CREATE TABLE `gov_guide_lists` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_guide_list_value` (`surface_key`,`field_key`,`value_ar`),
-  KEY `ix_guide_list_field` (`surface_key`,`field_key`,`active`,`sort_no`)
+  KEY `ix_guide_list_field` (`surface_key`,`field_key`,`active`,`sort_no`),
+  KEY `ix_hot_b071e2464a` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قيمُ القوائمِ المحكومةِ من الدليلِ المعماريّ — SILENT_DROP_FIX §2·2-④';
 
 -- ── Table: gov_independent_reviews ──
@@ -11427,7 +11452,8 @@ CREATE TABLE `gov_legacy_nav_recon` (
   `basis` varchar(300) NOT NULL,
   `reconciled_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_gtn` (`gtn_id`)
+  UNIQUE KEY `uq_gtn` (`gtn_id`),
+  KEY `ix_hot_e1004a9e48` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='§٢٠: مصالحةُ إرثِ gov_target_nav — Current يقترح ولا يعتمد نفسَه';
 
 -- ── Table: gov_migration_ledger ──
@@ -11592,6 +11618,28 @@ CREATE TABLE `gov_orphan_links` (
   KEY `ix_decision` (`owner_decision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
 
+-- ── Table: gov_orphan_screens ──
+CREATE TABLE `gov_orphan_screens` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(190) NOT NULL COMMENT 'المسار بحرفه كما على القرص',
+  `route_norm` varchar(190) NOT NULL COMMENT 'مسوى: صغير وبلا لاحقة — مفتاح المطابقة',
+  `owner_dept` varchar(120) NOT NULL DEFAULT '' COMMENT 'من nav_canonical ثم gov_screen_cycle',
+  `module_id` int(11) DEFAULT NULL COMMENT 'صف modules إن وجد — شرط التصريح بالقالب',
+  `module_code` varchar(160) DEFAULT NULL,
+  `title_ar` varchar(190) NOT NULL DEFAULT '',
+  `size_kb` int(10) unsigned NOT NULL DEFAULT 0,
+  `first_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  `last_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  `decision` enum('PENDING','KEEP','RETIRE','WIRED') NOT NULL DEFAULT 'PENDING' COMMENT 'حكم المالك: معلق · تبقى وتوصل · تتقاعد · وصلت فعلا',
+  `decided_by` int(11) DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  `note` varchar(400) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_orphan_route` (`route_norm`),
+  KEY `idx_orphan_dept` (`owner_dept`),
+  KEY `idx_orphan_decision` (`decision`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='شاشات مبنية لا يبلغها أحد — جرد وقرار';
+
 -- ── Table: gov_ownership_rulings ──
 CREATE TABLE `gov_ownership_rulings` (
   `route` varchar(190) NOT NULL,
@@ -11753,6 +11801,7 @@ CREATE TABLE `gov_profile_items` (
   PRIMARY KEY (`item_id`),
   UNIQUE KEY `uq_item` (`profile_id`,`item_kind`,`item_ref`),
   KEY `ix_profile` (`profile_id`),
+  KEY `ix_hot_e61ce3721a` (`company_id`),
   CONSTRAINT `fk_pi_profile` FOREIGN KEY (`profile_id`) REFERENCES `gov_role_profiles` (`profile_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §5-1 — بنودُ القالبِ الستة';
 
@@ -11909,6 +11958,7 @@ CREATE TABLE `gov_screen_cycle` (
   KEY `ix_dept` (`dept_name`),
   KEY `ix_cyc_screen` (`screen_id`),
   KEY `ix_cyc_rule` (`bridge_rule`),
+  KEY `ix_hot_6e5f185837` (`company_id`),
   CONSTRAINT `chk_cyc_bridge` CHECK (`bridge_rule` in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED','C5_AUTHORED','C5_NOT_APPLICABLE','C6_MANUAL_AMBIG') and `screen_id` <> '' or `bridge_rule` not in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED','C5_AUTHORED','C5_NOT_APPLICABLE','C6_MANUAL_AMBIG') and `screen_id` = '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
 
@@ -12040,7 +12090,9 @@ CREATE TABLE `gov_space_url_shadow` (
   `seen_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_route_space` (`route`,`space_ar`),
-  KEY `ix_seen` (`seen_at`)
+  KEY `ix_seen` (`seen_at`),
+  KEY `ix_hot_1c66658ad8` (`user_id`),
+  KEY `ix_hot_19ad4ff4c7` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-SEC-008 — ما كان سيُمنَع لو أُنفِذ حارسُ العنوانِ المباشر';
 
 -- ── Table: gov_stage_outputs ──
@@ -12190,6 +12242,8 @@ CREATE TABLE `gov_test_residue_archive` (
   KEY `idx_record_id` (`record_id`),
   KEY `idx_employee_created` (`employee_id`,`created_at`),
   KEY `ix_impersonation` (`impersonation_id`),
+  KEY `ix_hot_661f6da007` (`project_id`),
+  KEY `ix_hot_5ab7f9266e` (`contract_id`),
   CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -12408,6 +12462,8 @@ CREATE TABLE `guard_denials` (
   `request_source` varchar(24) DEFAULT NULL COMMENT 'مصدر الطلب',
   PRIMARY KEY (`deny_id`),
   KEY `ix_gd_guard` (`guard_code`,`at`),
+  KEY `ix_hot_d00bea4b12` (`company_id`),
+  KEY `ix_rng_28bebb8bf4` (`at`),
   CONSTRAINT `chk_denial_ref_present` CHECK (`attempted_ref` is not null and `attempted_ref` <> ''),
   CONSTRAINT `chk_denial_verb_present` CHECK (`verb_state` = 'PRE_VERB' or trim(`verb`) <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §9: سجل المنع — مقياس ملاءمة الحماية لا سجل مخالفات المستخدمين';
@@ -15398,7 +15454,8 @@ CREATE TABLE `nav_canonical` (
   UNIQUE KEY `uq_route` (`route`),
   UNIQUE KEY `uq_anchor` (`anchor_key`),
   KEY `ix_status_level` (`status`,`level_no`,`sort_no`),
-  KEY `ix_screen_id` (`screen_id`)
+  KEY `ix_screen_id` (`screen_id`),
+  KEY `ix_hot_7f220dbe34` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: سجلُّ التنقلِ المعياريُّ — صورةُ مصفوفةِ الـ359 المعتمَدة';
 
 -- ── Table: nav_canonical_current ──
@@ -15408,7 +15465,8 @@ CREATE TABLE `nav_canonical_current` (
   `cur_label` varchar(190) NOT NULL,
   `cur_group` varchar(190) NOT NULL,
   `cur_order` int(11) NOT NULL COMMENT 'تسلسلُ الظهورِ الحيُّ في الدور — من uxui_live_positions.tsv',
-  PRIMARY KEY (`route`,`role_id`)
+  PRIMARY KEY (`route`,`role_id`),
+  KEY `ix_hot_7470ece7e6` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01 v3: موضعُ الانتقالِ الحاليُّ للمعلَّقِ لكلِّ دور — المصفوفةُ وحدَها مصدرًا';
 
 -- ── Table: nav_canonical_variants ──
@@ -15493,6 +15551,7 @@ CREATE TABLE `nav_items` (
   KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
   KEY `ix_nav_group` (`group_id`),
   KEY `ix_nav_module` (`module_id`),
+  KEY `ix_hot_14aef043cc` (`created_at`),
   CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
   CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
   CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
@@ -15674,7 +15733,8 @@ CREATE TABLE `nav_legacy_disposition` (
   KEY `ix_ws` (`current_workspace`),
   KEY `ix_disp` (`disposition`),
   KEY `ix_action` (`action`),
-  KEY `ix_route` (`current_route`)
+  KEY `ix_route` (`current_route`),
+  KEY `ix_hot_e178a44dcb` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-ARCH-02 §15 — حكمُ كلِّ ظهورٍ إرثيّ: ⛔ ولا إرثَ يظهر بلا حكم (§41)';
 
 -- ── Table: nav_lifecycle_groups ──
@@ -15821,7 +15881,11 @@ CREATE TABLE `nav_workspace_placements` (
   UNIQUE KEY `uq_ws_route` (`workspace_id`,`route`),
   KEY `ix_ws_status` (`workspace_id`,`status`,`placement_type`),
   KEY `ix_screen` (`screen_id`),
-  KEY `ix_route` (`route`)
+  KEY `ix_route` (`route`),
+  KEY `ix_hot_e5d6d850bf` (`created_at`),
+  KEY `ix_hot_ddc7522622` (`status`),
+  KEY `ix_rng_00fcb44323` (`effective_from`),
+  KEY `ix_rng_e6cc9ab8a7` (`effective_to`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-ARCH-02 §8 — سجلُّ الموضعِ الحاكم: مصدرُ الحقيقةِ لمكانِ ظهورِ الشاشة';
 
 -- ── Table: nav_workspaces ──
@@ -15929,6 +15993,14 @@ CREATE TABLE `op_containers` (
   KEY `ix_container_origin` (`company_id`,`origin`,`origin_ack_by`),
   KEY `ix_oc_resource_plan` (`resource_plan_id`),
   KEY `fk_oc_parent_obl` (`parent_id`,`obl_id`),
+  KEY `ix_hot_3c05820971` (`created_at`),
+  KEY `ix_hot_3830b95c1f` (`is_deleted`),
+  KEY `ix_hot_35b0983776` (`state`),
+  KEY `ix_hot_d395bc3c09` (`project_id`),
+  KEY `ix_hot_977ec63d24` (`contract_id`),
+  KEY `ix_hot_62bf9ff67e` (`equipment_id`),
+  KEY `ix_rng_6e9d898dc6` (`valid_from`),
+  KEY `ix_rng_1e25eadb78` (`valid_to`),
   CONSTRAINT `fk_container_parent` FOREIGN KEY (`parent_id`) REFERENCES `op_containers` (`id`),
   CONSTRAINT `fk_oc_parent_obl` FOREIGN KEY (`parent_id`, `obl_id`) REFERENCES `op_containers` (`id`, `obl_id`),
   CONSTRAINT `ck_container_alloc` CHECK (`allocated_qty` >= 0 and `allocated_qty` <= `cap_qty`),
@@ -16667,6 +16739,9 @@ CREATE TABLE `payroll_lines` (
   PRIMARY KEY (`id`),
   KEY `ix_payroll_line_run_person` (`run_id`,`person_id`),
   KEY `ix_payroll_line_snapshot` (`snapshot_id`),
+  KEY `ix_hot_f44429bfc7` (`company_id`),
+  KEY `ix_hot_ebe8b13aef` (`created_at`),
+  KEY `ix_hot_863e2975a2` (`contract_id`),
   CONSTRAINT `fk_payroll_line_run` FOREIGN KEY (`run_id`) REFERENCES `payroll_runs` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_payroll_line_snapshot` FOREIGN KEY (`snapshot_id`) REFERENCES `contract_snapshots` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -16826,7 +16901,8 @@ CREATE TABLE `perm01_target_item` (
   `role_id` int(11) NOT NULL DEFAULT 0 COMMENT 'صفر: بندُ مساحةٍ لكلِّ أدوارِها · وإلا بندُ رابطٍ لدورٍ بعينه',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_target_item` (`workspace_id`,`module_code`,`role_id`),
-  KEY `ix_ws` (`workspace_id`)
+  KEY `ix_ws` (`workspace_id`),
+  KEY `ix_hot_9dbba66e0d` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §3-5 — بنود الهدف: شاشة واحدة لكل صف';
 
 -- ── Table: perm01_target_profile ──
@@ -16859,7 +16935,8 @@ CREATE TABLE `perm_change_log` (
   PRIMARY KEY (`id`),
   KEY `ix_subject` (`subject_kind`,`subject_id`),
   KEY `ix_screen` (`screen_code`),
-  KEY `ix_when` (`changed_at`)
+  KEY `ix_when` (`changed_at`),
+  KEY `ix_hot_cc82166f0d` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §7-5 — من غير الصلاحية ومتى ولماذا';
 
 -- ── Table: perm_shadow_diffs ──
@@ -16918,7 +16995,8 @@ CREATE TABLE `permission_audit_events` (
   `at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`ev_id`),
   KEY `idx_pae_person` (`company_id`,`person_id`,`at`),
-  KEY `idx_pae_type` (`event_type`,`at`)
+  KEY `idx_pae_type` (`event_type`,`at`),
+  KEY `ix_rng_863fe13154` (`at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: لا يُعدَّل ولا يُحذف — ولا يُخلط بمراجعة المدير الدورية';
 
 -- ── Table: permission_change_requests ──
@@ -17158,7 +17236,10 @@ CREATE TABLE `personal_notifications` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_pn_user` (`company_id`,`user_id`,`read_at`),
-  KEY `ix_pn_action` (`requires_action`,`task_item_id`)
+  KEY `ix_pn_action` (`requires_action`,`task_item_id`),
+  KEY `ix_hot_78ed321cb1` (`created_at`),
+  KEY `ix_hot_cfccf6ff3a` (`user_id`),
+  KEY `ix_rng_b428420e1e` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: التنبيه إحاطة — ولا يصير مهمة إلا بفعل مطلوب';
 
 -- ── Table: persons ──
@@ -24106,7 +24187,9 @@ CREATE TABLE `schema_migrations` (
   `applied_by` varchar(128) NOT NULL DEFAULT '',
   `error_text` text DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_schema_migrations_filename` (`filename`)
+  UNIQUE KEY `uq_schema_migrations_filename` (`filename`),
+  KEY `ix_hot_0ab93c8431` (`status`),
+  KEY `ix_rng_52ae75d9c9` (`applied_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: scr_access_review ──
@@ -25830,7 +25913,8 @@ CREATE TABLE `screen_view_rows` (
   UNIQUE KEY `uq_svr_canonical` (`canonical_file`,`dept`),
   KEY `ix_svr_role` (`role_id`,`role_kind`,`active`),
   KEY `ix_svr_route` (`route`),
-  KEY `ix_svr_canonical` (`canonical_file`)
+  KEY `ix_svr_canonical` (`canonical_file`),
+  KEY `ix_hot_9087cd9545` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-01 v6 §6: صفوفُ العرض — النطاقُ والزاويةُ والأفعالُ معلنةٌ لكل ناظر';
 
 -- ── Table: seat_assignments ──
@@ -25984,7 +26068,9 @@ CREATE TABLE `sensitive_read_log` (
   `context` varchar(190) DEFAULT NULL COMMENT 'الشاشة أو الخدمة',
   PRIMARY KEY (`read_id`),
   KEY `ix_srl_person` (`person_id`,`at`),
-  KEY `ix_srl_subject` (`subject_type`,`subject_id`)
+  KEY `ix_srl_subject` (`subject_type`,`subject_id`),
+  KEY `ix_hot_1caa33adc5` (`company_id`),
+  KEY `ix_rng_24dfb8632b` (`at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §9: سجل اطلاع على الحقول الحساسة — Insert-only';
 
 -- ── Table: settlement_lines ──
@@ -26012,6 +26098,10 @@ CREATE TABLE `settlement_lines` (
   UNIQUE KEY `uq_line_source` (`settlement_id`,`source_kind`,`source_ref`) COMMENT 'لا يُحمَّل مصدرٌ مرتين في التسوية الواحدة',
   KEY `ix_line_settlement` (`settlement_id`),
   KEY `ix_line_objected` (`objected`),
+  KEY `ix_hot_ddc1f6d978` (`company_id`),
+  KEY `ix_hot_12d8a2cfea` (`created_at`),
+  KEY `ix_rng_fe9100a141` (`work_date`),
+  KEY `ix_rng_55a2bd0102` (`resolved_at`),
   CONSTRAINT `fk_line_settlement` FOREIGN KEY (`settlement_id`) REFERENCES `settlements` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='بنودُ التسوية — كلُّ بندٍ برابط أصله (UX-05 §5.2)';
 
@@ -27993,20 +28083,6 @@ CREATE TABLE `sup_violations` (
   CONSTRAINT `chk_sv_desc` CHECK (char_length(`description`) >= 8)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الورقة م19 — المخالفات والجزاءات · سجلٌّ تابعٌ للتسوية';
 
--- ── Table: super_admin_password_resets ──
-CREATE TABLE `super_admin_password_resets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `super_admin_id` int(11) NOT NULL,
-  `token_hash` char(64) NOT NULL,
-  `expires_at` timestamp NOT NULL,
-  `used_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_super_admin_password_resets_token_hash` (`token_hash`),
-  KEY `idx_super_admin_password_resets_admin_id` (`super_admin_id`),
-  CONSTRAINT `fk_super_admin_password_resets_admin` FOREIGN KEY (`super_admin_id`) REFERENCES `super_admins` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- ── Table: super_admins ──
 CREATE TABLE `super_admins` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف فريد',
@@ -28650,7 +28726,9 @@ CREATE TABLE `task_assignments` (
   `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
   PRIMARY KEY (`id`),
   KEY `ix_ta_item` (`item_id`),
-  KEY `ix_ta_to` (`company_id`,`to_user_id`)
+  KEY `ix_ta_to` (`company_id`,`to_user_id`),
+  KEY `ix_hot_a2d9e855b4` (`created_at`),
+  KEY `ix_rng_757de07ebb` (`approved_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM: تاريخ الإسناد — العدّ يستمر ولا يُصفَّر';
 
 -- ── Table: task_dependencies ──
@@ -28758,6 +28836,7 @@ CREATE TABLE `template_permission_dims` (
   UNIQUE KEY `uq_tp_dim` (`tp_id`,`action_code`,`scope_code`),
   KEY `ix_tpd_action` (`action_code`),
   KEY `fk_tpd_scope` (`scope_code`),
+  KEY `ix_hot_ed96777fb1` (`created_at`),
   CONSTRAINT `fk_tpd_action` FOREIGN KEY (`action_code`) REFERENCES `sec_actions` (`action_code`),
   CONSTRAINT `fk_tpd_scope` FOREIGN KEY (`scope_code`) REFERENCES `sec_scopes` (`scope_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-013: البعد الرباعي لكل بند قالب — يُشتق baseline ويُنقح يدويًّا';
@@ -29350,7 +29429,10 @@ CREATE TABLE `timesheet` (
   KEY `idx_timesheet_date` (`date`),
   KEY `idx_timesheet_operator` (`operator`),
   KEY `idx_timesheet_date_id` (`date`,`id`),
-  KEY `ix_stop_role` (`stop_register_role`)
+  KEY `ix_stop_role` (`stop_register_role`),
+  KEY `ix_hot_da9e3152e0` (`company_id`),
+  KEY `ix_hot_3d79b60e0f` (`status`),
+  KEY `ix_hot_26ea526a81` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: timesheet_approval_notes ──
@@ -31808,6 +31890,13 @@ CREATE TABLE `unit_entries` (
   KEY `ix_supplier_ue` (`supplier_entity_id`,`entry_date`),
   KEY `ix_field_kind` (`field_kind`),
   KEY `ix_site_day` (`site_day_id`),
+  KEY `ix_hot_f773683dad` (`created_at`),
+  KEY `ix_hot_158f78c63f` (`state`),
+  KEY `ix_hot_4849121a41` (`project_id`),
+  KEY `ix_hot_ef29629208` (`contract_id`),
+  KEY `ix_hot_5eff113dff` (`event_id`),
+  KEY `ix_rng_ae72ab2a58` (`entry_date`),
+  KEY `ix_rng_2c833834c2` (`converted_at`),
   CONSTRAINT `chk_ue_match_evidence` CHECK (`client_match_state` = 'pending' or `client_match_at` is not null and `client_match_by` is not null),
   CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null),
   CONSTRAINT `chk_ue_meter` CHECK (`meter_after` is null or `meter_before` is null or `meter_after` >= `meter_before`),
@@ -31950,7 +32039,12 @@ CREATE TABLE `unit_time_log` (
   KEY `ix_state` (`company_id`,`ops_state`),
   KEY `ix_resp` (`company_id`,`resp_party`),
   KEY `ix_attribution` (`company_id`,`obligation_type`,`decided_at`),
-  KEY `ix_objection` (`company_id`,`objection_state`)
+  KEY `ix_objection` (`company_id`,`objection_state`),
+  KEY `ix_hot_23e7efb5b7` (`created_at`),
+  KEY `ix_hot_44aea6e9f8` (`project_id`),
+  KEY `ix_hot_d85ba4dced` (`equipment_id`),
+  KEY `ix_hot_7d21f4ed6c` (`entry_id`),
+  KEY `ix_rng_2a3658c069` (`log_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.3 — سجلّ الزمن التشغيلي: ماذا حدث لكل ساعةٍ من الوقت المتاح';
 
 -- ── Table: units_of_measure ──
@@ -32628,7 +32722,9 @@ CREATE TABLE `work_escalations` (
   `created_by` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `ix_we_item` (`item_kind`,`item_ref`),
-  KEY `ix_we_open` (`company_id`,`resolved_at`)
+  KEY `ix_we_open` (`company_id`,`resolved_at`),
+  KEY `ix_rng_3904808c51` (`resolved_at`),
+  KEY `ix_rng_4175797a7e` (`escalated_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AC-WFM-09: صفر مهمة متأخرة بلا تصعيد';
 
 -- ── Table: work_items ──
@@ -32694,7 +32790,14 @@ CREATE TABLE `work_items` (
   KEY `ix_wi_assignee` (`company_id`,`assigned_user_id`,`status`),
   KEY `ix_wi_owner` (`company_id`,`owner_user_id`,`status`),
   KEY `ix_wi_due` (`company_id`,`due_at`),
-  KEY `ix_wi_source` (`source_type`,`source_ref`)
+  KEY `ix_wi_source` (`source_type`,`source_ref`),
+  KEY `ix_hot_3c3411aeed` (`created_at`),
+  KEY `ix_hot_fe03514198` (`status`),
+  KEY `ix_hot_5821c9138b` (`project_id`),
+  KEY `ix_rng_e813c9e857` (`due_at`),
+  KEY `ix_rng_56d85b76f5` (`closed_at`),
+  KEY `ix_rng_186829b846` (`approved_at`),
+  KEY `ix_rng_2dd79468b6` (`response_due_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WFM-01: عنصر العمل — واجهة قراءة وتنفيذ لا مصدر بيانات';
 
 -- ── Table: worker_backup ──

@@ -221,20 +221,19 @@ $movement_result = array();
 try {
     $movement_result = $emp_gate->scopedQuery(
         array('scope' => array('t' => 'timesheet', 'o' => 'operations'),
-              'enrich' => array('p' => 'project', 'm' => 'mines', 'e' => 'equipments')),
+              'enrich' => array('p' => 'project', 'e' => 'equipments')),
         "SELECT
                    t.date,
                    t.shift,
                    t.operator_hours,
                    t.operator_standby_hours,
                    IFNULL(p.name, 'مشروع غير محدد') AS project_name,
-                   IFNULL(m.mine_name, 'منجم غير محدد') AS mine_name,
+                   IFNULL(NULLIF(p.mine_code, ''), 'منجم غير محدد') AS mine_name,
                    IFNULL(e.name, 'معدة غير محددة') AS equipment_name,
                    IFNULL(e.code, '-') AS equipment_code
                  FROM timesheet t
                  INNER JOIN operations o ON o.id = t.operator
                  LEFT JOIN project p ON p.id = o.project_id
-                 LEFT JOIN mines m ON m.id = o.mine_id
                  LEFT JOIN equipments e ON e.id = o.equipment
                  WHERE $timesheet_scope AND $operations_scope AND {TENANT_SCOPE}
                  ORDER BY STR_TO_DATE(t.date, '%Y-%m-%d') DESC, t.id DESC

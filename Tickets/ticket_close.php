@@ -49,7 +49,7 @@ ems_shell_axes($__pp);
    والاستعلامُ الفاشلُ يُميَّز عن «لا صفوف» — `config.php` يضبط mysqli على عدمِ
    الرمي، فعمودٌ ناقصٌ يعود `false` صامتًا ويُقرأ «الطابورُ خالٍ». */
 $rows = array(); $failed = false;
-$sql = "SELECT t.id, t.ticket_no, t.title, t.stage, t.created_by, t.created_at,
+$sql = "SELECT t.id, t.ticket_no, t.complaint AS title, t.stage, t.created_by, t.created_at,
                t.owner_role_id, t.resolution_due_at,
                u.name AS reporter_name, r.name AS owner_role_name
           FROM tickets t

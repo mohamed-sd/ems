@@ -62,7 +62,17 @@ function jrn_is_declared_tab(mysqli $db, $ROOT, $route)
         }
     }
     if (!isset($declared[$route])) { return false; }
-    $st = $db->prepare("SELECT COUNT(*) FROM nav_items WHERE route LIKE CONCAT('%', ?, '%')");
+    /* ◆ **والصفُّ المعطَّلُ ليس تسجيلًا في القوائم**: نصُّ رأسِ هذا الشاهدِ يشترط
+       أن «يُسجَّل في القوائم» — و`active = 0` لا يُصيَّر في قائمةِ أحدٍ أبدًا.
+       ⛔ **والعطبُ مقيسٌ لا مفترَض**: هجرةُ `2028_06_15_orphan_review_workspace`
+       أنشأت الدورَ 36 (مراجعةُ الشاشاتِ غيرِ المستعملة) وكتبت له **بنودًا
+       معطَّلةً** لكلِّ شاشةٍ يتيمة (2026-09-08 08:56:48). فانقلب تصنيفُ
+       `Clients/client_contacts.php` و`Suppliers/supplier_contacts.php` من
+       «تبويبٍ مُعلَن» إلى «شاشةٍ أُنشئت» — **بلا أن يُنشأَ ملفٌّ ولا يُصيَّرَ رابط**.
+       ⇒ يُقاس **التسجيلُ الحيُّ** لا وجودُ الصفّ. والاتجاهُ السالبُ يصمُد:
+       بندٌ نشِطٌ واحدٌ يكفي لِتُعَدَّ شاشةً. */
+    $st = $db->prepare("SELECT COUNT(*) FROM nav_items
+                         WHERE route LIKE CONCAT('%', ?, '%') AND active = 1");
     if (!$st) { return false; }
     $base = basename($route);
     $st->bind_param('s', $base);

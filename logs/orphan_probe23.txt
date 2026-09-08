@@ -1,0 +1,26 @@
+═══ تصنيفُ الـ23 ═══
+  main/ops_manager_board.php                   ↪ تحويل ⇒ main/dashboard.php
+  Financing/owners_registry.php                ↪ تحويل ⇒ main/dashboard.php
+  Governance/gov_dept.php                      ↪ تحويل ⇒ main/dashboard.php
+  Governance/ownership_grants.php              ↪ تحويل ⇒ main/dashboard.php
+  main/org_structure.php                       ↪ تحويل ⇒ main/dashboard.php
+  Settings/guard_classification.php            ↪ تحويل ⇒ main/dashboard.php
+  Oprators/select_project.php                  ↪ تحويل ⇒ main/dashboard.php
+  Finance/ob_commitments.php                   ↪ تحويل ⇒ Finance/ob_register.php?view=ob_commitments
+  Finance/ob_due_soon.php                      ↪ تحويل ⇒ Finance/ob_schedule.php?view=ob_due_soon
+  Finance/ob_horizon.php                       ↪ تحويل ⇒ Finance/ob_schedule.php?view=ob_horizon
+  Finance/ob_overdue.php                       ↪ تحويل ⇒ Finance/ob_schedule.php?view=ob_overdue
+  FinRequests/routing_admin.php                ↪ تحويل ⇒ main/dashboard.php
+  Audit/iaf_closure.php                        ↪ تحويل ⇒ main/dashboard.php
+  Audit/iaf_responses.php                      ↪ تحويل ⇒ main/dashboard.php
+  Approvals/hours_approval_followup.php        ↪ تحويل ⇒ main/dashboard.php
+  Equipments/equipments_drivers.php            ↪ تحويل ⇒ main/dashboard.php
+  Maintenance/breakdowns.php                   ↪ تحويل ⇒ main/dashboard.php
+  Reports/timesheetdeliy.php                   ↪ تحويل ⇒ main/dashboard.php
+  Tickets/admin_close.php                      ↪ تحويل ⇒ main/dashboard.php
+  Tickets/intake_classify.php                  ↪ تحويل ⇒ main/dashboard.php
+  Tickets/dept_inbox.php                       ↪ تحويل ⇒ main/dashboard.php
+  Portal/workspace.php                         ↪ تحويل ⇒ main/dashboard.php
+  Reports/approval_lag_report.php              ↪ تحويل ⇒ main/dashboard.php
+
+  منعٌ فعليّ = 0 · تحويلٌ مقصود = 23

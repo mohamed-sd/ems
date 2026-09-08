@@ -1,7 +1,7 @@
 {
     "dept": "sales",
     "dept_ar": "إدارة المبيعات التعاقدية والعقود",
-    "at": "2026-08-31 09:31:32",
+    "at": "2026-09-08 15:52:31",
     "mode": "full",
     "screens": {
         "Clients\/clients.php": {
@@ -11,12 +11,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 594 ك.ب"
+                    "note": "HTTP 200 · 693 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `clients` (id=4551)"
+                    "note": "صفٌّ أُنشئ فعلًا في `clients` (id=4593)"
                 },
                 {
                     "op": "EDIT",
@@ -42,12 +42,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 165 ك.ب"
+                    "note": "HTTP 200 · 164 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `products` (id=31)"
+                    "note": "صفٌّ أُنشئ فعلًا في `products` (id=40)"
                 },
                 {
                     "op": "EDIT",
@@ -78,7 +78,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `pricelists` (id=29)"
+                    "note": "صفٌّ أُنشئ فعلًا في `pricelists` (id=38)"
                 },
                 {
                     "op": "EDIT",
@@ -109,7 +109,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `units_of_measure` (id=19)"
+                    "note": "صفٌّ أُنشئ فعلًا في `units_of_measure` (id=28)"
                 },
                 {
                     "op": "EDIT",
@@ -140,7 +140,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `rate_books` (id=26)"
+                    "note": "صفٌّ أُنشئ فعلًا في `rate_books` (id=35)"
                 },
                 {
                     "op": "EDIT",
@@ -166,12 +166,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 265 ك.ب"
+                    "note": "HTTP 200 · 264 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `opportunities` (id=1500)"
+                    "note": "صفٌّ أُنشئ فعلًا في `opportunities` (id=1526)"
                 },
                 {
                     "op": "EDIT",
@@ -197,12 +197,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 719 ك.ب"
+                    "note": "HTTP 200 · 741 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `quotations` (id=186)"
+                    "note": "صفٌّ أُنشئ فعلًا في `quotations` (id=205)"
                 },
                 {
                     "op": "EDIT",
@@ -228,12 +228,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 82 ك.ب"
+                    "note": "HTTP 200 · 85 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_lines` (id=9)"
+                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_lines` (id=38)"
                 },
                 {
                     "op": "EDIT",
@@ -259,12 +259,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 79 ك.ب"
+                    "note": "HTTP 200 · 81 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_revisions` (id=13)"
+                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_revisions` (id=22)"
                 },
                 {
                     "op": "EDIT",
@@ -290,7 +290,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 74 ك.ب"
+                    "note": "HTTP 200 · 77 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -321,12 +321,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 188 ك.ب"
+                    "note": "HTTP 200 · 187 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `tenders` (id=28)"
+                    "note": "صفٌّ أُنشئ فعلًا في `tenders` (id=37)"
                 },
                 {
                     "op": "EDIT",
@@ -357,7 +357,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `readiness_lines` (id=43)"
+                    "note": "صفٌّ أُنشئ فعلًا في `readiness_lines` (id=52)"
                 },
                 {
                     "op": "EDIT",
@@ -388,7 +388,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `activities` (id=31)"
+                    "note": "صفٌّ أُنشئ فعلًا في `activities` (id=43)"
                 },
                 {
                     "op": "EDIT",
@@ -414,12 +414,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 79 ك.ب"
+                    "note": "HTTP 200 · 80 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `party_contacts` (id=14)"
+                    "note": "صفٌّ أُنشئ فعلًا في `party_contacts` (id=23)"
                 },
                 {
                     "op": "EDIT",
@@ -476,7 +476,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 79 ك.ب"
+                    "note": "HTTP 200 · 78 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -507,12 +507,12 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 612 ك.ب"
+                    "note": "HTTP 200 · 728 ك.ب"
                 },
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `project` (id=992967)"
+                    "note": "صفٌّ أُنشئ فعلًا في `project` (id=993000)"
                 },
                 {
                     "op": "EDIT",
@@ -543,7 +543,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `contract_events` (id=28)"
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_events` (id=37)"
                 },
                 {
                     "op": "EDIT",
@@ -574,7 +574,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `contract_commitments` (id=2148)"
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_commitments` (id=2181)"
                 },
                 {
                     "op": "EDIT",
@@ -600,7 +600,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 630 ك.ب"
+                    "note": "HTTP 200 · 635 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -636,7 +636,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `contract_obligations` (id=2614)"
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_obligations` (id=2623)"
                 },
                 {
                     "op": "EDIT",
@@ -667,7 +667,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `contract_guarantees` (id=797)"
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_guarantees` (id=806)"
                 },
                 {
                     "op": "EDIT",
@@ -698,7 +698,7 @@
                 {
                     "op": "ADD",
                     "status": "PASS",
-                    "note": "صفٌّ أُنشئ فعلًا في `client_contract_lines` (id=3744)"
+                    "note": "صفٌّ أُنشئ فعلًا في `client_contract_lines` (id=3764)"
                 },
                 {
                     "op": "EDIT",
@@ -724,7 +724,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 125 ك.ب"
+                    "note": "HTTP 200 · 124 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -755,7 +755,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 135 ك.ب"
+                    "note": "HTTP 200 · 134 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -848,7 +848,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 237 ك.ب"
+                    "note": "HTTP 200 · 236 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1003,7 +1003,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 149 ك.ب"
+                    "note": "HTTP 200 · 150 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1034,7 +1034,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 77 ك.ب"
+                    "note": "HTTP 200 · 79 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1096,7 +1096,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 74 ك.ب"
+                    "note": "HTTP 200 · 73 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1127,7 +1127,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 81 ك.ب"
+                    "note": "HTTP 200 · 80 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1282,7 +1282,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 109 ك.ب"
+                    "note": "HTTP 200 · 114 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1313,7 +1313,7 @@
                 {
                     "op": "VIEW",
                     "status": "PASS",
-                    "note": "HTTP 200 · 90 ك.ب"
+                    "note": "HTTP 200 · 93 ك.ب"
                 },
                 {
                     "op": "ADD",
@@ -1432,13 +1432,13 @@
         }
     },
     "fixtures": {
-        "CLIENT": 4550,
-        "PROJECT": 992966,
-        "OPPORTUNITY": 1499,
-        "QUOTATION": 185,
-        "CONTRACT": 7290,
-        "SITE": 1152,
-        "LINE": 3744
+        "CLIENT": 4592,
+        "PROJECT": 992999,
+        "OPPORTUNITY": 1525,
+        "QUOTATION": 204,
+        "CONTRACT": 7300,
+        "SITE": 1173,
+        "LINE": 3764
     },
     "residue_after": 0
 }

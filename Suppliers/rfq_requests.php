@@ -246,7 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         try {
             $__prs = $gate->scopedQuery(array('scope' => array('r' => 'proc_request')),
                 "SELECT r.id, r.state, r.fin_approval_state,
-                        COALESCE(r.note, '') note
+                        COALESCE(r.notes, '') note
                    FROM proc_request r
                   WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0) = 0
                     AND NOT EXISTS (SELECT 1 FROM supplier_rfqs q WHERE q.request_id = r.id)

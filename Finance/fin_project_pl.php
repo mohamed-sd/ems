@@ -22,11 +22,11 @@ $FA_SCREEN = array(
 function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
     $projects = array();
-    $r = $conn->query("SELECT id, name FROM projects WHERE company_id = {$company_id} ORDER BY id DESC LIMIT 100");
+    $r = $conn->query("SELECT id, name FROM project WHERE company_id = {$company_id} ORDER BY id DESC LIMIT 100");
     if ($r) { while ($x = $r->fetch_assoc()) { $projects[] = $x; } }
     $rows = array();
     $r = $conn->query("SELECT p.*, pr.name project_name FROM fin_project_pl p
-                        LEFT JOIN projects pr ON pr.id = p.project_id
+                        LEFT JOIN project pr ON pr.id = p.project_id
                        WHERE p.company_id = {$company_id} AND p.period = '" . $conn->real_escape_string($period) . "'
                        ORDER BY p.id DESC");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }

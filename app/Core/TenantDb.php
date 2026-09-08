@@ -188,9 +188,13 @@ class TenantDb
             if (in_array($table, self::$AUDIT_SKIP, true) || empty($cols)) { return $out; }
             $safe = array();
             foreach ($cols as $c) { $this->assertIdent($c); $safe[] = '`' . $c . '`'; }
-            $sql = 'SELECT `id`, ' . implode(', ', $safe) . ' FROM `' . $table . '` WHERE ' . $cond . ' LIMIT 50';
+            /* ◆ **مفتاحُ الصورةِ يُقرأ من المخطَّط**: كان `id` مثبَّتًا، فجدولٌ
+                 بلا `id` (286 من 1,249) **يسقط تدقيقُه صامتًا** في الالتقاط
+                 أدناه — أي أنَّ قيمةَ «قبل» تضيع لربعِ الجداول بلا إنذار. */
+            $__pk = $this->primaryKeyOf($table); $this->assertIdent($__pk);
+            $sql = 'SELECT `' . $__pk . '`, ' . implode(', ', $safe) . ' FROM `' . $table . '` WHERE ' . $cond . ' LIMIT 50';
             $res = $this->run($sql, $condParams);
-            while ($res && ($r = $res->fetch_assoc())) { $out[(int) $r['id']] = $r; }
+            while ($res && ($r = $res->fetch_assoc())) { $out[(int) $r[$__pk]] = $r; }
         } catch (\Throwable $e) {
             /* جدولٌ بلا `id` أو عمودٌ محسوب — التدقيقُ يسقط ولا يقطع الكتابة */
         }
@@ -290,7 +294,7 @@ class TenantDb
             'is_deleted' => 1,
             'deleted_at' => date('Y-m-d H:i:s'),
             'deleted_by' => $this->ctx->userId(),
-        ), array('id' => intval($id)));
+        ), array($this->primaryKeyOf($table) => intval($id)));
     }
 
     /**
@@ -314,7 +318,8 @@ class TenantDb
         $auditBefore = array();
         try {
             if (!in_array($table, self::$AUDIT_SKIP, true)) {
-                $rs = $this->conn->query('SELECT * FROM `' . $table . '` WHERE `id` = ' . $id . ' LIMIT 1');
+                $__spk = $this->primaryKeyOf($table); $this->assertIdent($__spk);
+                $rs = $this->conn->query('SELECT * FROM `' . $table . '` WHERE `' . $__spk . '` = ' . $id . ' LIMIT 1');
                 if ($rs && ($rr = $rs->fetch_assoc())) { $auditBefore = $rr; }
             }
         } catch (\Throwable $e) { /* التدقيقُ يسقط ولا يمنع الحذف */ }
@@ -326,7 +331,8 @@ class TenantDb
         }
 
         if ($this->crossTenant) {
-            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `id` = ?');
+            $__pk = $this->primaryKeyOf($table); $this->assertIdent($__pk);
+            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `' . $__pk . '` = ?');
             if (!$stmt) {
                 throw new TenantGateException('deleteRow prepare failed: ' . $this->conn->error);
             }
@@ -334,7 +340,8 @@ class TenantDb
         } else {
             $this->requireTenant($table);
             $cid = $this->ctx->companyId();
-            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `id` = ? AND `company_id` = ?');
+            $__pk = $this->primaryKeyOf($table); $this->assertIdent($__pk);
+            $stmt = $this->conn->prepare('DELETE FROM `' . $table . '` WHERE `' . $__pk . '` = ? AND `company_id` = ?');
             if (!$stmt) {
                 throw new TenantGateException('deleteRow prepare failed: ' . $this->conn->error);
             }
@@ -393,7 +400,8 @@ class TenantDb
         $this->requireTenant($parentTable);
 
         // النطاق 1: الأب مملوكٌ لشركة السياق (تحقُّق صريح — يُرفض غير المملوك)
-        $owned = $this->selectOne($parentTable, array('columns' => array('id'), 'where' => array('id' => $parentId), 'includeDeleted' => true));
+        $__ppk = $this->primaryKeyOf($parentTable);
+        $owned = $this->selectOne($parentTable, array('columns' => array($__ppk), 'where' => array($__ppk => $parentId), 'includeDeleted' => true));
         if ($owned === null) {
             $this->deny('replaceChildren: parent not owned by tenant', $parentTable . '#' . $parentId);
         }
@@ -491,20 +499,25 @@ class TenantDb
         $cid = $this->ctx->companyId();
 
         // النطاق 1: الأب مملوكٌ لشركة السياق (تحقُّق صريح — يُرفض غير المملوك)
-        $owned = $this->selectOne($parentTable, array('columns' => array('id'), 'where' => array('id' => $parentId), 'includeDeleted' => true));
+        $__ppk = $this->primaryKeyOf($parentTable);
+        $owned = $this->selectOne($parentTable, array('columns' => array($__ppk), 'where' => array($__ppk => $parentId), 'includeDeleted' => true));
         if ($owned === null) {
             $this->deny('deleteChild: parent not owned by tenant', $parentTable . '#' . $parentId);
         }
 
         // النطاق 2: حذف الابن بالشروط الثلاثة معًا إلزامًا (الصف + الأب + الشركة).
         // ابن T_CHILD بلا عمود company_id: شرطُ الشركة مستوفًى عبر الأب المملوك المتحقَّق أعلاه.
+        /* ◆ **ومفتاحُ الابنِ يُقرأ من مخطَّطِه** كما يُقرأ مفتاحُ الأب — فابنٌ
+             مفتاحُه `ws_id` أو `app_id` كان حذفُه يفشل ببناءِ الاستعلام. */
+        $__cpk = $this->primaryKeyOf($childTable);
+        $this->assertIdent($__cpk);
         if ($childless) {
             $stmt = $this->conn->prepare(
-                'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ?'
+                'DELETE FROM `' . $childTable . '` WHERE `' . $__cpk . '` = ? AND `' . $parentCol . '` = ?'
             );
         } else {
             $stmt = $this->conn->prepare(
-                'DELETE FROM `' . $childTable . '` WHERE `id` = ? AND `' . $parentCol . '` = ? AND `company_id` = ?'
+                'DELETE FROM `' . $childTable . '` WHERE `' . $__cpk . '` = ? AND `' . $parentCol . '` = ? AND `company_id` = ?'
             );
         }
         if (!$stmt) {
@@ -813,9 +826,11 @@ class TenantDb
                     // إن كان الأب كتالوجًا: العزل عبره «عامّ أو مِلكي» قراءةً (الكتابة strict = مِلكي).
                     $pDef = TenantRegistry::get($parent);
                     if ($pDef !== null && $pDef['type'] === TenantRegistry::T_CATALOG && empty($opts['__strictTenant'])) {
-                        $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND (__p.`company_id` IS NULL OR __p.`company_id` = ?))';
+                        $__epk = $this->primaryKeyOf($parent); $this->assertIdent($__epk);
+            $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`' . $__epk . '` = `' . $table . '`.`' . $fk . '` AND (__p.`company_id` IS NULL OR __p.`company_id` = ?))';
                     } else {
-                        $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`id` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
+                        $__epk = $this->primaryKeyOf($parent); $this->assertIdent($__epk);
+            $conds[] = 'EXISTS (SELECT 1 FROM `' . $parent . '` __p WHERE __p.`' . $__epk . '` = `' . $table . '`.`' . $fk . '` AND __p.`company_id` = ?)';
                     }
                     $params[] = $this->ctx->companyId();
                 }
@@ -1041,6 +1056,30 @@ class TenantDb
         if (!($res instanceof \mysqli_result) || $res->num_rows === 0) {
             $this->deny('child insert: parent not owned by tenant', $table . '.' . $fk . '=' . intval($data[$fk]));
         }
+    }
+
+    /**
+     * **المفتاحُ الأساسيُّ لأيِّ جدول** — لا للأبِ وحدَه.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ⛔ **العطبُ المقيس**: كانت هذه القراءةُ تُستعمل في **موضعٍ واحدٍ** (فحصِ
+     *   ملكيّةِ الأبِ عند إدراجِ ابن)، بينما تُثبِّت بقيّةُ البوّابةِ الاسمَ `id`
+     *   حرفًا. و**286 جدولًا من 1,249 (23%) بلا عمودِ `id`** — مفاتيحُها
+     *   `profile_id` · `grant_id` · `item_id` · `job_id` · `effect_id` …
+     *   فكلُّ نداءٍ عامٍّ على أحدِها **يفشل ببناءِ الاستعلامِ لا بمنعٍ مقصود**.
+     * ◆ **مُثبَتٌ بالتشغيلِ لا بالسجلِّ وحدَه**: `deleteRow('ems_job_queue', …)`
+     *   و`deleteRow('fin_event_effects', …)` تردّان
+     *   `Unknown column 'id' in 'WHERE'`. وفي `logs/security.log` **956 حالةَ
+     *   فشلٍ** بالسبب نفسِه على `gov_role_profiles` و`gov_authority_grants`
+     *   و`gov_profile_items` — أي على جداولِ الصلاحيّاتِ نفسِها.
+     * ◆ **والعلاجُ كان مكتوبًا هنا ولم يُعمَّم**: القاعدةُ صحيحةٌ («المفتاحُ
+     *   يُقرأ من المخطَّط») وطُبِّقت في موضعٍ من خمسةَ عشر. فتُعمَّم.
+     * ⚠ **ولمن مفتاحُه `id` لا يتغيّر سلوكٌ حرفًا** — القراءةُ تُرجعه كما هو.
+     * ◆ **ومخبَّأةٌ لمرّةٍ واحدةٍ لكلِّ جدولٍ في الطلب** فلا كلفةَ متكرِّرة.
+     * ═══════════════════════════════════════════════════════════════════════
+     */
+    private function primaryKeyOf($table, $declared = '')
+    {
+        return $this->parentKeyOf($table, $declared);
     }
 
     /**
